@@ -62,7 +62,6 @@ async fn main() {
                             SortBy::Points => players.sort_by(|a, b| b.1.cmp(&a.1)),
                         }
 
-                        players.sort_by(|a, b| b.0.cmp(&a.0));
                         println!(
                             "{:<20} {:<15} {:<8} {:<8}",
                             "Name", "Team", "Price", "Points"
