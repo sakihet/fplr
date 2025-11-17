@@ -1,4 +1,4 @@
-use clap::{Parser, Subcommand};
+use clap::{Parser, Subcommand, ValueEnum};
 use serde_json::Value;
 
 #[derive(Parser, Debug)]
@@ -8,9 +8,24 @@ struct Args {
     commands: Commands,
 }
 
+#[derive(Clone, Debug, ValueEnum)]
+enum SortBy {
+    Points,
+    Price,
+}
+
+impl Default for SortBy {
+    fn default() -> Self {
+        SortBy::Points
+    }
+}
+
 #[derive(Subcommand, Debug)]
 enum Commands {
-    Player {},
+    Player {
+        #[arg(short, long, default_value = "points")]
+        sort: SortBy,
+    },
     Team {},
     Fixture {},
 }
@@ -27,7 +42,7 @@ async fn main() {
     let args = Args::parse();
 
     match args.commands {
-        Commands::Player {} => {
+        Commands::Player { sort } => {
             println!("show players");
             match fetch_fpl_data().await {
                 Ok(data) => {
@@ -36,16 +51,23 @@ async fn main() {
                         let mut players: Vec<_> = elements
                             .iter()
                             .filter_map(|player| {
+                                let price = player["now_cost"].as_u64()?;
                                 let points = player["total_points"].as_u64()?;
-                                Some((points, player))
+                                Some((price, points, player))
                             })
                             .collect();
+
+                        match sort {
+                            SortBy::Price => players.sort_by(|a, b| b.0.cmp(&a.0)),
+                            SortBy::Points => players.sort_by(|a, b| b.1.cmp(&a.1)),
+                        }
+
                         players.sort_by(|a, b| b.0.cmp(&a.0));
                         println!(
                             "{:<20} {:<15} {:<8} {:<8}",
                             "Name", "Team", "Price", "Points"
                         );
-                        for (points, player) in players.iter().take(20) {
+                        for (_price, points, player) in players.iter().take(20) {
                             if let (Some(web_name), Some(team_code), Some(price)) = (
                                 player["web_name"].as_str(),
                                 player["team_code"].as_u64(),
