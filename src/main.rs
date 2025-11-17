@@ -33,6 +33,31 @@ async fn main() {
                 Ok(data) => {
                     if let Some(elements) = data["elements"].as_array() {
                         println!("Found {} players", elements.len());
+                        let mut players: Vec<_> = elements
+                            .iter()
+                            .filter_map(|player| {
+                                let points = player["total_points"].as_u64()?;
+                                Some((points, player))
+                            })
+                            .collect();
+                        players.sort_by(|a, b| b.0.cmp(&a.0));
+                        println!(
+                            "{:<20} {:<15} {:<8} {:<8}",
+                            "Name", "Team", "Price", "Points"
+                        );
+                        for (points, player) in players.iter().take(20) {
+                            if let (Some(web_name), Some(team_code), Some(price)) = (
+                                player["web_name"].as_str(),
+                                player["team_code"].as_u64(),
+                                player["now_cost"].as_u64(),
+                            ) {
+                                let price_formatted = format!("{:.1}", price as f64 / 10.0);
+                                println!(
+                                    "{:<20} {:<15} {:<8} {:<8}",
+                                    web_name, team_code, price_formatted, points
+                                );
+                            }
+                        }
                     }
                 }
                 Err(e) => {
@@ -47,7 +72,7 @@ async fn main() {
                     if let Some(teams) = data["teams"].as_array() {
                         println!("Found {} teams", teams.len());
                         for team in teams {
-                            if let(Some(id), Some(name), Some(short_name)) = (
+                            if let (Some(id), Some(name), Some(short_name)) = (
                                 team["id"].as_u64(),
                                 team["name"].as_str(),
                                 team["short_name"].as_str(),
