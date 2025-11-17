@@ -46,6 +46,15 @@ async fn main() {
                 Ok(data) => {
                     if let Some(teams) = data["teams"].as_array() {
                         println!("Found {} teams", teams.len());
+                        for team in teams {
+                            if let(Some(id), Some(name), Some(short_name)) = (
+                                team["id"].as_u64(),
+                                team["name"].as_str(),
+                                team["short_name"].as_str(),
+                            ) {
+                                println!("{:2}. {} ({})", id, name, short_name);
+                            }
+                        }
                     }
                 }
                 Err(e) => {
