@@ -9,12 +9,9 @@ struct Args {
 
 #[derive(Subcommand, Debug)]
 enum Commands {
-    Player {
-    },
-    Team {
-    },
-    Fixture {
-    }
+    Player {},
+    Team {},
+    Fixture {},
 }
 
 fn main() {
@@ -31,4 +28,4 @@ fn main() {
             println!("show fixtures");
         }
     }
- }
+}
