@@ -1,19 +1,34 @@
-use clap::Parser;
+use clap::{Parser, Subcommand};
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 struct Args {
-    #[arg(short, long)]
-    name: String,
+    #[command(subcommand)]
+    commands: Commands,
+}
 
-    #[arg(short, long, default_value_t = 1)]
-    count: u8
+#[derive(Subcommand, Debug)]
+enum Commands {
+    Player {
+    },
+    Team {
+    },
+    Fixture {
+    }
 }
 
 fn main() {
     let args = Args::parse();
 
-    for _ in 0..args.count {
-        println!("Hello, {}!", args.name);
+    match args.commands {
+        Commands::Player {} => {
+            println!("show players");
+        }
+        Commands::Team {} => {
+            println!("show teams");
+        }
+        Commands::Fixture {} => {
+            println!("show fixtures");
+        }
     }
-}
+ }
