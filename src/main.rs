@@ -60,6 +60,8 @@ impl Position {
 
 #[derive(Subcommand, Debug)]
 enum Commands {
+    Fixture {},
+    Gameweek {},
     Player {
         #[arg(short, long, default_value = "points")]
         sort: SortBy,
@@ -67,7 +69,6 @@ enum Commands {
         position: Option<Position>,
     },
     Team {},
-    Fixture {},
 }
 
 async fn fetch_fpl_data() -> Result<Value, Box<dyn std::error::Error>> {
@@ -89,6 +90,30 @@ async fn main() {
     let args = Args::parse();
 
     match args.commands {
+        Commands::Gameweek {} => match fetch_fpl_data().await {
+            Ok(data) => {
+                if let Some(events) = data["events"].as_array() {
+                    let events: Vec<_> = events
+                        .iter()
+                        .filter_map(|event| {
+                            let id = event["id"].as_u64()?;
+                            let name = event["name"].as_str()?;
+                            let is_current = event["is_current"].as_bool()?;
+                            let is_next = event["is_next"].as_bool()?;
+
+                            Some((id, name.to_string(), is_current, is_next))
+                        })
+                        .collect();
+                    println!("{:<4} {:<20} {:<10} {:<10}", "ID", "Name", "Current", "Next");
+                    for (id, name, is_current, is_next) in events {
+                        println!("{:<4} {:<20} {:<10} {:<10}", id, name, is_current, is_next);
+                    }
+                }
+            }
+            Err(e) => {
+                eprintln!("Error: {}", e);
+            }
+        },
         Commands::Player { sort, position } => match fetch_fpl_data().await {
             Ok(data) => {
                 if let Some(elements) = data["elements"].as_array() {
