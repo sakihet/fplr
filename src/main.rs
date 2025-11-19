@@ -77,6 +77,13 @@ async fn fetch_fpl_data() -> Result<Value, Box<dyn std::error::Error>> {
     Ok(json)
 }
 
+async fn fetch_fixtures() -> Result<Value, Box<dyn std::error::Error>> {
+    let url = "https://fantasy.premierleague.com/api/fixtures/";
+    let response = reqwest::get(url).await?;
+    let json: Value = response.json().await?;
+    Ok(json)
+}
+
 #[tokio::main]
 async fn main() {
     let args = Args::parse();
@@ -190,11 +197,35 @@ async fn main() {
             }
         }
         Commands::Fixture {} => {
-            println!("show fixtures");
-            match fetch_fpl_data().await {
+            match fetch_fixtures().await {
                 Ok(data) => {
-                    if let Some(fixtures) = data["events"].as_array() {
-                        println!("Found {} fixtures", fixtures.len());
+                    if let Some(events) = data.as_array() {
+                        let mut events: Vec<_> = events
+                            .iter()
+                            .filter_map(|event| {
+                                let id = event["id"].as_u64()?;
+                                let kickoff_time = event["kickoff_time"].as_str()?;
+                                let team_a = event["team_a"].as_u64()?;
+                                let team_h = event["team_h"].as_u64()?;
+                                let finished = event["finished"].as_bool().unwrap_or(false);
+
+                                if !finished {
+                                    Some((id, kickoff_time.to_string(), team_a, team_h))
+                                } else {
+                                    None
+                                }
+                            })
+                            .collect();
+                        events.sort_by(|a, b| a.1.cmp(&b.1));
+                        println!(
+                            "{:<4} {:<20} {:<4} vs {:<4}",
+                            "ID", "Kickoff Time", "Home", "Away"
+                        );
+                        if let Some((id, kickoff_time, team_a, team_h)) = events.first() {
+                            println!("{:<4} {:<20} {:<4} vs {:<4}", id, kickoff_time, team_a, team_h);
+                        } else {
+                            println!("No upcoming fixtures found.");
+                        }
                     }
                 }
                 Err(e) => {
