@@ -22,11 +22,49 @@ impl Default for SortBy {
     }
 }
 
+#[derive(Clone, Debug, ValueEnum)]
+enum Position {
+    Goalkeeper,
+    Defender,
+    Midfielder,
+    Forward,
+}
+
+impl Position {
+    fn element_type_id(&self) -> u8 {
+        match self {
+            Position::Goalkeeper => 1,
+            Position::Defender => 2,
+            Position::Midfielder => 3,
+            Position::Forward => 4,
+        }
+    }
+    fn display_name(&self) -> &str {
+        match self {
+            Position::Goalkeeper => "GKP",
+            Position::Defender => "DEF",
+            Position::Midfielder => "MID",
+            Position::Forward => "FWD",
+        }
+    }
+    fn from_element_type_id(id: u64) -> Option<Self> {
+        match id {
+            1 => Some(Position::Goalkeeper),
+            2 => Some(Position::Defender),
+            3 => Some(Position::Midfielder),
+            4 => Some(Position::Forward),
+            _ => None,
+        }
+    }
+}
+
 #[derive(Subcommand, Debug)]
 enum Commands {
     Player {
         #[arg(short, long, default_value = "points")]
         sort: SortBy,
+        #[arg(short, long)]
+        position: Option<Position>,
     },
     Team {},
     Fixture {},
@@ -44,7 +82,7 @@ async fn main() {
     let args = Args::parse();
 
     match args.commands {
-        Commands::Player { sort } => match fetch_fpl_data().await {
+        Commands::Player { sort, position } => match fetch_fpl_data().await {
             Ok(data) => {
                 if let Some(elements) = data["elements"].as_array() {
                     let mut players: Vec<_> = elements
@@ -58,7 +96,16 @@ async fn main() {
                                 .ok()?;
                             let form = player["form"].as_str()?.parse::<f64>().ok()?;
                             let points = player["total_points"].as_u64()?;
-                            Some((id, cost, selected_by, form, points, player))
+                            let element_type = player["element_type"].as_u64()? as u8;
+
+                            // filtering by positioin
+                            if let Some(ref pos) = position {
+                                if element_type != pos.element_type_id() {
+                                    return None;
+                                }
+                            }
+
+                            Some((id, cost, selected_by, form, points, element_type, player))
                         })
                         .collect();
 
@@ -72,15 +119,16 @@ async fn main() {
                     }
 
                     println!(
-                        "{:<4} {:<20} {:<15} {:<8} {:<8} {:<8} {:<8}",
-                        "ID", "Name", "Team", "Cost", "Selected", "Form", "Points"
+                        "{:<4} {:<20} {:<4} {:<15} {:<8} {:<8} {:<8} {:<8}",
+                        "ID", "Name", "Pos", "Team", "Cost", "Selected", "Form", "Points"
                     );
-                    for (_id, _cost, _selected_by, _form, _points, player) in
+                    for (_id, _cost, _selected_by, _form, _points, _element_type, player) in
                         players.iter().take(20)
                     {
                         if let (
                             Some(id),
                             Some(web_name),
+                            Some(element_type),
                             Some(team_code),
                             Some(price),
                             Some(selected_by),
@@ -89,6 +137,7 @@ async fn main() {
                         ) = (
                             player["id"].as_u64(),
                             player["web_name"].as_str(),
+                            player["element_type"].as_u64(),
                             player["team_code"].as_u64(),
                             player["now_cost"].as_u64(),
                             player["selected_by_percent"].as_str(),
@@ -96,9 +145,19 @@ async fn main() {
                             player["total_points"].as_u64(),
                         ) {
                             let price_formatted = format!("{:.1}", price as f64 / 10.0);
+                            let position_name = Position::from_element_type_id(element_type)
+                                .map(|p| p.display_name().to_string())
+                                .unwrap_or("N/A".to_string());
                             println!(
-                                "{:<4} {:<20} {:<15} {:<8} {:<8} {:<8} {:<8}",
-                                id, web_name, team_code, price_formatted, selected_by, form, points
+                                "{:<4} {:<20} {:<4} {:<15} {:<8} {:<8} {:<8} {:<8}",
+                                id,
+                                web_name,
+                                position_name,
+                                team_code,
+                                price_formatted,
+                                selected_by,
+                                form,
+                                points
                             );
                         }
                     }
