@@ -1,5 +1,7 @@
+mod api;
+
 use clap::{Parser, Subcommand, ValueEnum};
-use serde_json::Value;
+use crate::api::FplClient;
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -71,26 +73,12 @@ enum Commands {
     Team {},
 }
 
-async fn fetch_fpl_data() -> Result<Value, Box<dyn std::error::Error>> {
-    let url = "https://fantasy.premierleague.com/api/bootstrap-static/";
-    let response = reqwest::get(url).await?;
-    let json: Value = response.json().await?;
-    Ok(json)
-}
-
-async fn fetch_fixtures() -> Result<Value, Box<dyn std::error::Error>> {
-    let url = "https://fantasy.premierleague.com/api/fixtures/";
-    let response = reqwest::get(url).await?;
-    let json: Value = response.json().await?;
-    Ok(json)
-}
-
 #[tokio::main]
 async fn main() {
     let args = Args::parse();
 
     match args.commands {
-        Commands::Gameweek {} => match fetch_fpl_data().await {
+        Commands::Gameweek {} => match FplClient::fetch_bootstrap_static().await {
             Ok(data) => {
                 if let Some(events) = data["events"].as_array() {
                     let events: Vec<_> = events
@@ -114,7 +102,7 @@ async fn main() {
                 eprintln!("Error: {}", e);
             }
         },
-        Commands::Player { sort, position } => match fetch_fpl_data().await {
+        Commands::Player { sort, position } => match FplClient::fetch_bootstrap_static().await {
             Ok(data) => {
                 if let Some(elements) = data["elements"].as_array() {
                     let mut players: Vec<_> = elements
@@ -200,8 +188,7 @@ async fn main() {
             }
         },
         Commands::Team {} => {
-            println!("show teams");
-            match fetch_fpl_data().await {
+            match FplClient::fetch_bootstrap_static().await {
                 Ok(data) => {
                     if let Some(teams) = data["teams"].as_array() {
                         println!("Found {} teams", teams.len());
@@ -222,7 +209,7 @@ async fn main() {
             }
         }
         Commands::Fixture {} => {
-            match fetch_fixtures().await {
+            match FplClient::fetch_fixtures().await {
                 Ok(data) => {
                     if let Some(events) = data.as_array() {
                         let mut events: Vec<_> = events
