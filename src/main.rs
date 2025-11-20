@@ -44,9 +44,9 @@ async fn main() {
                             Some((id, name.to_string(), is_current, is_next))
                         })
                         .collect();
-                    println!("{:<4} {:<20} {:<10} {:<10}", "ID", "Name", "Current", "Next");
+                    println!("{:<4} {:<16} {:<8} {:<8}", "ID", "Name", "Current", "Next");
                     for (id, name, is_current, is_next) in events {
-                        println!("{:<4} {:<20} {:<10} {:<10}", id, name, is_current, is_next);
+                        println!("{:<4} {:<16} {:<8} {:<8}", id, name, is_current, is_next);
                     }
                 }
             }
@@ -91,7 +91,7 @@ async fn main() {
                     }
 
                     println!(
-                        "{:<4} {:<20} {:<4} {:<15} {:<8} {:<8} {:<8} {:<8}",
+                        "{:<4} {:<20} {:<4} {:<16} {:<8} {:<8} {:<8} {:<8}",
                         "ID", "Name", "Pos", "Team", "Cost", "Selected", "Form", "Points"
                     );
                     for (_id, _cost, _selected_by, _form, _points, _element_type, player) in
@@ -121,7 +121,7 @@ async fn main() {
                                 .map(|p| p.display_name().to_string())
                                 .unwrap_or("N/A".to_string());
                             println!(
-                                "{:<4} {:<20} {:<4} {:<15} {:<8} {:<8} {:<8} {:<8}",
+                                "{:<4} {:<20} {:<4} {:<16} {:<8} {:<8} {:<8} {:<8}",
                                 id,
                                 web_name,
                                 position_name,
@@ -143,14 +143,14 @@ async fn main() {
             match FplClient::fetch_bootstrap_static().await {
                 Ok(data) => {
                     if let Some(teams) = data["teams"].as_array() {
-                        println!("Found {} teams", teams.len());
+                        println!("{:<4} {:<20} {:<4}", "ID", "Name", "Short Name");
                         for team in teams {
                             if let (Some(id), Some(name), Some(short_name)) = (
                                 team["id"].as_u64(),
                                 team["name"].as_str(),
                                 team["short_name"].as_str(),
                             ) {
-                                println!("{:2}. {} ({})", id, name, short_name);
+                                println!("{:<4} {:<20} {:<4}", id, name, short_name);
                             }
                         }
                     }
