@@ -1,8 +1,10 @@
 mod api;
 mod models;
 
+use std::collections::HashMap;
+
 use crate::api::FplClient;
-use crate::models::{Element, Position, SortBy};
+use crate::models::{Element, Position, SortBy, Team};
 use clap::{Parser, Subcommand};
 
 #[derive(Parser, Debug)]
@@ -23,6 +25,13 @@ enum Commands {
         position: Option<Position>,
     },
     Team {},
+}
+
+fn create_team_map(teams: &[Team]) -> HashMap<u64, String> {
+    teams
+        .iter()
+        .map(|team| (team.id, team.name.clone()))
+        .collect()
 }
 
 #[tokio::main]
@@ -46,6 +55,8 @@ async fn main() {
         },
         Commands::Player { sort, position } => match FplClient::fetch_bootstrap_static().await {
             Ok(data) => {
+                let team_map = create_team_map(&data.teams);
+
                 let mut players: Vec<Element> = data
                     .elements
                     .into_iter()
@@ -79,6 +90,11 @@ async fn main() {
                 );
 
                 for player in players.iter().take(20) {
+                    let team_name = team_map
+                        .get(&player.team)
+                        .map(|s| s.as_str())
+                        .unwrap_or("Unknown");
+
                     println!(
                         "{:<4} {:<20} {:<4} {:<16} {:<8} {:<8} {:<8} {:<8}",
                         player.id,
@@ -86,7 +102,7 @@ async fn main() {
                         Position::from_element_type_id(player.element_type)
                             .map(|p| p.display_name().to_string())
                             .unwrap_or("N/A".to_string()),
-                        player.team_code,
+                        team_name,
                         format!("{:.1}", player.now_cost as f64 / 10.0),
                         player.selected_by_percent,
                         player.form,
