@@ -1,4 +1,5 @@
 use clap::ValueEnum;
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, ValueEnum)]
 pub enum SortBy {
@@ -48,4 +49,38 @@ impl Position {
             _ => None,
         }
     }
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Event {
+    pub id: u64,
+    pub name: String,
+    pub is_current: bool,
+    pub is_next: bool,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Element {
+    pub id: u64,
+    pub web_name: String,
+    pub element_type: u64,
+    pub team_code: u64,
+    pub now_cost: u64,
+    pub selected_by_percent: String,
+    pub form: String,
+    pub total_points: u64,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Team {
+    pub id: u64,
+    pub name: String,
+    pub short_name: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct BootstrapStatic {
+    pub events: Vec<Event>,
+    pub elements: Vec<Element>,
+    pub teams: Vec<Team>,
 }
