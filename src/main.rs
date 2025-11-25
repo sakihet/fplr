@@ -23,6 +23,8 @@ enum Commands {
         sort: SortBy,
         #[arg(short, long)]
         position: Option<Position>,
+        #[arg(short, long, default_value = "20")]
+        limit: usize,
     },
     Team {},
 }
@@ -53,7 +55,11 @@ async fn main() {
                 eprintln!("Error: {}", e);
             }
         },
-        Commands::Player { sort, position } => match FplClient::fetch_bootstrap_static().await {
+        Commands::Player {
+            sort,
+            position,
+            limit,
+        } => match FplClient::fetch_bootstrap_static().await {
             Ok(data) => {
                 let team_map = create_team_map(&data.teams);
 
@@ -89,7 +95,7 @@ async fn main() {
                     "ID", "Name", "Pos", "Team", "Cost", "Selected", "Form", "Points"
                 );
 
-                for player in players.iter().take(20) {
+                for player in players.iter().take(limit) {
                     let team_name = team_map
                         .get(&player.team)
                         .map(|s| s.as_str())
