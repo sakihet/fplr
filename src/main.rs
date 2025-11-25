@@ -25,6 +25,8 @@ enum Commands {
         position: Option<Position>,
         #[arg(short, long, default_value = "20")]
         limit: usize,
+        #[arg(short, long)]
+        team: Option<String>,
     },
     Team {},
 }
@@ -33,6 +35,18 @@ fn create_team_map(teams: &[Team]) -> HashMap<u64, String> {
     teams
         .iter()
         .map(|team| (team.id, team.name.clone()))
+        .collect()
+}
+
+fn find_team_ids_by_name(teams: &[Team], name: &str) -> Vec<u64> {
+    let search_term = name.to_lowercase();
+    teams
+        .iter()
+        .filter(|team| {
+            team.name.to_lowercase().contains(&search_term)
+                || team.short_name.to_lowercase().contains(&search_term)
+        })
+        .map(|team| team.id)
         .collect()
 }
 
@@ -59,19 +73,31 @@ async fn main() {
             sort,
             position,
             limit,
+            team,
         } => match FplClient::fetch_bootstrap_static().await {
             Ok(data) => {
                 let team_map = create_team_map(&data.teams);
+                let target_team_ids = if let Some(ref team_name) = team {
+                    find_team_ids_by_name(&data.teams, team_name)
+                } else {
+                    Vec::new()
+                };
 
                 let mut players: Vec<Element> = data
                     .elements
                     .into_iter()
                     .filter(|player| {
-                        if let Some(ref pos) = position {
+                        let position_match = if let Some(ref pos) = position {
                             player.element_type == pos.element_type_id() as u64
                         } else {
                             true
-                        }
+                        };
+                        let team_match = if team.is_some() {
+                            target_team_ids.contains(&player.team)
+                        } else {
+                            true
+                        };
+                        position_match && team_match
                     })
                     .collect();
 
