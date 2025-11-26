@@ -57,7 +57,10 @@ async fn main() {
     match args.commands {
         Commands::Gameweek {} => match FplClient::fetch_bootstrap_static().await {
             Ok(data) => {
-                println!("{:<4} {:<16} {:<12} {:<20}", "ID", "Name", "Status", "Deadline");
+                println!(
+                    "{:<4} {:<16} {:<12} {:<20}",
+                    "ID", "Name", "Status", "Deadline"
+                );
                 for event in data.events {
                     let status = if event.is_current {
                         "Current"
@@ -166,37 +169,63 @@ async fn main() {
                 eprintln!("Error: {}", e);
             }
         },
-        Commands::Fixture {} => match FplClient::fetch_fixtures().await {
-            Ok(data) => {
-                if let Some(events) = data.as_array() {
-                    let mut events: Vec<_> = events
-                        .iter()
-                        .filter_map(|event| {
-                            let id = event["id"].as_u64()?;
-                            let kickoff_time = event["kickoff_time"].as_str()?;
-                            let team_a = event["team_a"].as_u64()?;
-                            let team_h = event["team_h"].as_u64()?;
-                            let finished = event["finished"].as_bool().unwrap_or(false);
+        Commands::Fixture {} => match FplClient::fetch_bootstrap_static().await {
+            Ok(bootstrap_data) => {
+                let team_map = create_team_map(&bootstrap_data.teams);
 
-                            if !finished {
-                                Some((id, kickoff_time.to_string(), team_a, team_h))
-                            } else {
-                                None
+                if let Some(next_event) = bootstrap_data.events.iter().find(|e| e.is_next) {
+                    let next_event_id = next_event.id;
+
+                    match FplClient::fetch_fixtures().await {
+                        Ok(fixtures_data) => {
+                            if let Some(fixtures) = fixtures_data.as_array() {
+                                let mut next_fixtures: Vec<_> = fixtures
+                                    .iter()
+                                    .filter_map(|fixture| {
+                                        let event = fixture["event"].as_u64()?;
+                                        if event != next_event_id {
+                                            return None;
+                                        }
+
+                                        let id = fixture["id"].as_u64()?;
+                                        let kickoff_time = fixture["kickoff_time"].as_str()?;
+                                        let team_a = fixture["team_a"].as_u64()?;
+                                        let team_h = fixture["team_h"].as_u64()?;
+                                        let finished =
+                                            fixture["finished"].as_bool().unwrap_or(false);
+
+                                        if !finished {
+                                            Some((id, kickoff_time.to_string(), team_a, team_h))
+                                        } else {
+                                            None
+                                        }
+                                    })
+                                    .collect();
+
+                                next_fixtures.sort_by(|a, b| a.1.cmp(&b.1));
+                                println!(
+                                    "{:<4} {:<20} {:<20} {:<20}",
+                                    "ID", "Kickoff Time", "Home", "Away"
+                                );
+                                for (id, kickoff_time, team_h, team_a) in next_fixtures {
+                                    let home_team = team_map
+                                        .get(&team_h)
+                                        .map(|s| s.as_str())
+                                        .unwrap_or("Unknown");
+                                    let away_team = team_map
+                                        .get(&team_a)
+                                        .map(|s| s.as_str())
+                                        .unwrap_or("Unknown");
+                                    println!(
+                                        "{:<4} {:<20} {:<20} {:<20}",
+                                        id, kickoff_time, home_team, away_team
+                                    );
+                                }
                             }
-                        })
-                        .collect();
-                    events.sort_by(|a, b| a.1.cmp(&b.1));
-                    println!(
-                        "{:<4} {:<20} {:<4} vs {:<4}",
-                        "ID", "Kickoff Time", "Home", "Away"
-                    );
-                    if let Some((id, kickoff_time, team_a, team_h)) = events.first() {
-                        println!(
-                            "{:<4} {:<20} {:<4} vs {:<4}",
-                            id, kickoff_time, team_a, team_h
-                        );
-                    } else {
-                        println!("No upcoming fixtures found.");
+                        }
+                        Err(e) => {
+                            eprintln!("Error: {}", e);
+                        }
                     }
                 }
             }
