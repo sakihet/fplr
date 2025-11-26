@@ -57,6 +57,8 @@ pub struct Event {
     pub name: String,
     pub is_current: bool,
     pub is_next: bool,
+    pub deadline_time: String,
+    pub finished: bool,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

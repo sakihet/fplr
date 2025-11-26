@@ -57,11 +57,20 @@ async fn main() {
     match args.commands {
         Commands::Gameweek {} => match FplClient::fetch_bootstrap_static().await {
             Ok(data) => {
-                println!("{:<4} {:<16} {:<8} {:<8}", "ID", "Name", "Current", "Next");
+                println!("{:<4} {:<16} {:<12} {:<20}", "ID", "Name", "Status", "Deadline");
                 for event in data.events {
+                    let status = if event.is_current {
+                        "Current"
+                    } else if event.is_next {
+                        "Next"
+                    } else if event.finished {
+                        "Finished"
+                    } else {
+                        "Upcoming"
+                    };
                     println!(
-                        "{:<4} {:<16} {:<8} {:<8}",
-                        event.id, event.name, event.is_current, event.is_next
+                        "{:<4} {:<16} {:<12} {:<20}",
+                        event.id, event.name, status, event.deadline_time
                     );
                 }
             }
