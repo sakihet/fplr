@@ -129,8 +129,8 @@ async fn main() {
                 }
 
                 println!(
-                    "{:<4} {:<20} {:<4} {:<16} {:<8} {:<8} {:<8} {:<8}",
-                    "ID", "Name", "Pos", "Team", "Cost", "Selected", "Form", "Points"
+                    "{:<4} {:<20} {:<4} {:<16} {:<8} {:<8} {:<8} {:<8} {:<30}",
+                    "ID", "Name", "Pos", "Team", "Cost", "Selected", "Form", "Points", "News"
                 );
 
                 for player in players.iter().take(limit) {
@@ -140,7 +140,7 @@ async fn main() {
                         .unwrap_or("Unknown");
 
                     println!(
-                        "{:<4} {:<20} {:<4} {:<16} {:<8} {:<8} {:<8} {:<8}",
+                        "{:<4} {:<20} {:<4} {:<16} {:<8} {:<8} {:<8} {:<8} {:<30}",
                         player.id,
                         player.web_name,
                         Position::from_element_type_id(player.element_type)
@@ -150,7 +150,8 @@ async fn main() {
                         format!("{:.1}", player.now_cost as f64 / 10.0),
                         player.selected_by_percent,
                         player.form,
-                        player.total_points
+                        player.total_points,
+                        player.news,
                     );
                 }
             }

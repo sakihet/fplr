@@ -71,6 +71,7 @@ pub struct Element {
     pub selected_by_percent: String,
     pub form: String,
     pub total_points: u64,
+    pub news: String,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
