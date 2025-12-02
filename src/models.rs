@@ -1,18 +1,13 @@
 use clap::ValueEnum;
 use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug, ValueEnum)]
+#[derive(Clone, Debug, Default, ValueEnum)]
 pub enum SortBy {
     Cost,
     SelectedBy,
     Form,
+    #[default]
     Points,
-}
-
-impl Default for SortBy {
-    fn default() -> Self {
-        SortBy::Points
-    }
 }
 
 #[derive(Clone, Debug, ValueEnum)]
