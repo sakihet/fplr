@@ -82,3 +82,16 @@ pub struct BootstrapStatic {
     pub elements: Vec<Element>,
     pub teams: Vec<Team>,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_position_element_type_id() {
+        assert_eq!(Position::Goalkeeper.element_type_id(), 1);
+        assert_eq!(Position::Defender.element_type_id(), 2);
+        assert_eq!(Position::Midfielder.element_type_id(), 3);
+        assert_eq!(Position::Forward.element_type_id(), 4);
+    }
+}
