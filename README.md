@@ -1,11 +1,13 @@
 # fplr - a CLI for [Fantasy Premier League](https://fantasy.premierleague.com/)
 
+Browse FPL data comfortably from your terminal.
+
 ## Commands
 
-- fixture   
-- gameweek  
-- player    
-- team      
+- fixture
+- gameweek
+- player
+- team
 
 ## Example
 
