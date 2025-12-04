@@ -1,4 +1,4 @@
-# fplr - a CLI for Fantasy Premier League
+# fplr - a CLI for [Fantasy Premier League](https://fantasy.premierleague.com/)
 
 ## Commands
 
