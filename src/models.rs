@@ -83,6 +83,63 @@ pub struct BootstrapStatic {
     pub teams: Vec<Team>,
 }
 
+#[derive(Debug, Deserialize, Serialize)]
+pub struct LiveData {
+    pub elements: Vec<LiveElement>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct LiveElement {
+    pub id: u64,
+    pub stats: LiveStats,
+    pub explain: Vec<LiveExplain>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct LiveStats {
+    pub assists: u64,
+    pub bonus: u64,
+    pub bps: i64,
+    pub clean_sheets: u64,
+    pub clearances_blocks_interceptions: u64,
+    pub creativity: String,
+    pub defensive_contribution: u64,
+    pub expected_assists: String,
+    pub expected_goal_involvements: String,
+    pub expected_goals: String,
+    pub expected_goals_conceded: String,
+    pub goals_conceded: u64,
+    pub goals_scored: u64,
+    pub ict_index: String,
+    pub in_dreamteam: bool,
+    pub influence: String,
+    pub minutes: u64,
+    pub own_goals: u64,
+    pub penalties_missed: u64,
+    pub penalties_saved: u64,
+    pub recoveries: u64,
+    pub red_cards: u64,
+    pub saves: u64,
+    pub starts: u64,
+    pub tackles: u64,
+    pub threat: String,
+    pub total_points: i64,
+    pub yellow_cards: u64,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct LiveExplain {
+    pub fixture: u64,
+    pub stats: Vec<LiveExplainStat>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct LiveExplainStat {
+    pub identifier: String,
+    pub points: i64,
+    pub value: u64,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

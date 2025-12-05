@@ -18,6 +18,10 @@ struct Args {
 enum Commands {
     Fixture {},
     Gameweek {},
+    Live {
+        #[arg(short, long)]
+        event: u32,
+    },
     Player {
         #[arg(short, long, default_value = "points")]
         sort: SortBy,
@@ -75,6 +79,20 @@ async fn main() {
                         "{:<4} {:<16} {:<12} {:<20}",
                         event.id, event.name, status, event.deadline_time
                     );
+                }
+            }
+            Err(e) => {
+                eprintln!("Error: {}", e);
+            }
+        },
+        Commands::Live { event } => match FplClient::fetch_live(event).await {
+            Ok(data) => {
+                let mut elements = data.elements;
+                elements.sort_by(|a, b| b.stats.total_points.cmp(&a.stats.total_points));
+
+                println!("{:<4} {:<12}", "ID", "TOTAL_POINTS");
+                for element in elements.iter().take(30) {
+                    println!("{:<4} {:<12}", element.id, element.stats.total_points);
                 }
             }
             Err(e) => {
