@@ -1,6 +1,14 @@
-# fplr - a CLI for [Fantasy Premier League](https://fantasy.premierleague.com/)
+# fplr - a CLI for [Fantasy Premier League](https://fantasy.premierleague.com/) in Rust
 
 Browse FPL data comfortably from your terminal.
+
+## Installation
+
+```sh
+git clone https://github.com/sakihet/fplr.git
+cd fplr
+cargo install --path .
+```
 
 ## Commands
 
