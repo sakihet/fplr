@@ -2,6 +2,9 @@
 name = "fplr"
 version = "0.1.0"
 edition = "2024"
+authors = ["saki"]
+description = "CLI for Fantasy Premier League"
+license = "MIT"
 
 [dependencies]
 clap = { version = "4.5.51", features = ["derive"] }
