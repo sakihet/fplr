@@ -85,18 +85,35 @@ async fn main() {
                 eprintln!("Error: {}", e);
             }
         },
-        Commands::Live { event } => match FplClient::fetch_live(event).await {
-            Ok(data) => {
-                let mut elements = data.elements;
-                elements.sort_by(|a, b| b.stats.total_points.cmp(&a.stats.total_points));
+        Commands::Live { event } => {
+            match FplClient::fetch_bootstrap_static().await {
+                Ok(bootstrap_data) => {
+                    let player_map: HashMap<u64, String> = bootstrap_data
+                        .elements
+                        .iter()
+                        .map(|player| (player.id, player.web_name.clone()))
+                        .collect();
 
-                println!("{:<4} {:<12}", "ID", "TOTAL_POINTS");
-                for element in elements.iter().take(30) {
-                    println!("{:<4} {:<12}", element.id, element.stats.total_points);
+                    match FplClient::fetch_live(event).await {
+                        Ok(data) => {
+                            let mut elements = data.elements;
+                            elements.sort_by(|a, b| b.stats.total_points.cmp(&a.stats.total_points));
+
+                            println!("{:<4} {:<20} {:<12}", "ID", "Name", "TOTAL_POINTS");
+                            for element in elements.iter().take(30) {
+                                let name = player_map.get(&element.id).map(|s| s.as_str()).unwrap_or("Unknown");
+
+                                println!("{:<4} {:<20} {:<12}", element.id, name, element.stats.total_points);
+                            }
+                        }
+                        Err(e) => {
+                            eprintln!("Error: {}", e);
+                        }
+                    }
                 }
-            }
-            Err(e) => {
-                eprintln!("Error: {}", e);
+                Err(e) => {
+                    eprintln!("Error: {}", e);
+                }
             }
         },
         Commands::Player {
