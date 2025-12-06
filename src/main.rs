@@ -19,8 +19,9 @@ enum Commands {
     Fixture {},
     Gameweek {},
     Live {
-        #[arg(short, long)]
         event: u32,
+        #[arg(short, long, default_value = "20")]
+        limit: usize,
     },
     Player {
         #[arg(short, long, default_value = "points")]
@@ -85,7 +86,10 @@ async fn main() {
                 eprintln!("Error: {}", e);
             }
         },
-        Commands::Live { event } => {
+        Commands::Live {
+            event,
+            limit
+        } => {
             match FplClient::fetch_bootstrap_static().await {
                 Ok(bootstrap_data) => {
                     let player_map: HashMap<u64, String> = bootstrap_data
@@ -100,7 +104,7 @@ async fn main() {
                             elements.sort_by(|a, b| b.stats.total_points.cmp(&a.stats.total_points));
 
                             println!("{:<4} {:<20} {:<12}", "ID", "Name", "TOTAL_POINTS");
-                            for element in elements.iter().take(30) {
+                            for element in elements.iter().take(limit) {
                                 let name = player_map.get(&element.id).map(|s| s.as_str()).unwrap_or("Unknown");
 
                                 println!("{:<4} {:<20} {:<12}", element.id, name, element.stats.total_points);
