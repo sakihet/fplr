@@ -84,6 +84,56 @@ pub struct BootstrapStatic {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
+pub struct PlayerHistory {
+    pub element: u64,
+    pub fixture: u64,
+    pub opponent_team: u64,
+    pub total_points: i64,
+    pub was_home: bool,
+    pub kickoff_time: String,
+    pub team_h_score: u64,
+    pub team_a_score: u64,
+    pub round: u64,
+    pub modified: bool,
+    pub minutes: u64,
+    pub goals_scored: u64,
+    pub assists: u64,
+    pub clean_sheets: u64,
+    pub goals_conceded: u64,
+    pub own_goals: u64,
+    pub penalties_saved: u64,
+    pub penalties_missed: u64,
+    pub yellow_cards: u64,
+    pub red_cards: u64,
+    pub saves: u64,
+    pub bonus: u64,
+    pub bps: i64,
+    pub influence: String,
+    pub creativity: String,
+    pub threat: String,
+    pub ict_index: String,
+    pub clearances_blocks_interceptions: u64,
+    pub recoveries: u64,
+    pub tackles: u64,
+    pub defensive_contribution: u64,
+    pub starts: u64,
+    pub expected_goals: String,
+    pub expected_assists: String,
+    pub expected_goal_involvements: String,
+    pub expected_goals_conceded: String,
+    pub value: u64,
+    pub transfers_balance: i64,
+    pub selected: u64,
+    pub transfers_in: u64,
+    pub transfers_out: u64,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct PlayerSummary {
+    pub history: Vec<PlayerHistory>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
 pub struct LiveData {
     pub elements: Vec<LiveElement>,
 }
