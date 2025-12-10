@@ -16,6 +16,7 @@ cargo install --path .
 - gameweek
 - live
 - player
+- player-summary
 - team
 
 ## Example
