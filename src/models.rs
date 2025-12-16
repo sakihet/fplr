@@ -47,6 +47,25 @@ impl Position {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
+pub struct DreamTeamTopPlayer {
+    pub id: u64,
+    pub points: i64,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct DreamTeamTeam {
+    pub element: u64,
+    pub points: i64,
+    pub position: u64,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct DreamTeam {
+    pub top_player: DreamTeamTopPlayer,
+    pub team: Vec<DreamTeamTeam>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Event {
     pub id: u64,
     pub name: String,

@@ -16,6 +16,8 @@ struct Args {
 
 #[derive(Subcommand, Debug)]
 enum Commands {
+    /// Show dream team
+    DreamTeam { event_id: u32 },
     /// Show upcoming fixtures
     Fixture {},
     /// Show gameweeks
@@ -68,6 +70,38 @@ async fn main() {
     let args = Args::parse();
 
     match args.commands {
+        Commands::DreamTeam { event_id } => match FplClient::fetch_bootstrap_static().await {
+            Ok(bootstrap_data) => {
+                let player_map: HashMap<u64, String> = bootstrap_data
+                    .elements
+                    .iter()
+                    .map(|player| (player.id, player.web_name.clone()))
+                    .collect();
+
+                match FplClient::fetch_dream_team(event_id).await {
+                    Ok(data) => {
+                        let mut team = data.team;
+                        team.sort_by(|a, b| b.points.cmp(&a.points));
+
+                        println!("{:<4} {:<20} {:<12}", "ID", "Name", "Points");
+                        for t in team.iter() {
+                            let name = player_map
+                                .get(&t.element)
+                                .map(|s| s.as_str())
+                                .unwrap_or("Unknown");
+
+                            println!("{:<4} {:<20} {:<12}", t.element, name, t.points);
+                        }
+                    }
+                    Err(e) => {
+                        eprintln!("Error: {}", e);
+                    }
+                }
+            }
+            Err(e) => {
+                eprintln!("Error: {}", e);
+            }
+        },
         Commands::Gameweek {} => match FplClient::fetch_bootstrap_static().await {
             Ok(data) => {
                 println!(
