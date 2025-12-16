@@ -209,6 +209,21 @@ pub struct LiveExplainStat {
     pub value: u64,
 }
 
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Pick {
+    pub element: u64,
+    pub position: u32,
+    pub multiplier: u8,
+    pub is_captain: bool,
+    pub is_vice_captain: bool,
+    pub element_type: u8,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct ManagerPicks {
+    pub picks: Vec<Pick>,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

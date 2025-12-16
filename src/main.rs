@@ -39,6 +39,13 @@ enum Commands {
         #[arg(short, long)]
         team: Option<String>,
     },
+    /// Show a manager's team picks for a specific event
+    Pick {
+        /// Manager ID (entry ID)
+        manager_id: u64,
+        /// Event ID
+        event_id: u32,
+    },
     /// Show player summary
     #[command(name = "player-summary")]
     PlayerSummary { player_id: u64 },
@@ -235,6 +242,48 @@ async fn main() {
                         player.total_points,
                         player.news,
                     );
+                }
+            }
+            Err(e) => {
+                eprintln!("Error: {}", e);
+            }
+        },
+        Commands::Pick {
+            manager_id,
+            event_id,
+        } => match FplClient::fetch_bootstrap_static().await {
+            Ok(bootstrap_data) => {
+                let player_map: HashMap<u64, String> = bootstrap_data
+                    .elements
+                    .iter()
+                    .map(|player| (player.id, player.web_name.clone()))
+                    .collect();
+
+                match FplClient::fetch_manager_picks(manager_id, event_id).await {
+                    Ok(picks) => {
+                        println!(
+                            "{:<4} {:<20} {:<4} {:<4} {:<4}",
+                            "ID", "Name", "Pos", "C", "VC"
+                        );
+                        for pick in picks.picks.iter() {
+                            let name = player_map
+                                .get(&pick.element)
+                                .map(|s| s.as_str())
+                                .unwrap_or("Unknown");
+
+                            println!(
+                                "{:<4} {:<20} {:<4} {:<4} {:<4}",
+                                pick.element,
+                                name,
+                                pick.position,
+                                if pick.is_captain { "Y" } else { "N" },
+                                if pick.is_vice_captain { "Y" } else { "N" },
+                            );
+                        }
+                    }
+                    Err(e) => {
+                        eprintln!("Error: {}", e);
+                    }
                 }
             }
             Err(e) => {
