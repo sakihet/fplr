@@ -90,6 +90,20 @@ pub struct Element {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Team {
+    pub position: u64,
+    pub played: u64,
+    pub win: u64,
+    pub draw: u64,
+    pub loss: u64,
+    pub points: u64,
+    pub strength: u8,
+    pub strength_overall_home: u64,
+    pub strength_overall_away: u64,
+    pub strength_attack_home: u64,
+    pub strength_attack_away: u64,
+    pub strength_defence_home: u64,
+    pub strength_defence_away: u64,
+    pub form: Option<String>,
     pub id: u64,
     pub name: String,
     pub short_name: String,
