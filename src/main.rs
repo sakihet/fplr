@@ -16,13 +16,17 @@ struct Args {
 
 #[derive(Subcommand, Debug)]
 enum Commands {
+    /// Show upcoming fixtures
     Fixture {},
+    /// Show gameweeks
     Gameweek {},
+    /// Show live player stats for a specific event
     Live {
         event: u32,
         #[arg(short, long, default_value = "20")]
         limit: usize,
     },
+    /// Show players
     Player {
         #[arg(short, long, default_value = "points")]
         sort: SortBy,
@@ -33,10 +37,10 @@ enum Commands {
         #[arg(short, long)]
         team: Option<String>,
     },
+    /// Show player summary
     #[command(name = "player-summary")]
-    PlayerSummary {
-        player_id: u64,
-    },
+    PlayerSummary { player_id: u64 },
+    /// Show teams
     Team {},
 }
 
