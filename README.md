@@ -12,6 +12,8 @@ cargo install --path .
 
 ## Commands
 
+- pick
+- dream-team
 - fixture
 - gameweek
 - live

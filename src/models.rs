@@ -47,6 +47,25 @@ impl Position {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
+pub struct DreamTeamTopPlayer {
+    pub id: u64,
+    pub points: i64,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct DreamTeamTeam {
+    pub element: u64,
+    pub points: i64,
+    pub position: u64,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct DreamTeam {
+    pub top_player: DreamTeamTopPlayer,
+    pub team: Vec<DreamTeamTeam>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Event {
     pub id: u64,
     pub name: String,
@@ -188,6 +207,21 @@ pub struct LiveExplainStat {
     pub identifier: String,
     pub points: i64,
     pub value: u64,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Pick {
+    pub element: u64,
+    pub position: u32,
+    pub multiplier: u8,
+    pub is_captain: bool,
+    pub is_vice_captain: bool,
+    pub element_type: u8,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct ManagerPicks {
+    pub picks: Vec<Pick>,
 }
 
 #[cfg(test)]

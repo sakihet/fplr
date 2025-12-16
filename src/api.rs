@@ -1,6 +1,6 @@
 use serde_json::Value;
 
-use crate::models::{BootstrapStatic, LiveData, PlayerSummary};
+use crate::models::{BootstrapStatic, DreamTeam, LiveData, ManagerPicks, PlayerSummary};
 
 pub struct FplClient;
 
@@ -9,6 +9,16 @@ impl FplClient {
         let url = "https://fantasy.premierleague.com/api/bootstrap-static/";
         let response = reqwest::get(url).await?;
         let json: BootstrapStatic = response.json().await?;
+        Ok(json)
+    }
+
+    pub async fn fetch_dream_team(event_id: u32) -> Result<DreamTeam, Box<dyn std::error::Error>> {
+        let url = format!(
+            "https://fantasy.premierleague.com/api/dream-team/{}/",
+            event_id
+        );
+        let response = reqwest::get(url).await?;
+        let json: DreamTeam = response.json().await?;
         Ok(json)
     }
 
@@ -26,6 +36,19 @@ impl FplClient {
         );
         let response = reqwest::get(url).await?;
         let json: LiveData = response.json().await?;
+        Ok(json)
+    }
+
+    pub async fn fetch_manager_picks(
+        manager_id: u64,
+        event_id: u32,
+    ) -> Result<ManagerPicks, Box<dyn std::error::Error>> {
+        let url = format!(
+            "https://fantasy.premierleague.com/api/entry/{}/event/{}/picks/",
+            manager_id, event_id
+        );
+        let response = reqwest::get(url).await?;
+        let json: ManagerPicks = response.json().await?;
         Ok(json)
     }
 

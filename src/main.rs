@@ -16,13 +16,19 @@ struct Args {
 
 #[derive(Subcommand, Debug)]
 enum Commands {
+    /// Show dream team
+    DreamTeam { event_id: u32 },
+    /// Show upcoming fixtures
     Fixture {},
+    /// Show gameweeks
     Gameweek {},
+    /// Show live player stats for a specific event
     Live {
         event: u32,
         #[arg(short, long, default_value = "20")]
         limit: usize,
     },
+    /// Show players
     Player {
         #[arg(short, long, default_value = "points")]
         sort: SortBy,
@@ -33,10 +39,17 @@ enum Commands {
         #[arg(short, long)]
         team: Option<String>,
     },
-    #[command(name = "player-summary")]
-    PlayerSummary {
-        player_id: u64,
+    /// Show a manager's team picks for a specific event
+    Pick {
+        /// Manager ID (entry ID)
+        manager_id: u64,
+        /// Event ID
+        event_id: u32,
     },
+    /// Show player summary
+    #[command(name = "player-summary")]
+    PlayerSummary { player_id: u64 },
+    /// Show teams
     Team {},
 }
 
@@ -64,6 +77,38 @@ async fn main() {
     let args = Args::parse();
 
     match args.commands {
+        Commands::DreamTeam { event_id } => match FplClient::fetch_bootstrap_static().await {
+            Ok(bootstrap_data) => {
+                let player_map: HashMap<u64, String> = bootstrap_data
+                    .elements
+                    .iter()
+                    .map(|player| (player.id, player.web_name.clone()))
+                    .collect();
+
+                match FplClient::fetch_dream_team(event_id).await {
+                    Ok(data) => {
+                        let mut team = data.team;
+                        team.sort_by(|a, b| b.points.cmp(&a.points));
+
+                        println!("{:<4} {:<20} {:<12}", "ID", "Name", "Points");
+                        for t in team.iter() {
+                            let name = player_map
+                                .get(&t.element)
+                                .map(|s| s.as_str())
+                                .unwrap_or("Unknown");
+
+                            println!("{:<4} {:<20} {:<12}", t.element, name, t.points);
+                        }
+                    }
+                    Err(e) => {
+                        eprintln!("Error: {}", e);
+                    }
+                }
+            }
+            Err(e) => {
+                eprintln!("Error: {}", e);
+            }
+        },
         Commands::Gameweek {} => match FplClient::fetch_bootstrap_static().await {
             Ok(data) => {
                 println!(
@@ -197,6 +242,65 @@ async fn main() {
                         player.total_points,
                         player.news,
                     );
+                }
+            }
+            Err(e) => {
+                eprintln!("Error: {}", e);
+            }
+        },
+        Commands::Pick {
+            manager_id,
+            event_id,
+        } => match FplClient::fetch_bootstrap_static().await {
+            Ok(bootstrap_data) => {
+                let player_map: HashMap<u64, String> = bootstrap_data
+                    .elements
+                    .iter()
+                    .map(|player| (player.id, player.web_name.clone()))
+                    .collect();
+
+                match FplClient::fetch_live(event_id).await {
+                    Ok(live_data) => {
+                        let points_map: HashMap<u64, i64> = live_data
+                            .elements
+                            .iter()
+                            .map(|element| (element.id, element.stats.total_points))
+                            .collect();
+
+                        match FplClient::fetch_manager_picks(manager_id, event_id).await {
+                            Ok(picks) => {
+                                println!(
+                                    "{:<4} {:<20} {:<4} {:<4} {:<4} {:<4}",
+                                    "ID", "Name", "Pos", "C", "VC", "Pts"
+                                );
+                                for pick in picks.picks.iter() {
+                                    let name = player_map
+                                        .get(&pick.element)
+                                        .map(|s| s.as_str())
+                                        .unwrap_or("Unknown");
+
+                                    let points =
+                                        points_map.get(&pick.element).copied().unwrap_or(0);
+
+                                    println!(
+                                        "{:<4} {:<20} {:<4} {:<4} {:<4} {:<4}",
+                                        pick.element,
+                                        name,
+                                        pick.position,
+                                        if pick.is_captain { "Y" } else { "N" },
+                                        if pick.is_vice_captain { "Y" } else { "N" },
+                                        points,
+                                    );
+                                }
+                            }
+                            Err(e) => {
+                                eprintln!("Error: {}", e);
+                            }
+                        }
+                    }
+                    Err(e) => {
+                        eprintln!("Error: {}", e);
+                    }
                 }
             }
             Err(e) => {
