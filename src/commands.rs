@@ -314,7 +314,10 @@ pub async fn handle_player_summary(player_id: u64) {
     match FplClient::fetch_player_summary(player_id).await {
         Ok(summary) => {
             let histories = summary.history;
-            println!("{:<3} {:<3} {:<4} {:<2} {:<2}", "GW", "Pts", "Min", "G", "A");
+            println!(
+                "{:<3} {:<3} {:<4} {:<2} {:<2}",
+                "GW", "Pts", "Min", "G", "A"
+            );
             for history in histories.iter() {
                 println!(
                     "{:<3} {:<3} {:<4} {:<2} {:<2}",
