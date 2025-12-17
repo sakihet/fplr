@@ -72,6 +72,13 @@ fn find_team_ids_by_name(teams: &[Team], name: &str) -> Vec<u64> {
         .collect()
 }
 
+fn create_player_map(elements: &[Element]) -> HashMap<u64, String> {
+    elements
+        .iter()
+        .map(|player| (player.id, player.web_name.clone()))
+        .collect()
+}
+
 #[tokio::main]
 async fn main() {
     let args = Args::parse();
@@ -79,11 +86,7 @@ async fn main() {
     match args.commands {
         Commands::DreamTeam { event_id } => match FplClient::fetch_bootstrap_static().await {
             Ok(bootstrap_data) => {
-                let player_map: HashMap<u64, String> = bootstrap_data
-                    .elements
-                    .iter()
-                    .map(|player| (player.id, player.web_name.clone()))
-                    .collect();
+                let player_map = create_player_map(&bootstrap_data.elements);
 
                 match FplClient::fetch_dream_team(event_id).await {
                     Ok(data) => {
@@ -137,11 +140,7 @@ async fn main() {
         },
         Commands::Live { event, limit } => match FplClient::fetch_bootstrap_static().await {
             Ok(bootstrap_data) => {
-                let player_map: HashMap<u64, String> = bootstrap_data
-                    .elements
-                    .iter()
-                    .map(|player| (player.id, player.web_name.clone()))
-                    .collect();
+                let player_map = create_player_map(&bootstrap_data.elements);
 
                 match FplClient::fetch_live(event).await {
                     Ok(data) => {
@@ -305,11 +304,7 @@ async fn main() {
             event_id,
         } => match FplClient::fetch_bootstrap_static().await {
             Ok(bootstrap_data) => {
-                let player_map: HashMap<u64, String> = bootstrap_data
-                    .elements
-                    .iter()
-                    .map(|player| (player.id, player.web_name.clone()))
-                    .collect();
+                let player_map = create_player_map(&bootstrap_data.elements);
 
                 match FplClient::fetch_live(event_id).await {
                     Ok(live_data) => {
