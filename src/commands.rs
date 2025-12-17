@@ -86,7 +86,10 @@ pub async fn handle_gameweek() {
                 };
                 println!(
                     "{:<4} {:<16} {:<12} {:<20}",
-                    event.id, event.name, status, event.deadline_time
+                    event.id,
+                    event.name,
+                    status,
+                    format_datetime(&event.deadline_time)
                 );
             }
         }
