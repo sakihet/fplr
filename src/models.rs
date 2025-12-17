@@ -223,6 +223,22 @@ pub struct LiveExplainStat {
     pub value: u64,
 }
 
+#[derive(Default)]
+pub struct StatsPoints {
+    pub minutes: i64,
+    pub goals_scored: i64,
+    pub assists: i64,
+    pub clean_sheets: i64,
+    pub goals_conceded: i64,
+    pub saves: i64,
+    pub penalties_saved: i64,
+    pub penalties_missed: i64,
+    pub yellow_cards: i64,
+    pub red_cards: i64,
+    pub own_goals: i64,
+    pub bonus: i64,
+}
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Pick {
     pub element: u64,
