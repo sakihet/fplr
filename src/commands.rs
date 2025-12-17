@@ -1,7 +1,14 @@
 use std::collections::HashMap;
 
+use chrono::{DateTime, Utc};
+
 use crate::api::FplClient;
 use crate::models::{Element, Position, SortBy, StatsPoints, Team};
+
+fn format_datetime(datetime_str: &str) -> String {
+    let dt = datetime_str.parse::<DateTime<Utc>>().unwrap();
+    dt.format("%Y-%m-%d %H:%M UTC").to_string()
+}
 
 fn create_team_map(teams: &[Team]) -> HashMap<u64, String> {
     teams
@@ -404,7 +411,10 @@ pub async fn handle_fixture() {
                                     .unwrap_or("Unknown");
                                 println!(
                                     "{:<4} {:<20} {:<20} {:<20}",
-                                    id, kickoff_time, home_team, away_team
+                                    id,
+                                    format_datetime(&kickoff_time),
+                                    home_team,
+                                    away_team
                                 );
                             }
                         }
