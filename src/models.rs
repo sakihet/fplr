@@ -90,6 +90,20 @@ pub struct Element {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Team {
+    pub position: u64,
+    pub played: u64,
+    pub win: u64,
+    pub draw: u64,
+    pub loss: u64,
+    pub points: u64,
+    pub strength: u8,
+    pub strength_overall_home: u64,
+    pub strength_overall_away: u64,
+    pub strength_attack_home: u64,
+    pub strength_attack_away: u64,
+    pub strength_defence_home: u64,
+    pub strength_defence_away: u64,
+    pub form: Option<String>,
     pub id: u64,
     pub name: String,
     pub short_name: String,
@@ -207,6 +221,22 @@ pub struct LiveExplainStat {
     pub identifier: String,
     pub points: i64,
     pub value: u64,
+}
+
+#[derive(Default)]
+pub struct StatsPoints {
+    pub minutes: i64,
+    pub goals_scored: i64,
+    pub assists: i64,
+    pub clean_sheets: i64,
+    pub goals_conceded: i64,
+    pub saves: i64,
+    pub penalties_saved: i64,
+    pub penalties_missed: i64,
+    pub yellow_cards: i64,
+    pub red_cards: i64,
+    pub own_goals: i64,
+    pub bonus: i64,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
