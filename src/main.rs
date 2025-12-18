@@ -46,7 +46,11 @@ enum Commands {
     },
     /// Show player summary
     #[command(name = "player-summary")]
-    PlayerSummary { player_id: u64 },
+    PlayerSummary {
+        player_id: u64,
+        #[arg(short, long)]
+        graph: bool,
+    },
     /// Show teams
     Team {},
 }
@@ -69,7 +73,9 @@ async fn main() {
             manager_id,
             event_id,
         } => commands::handle_pick(manager_id, event_id).await,
-        Commands::PlayerSummary { player_id } => commands::handle_player_summary(player_id).await,
+        Commands::PlayerSummary { player_id, graph } => {
+            commands::handle_player_summary(player_id, graph).await
+        }
         Commands::Team {} => commands::handle_team().await,
         Commands::Fixture {} => commands::handle_fixture().await,
     }
