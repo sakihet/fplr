@@ -51,6 +51,8 @@ enum Commands {
         #[arg(short, long)]
         graph: bool,
     },
+    /// Show status
+    Status {},
     /// Show teams
     Team {},
 }
@@ -76,6 +78,7 @@ async fn main() {
         Commands::PlayerSummary { player_id, graph } => {
             commands::handle_player_summary(player_id, graph).await
         }
+        Commands::Status {} => commands::handle_status().await,
         Commands::Team {} => commands::handle_team().await,
         Commands::Fixture {} => commands::handle_fixture().await,
     }

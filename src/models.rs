@@ -69,9 +69,11 @@ pub struct DreamTeam {
 pub struct Event {
     pub id: u64,
     pub name: String,
+    pub deadline_time: String,
+    pub average_entry_score: Option<u64>,
+    pub highest_score: Option<u64>,
     pub is_current: bool,
     pub is_next: bool,
-    pub deadline_time: String,
     pub finished: bool,
 }
 
