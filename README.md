@@ -12,14 +12,19 @@ cargo install --path .
 
 ## Commands
 
-- pick
-- dream-team
-- fixture
-- gameweek
-- live
-- player
-- player-summary
-- team
+```
+Commands:
+  dream-team      Show dream team
+  fixture         Show upcoming fixtures
+  gameweek        Show gameweeks
+  live            Show live player stats for a specific event
+  player          Show players
+  pick            Show a manager's team picks for a specific event
+  player-summary  Show player summary
+  status          Show status
+  team            Show teams
+  help            Print this message or the help of the given subcommand(s)
+```
 
 ## Example
 
