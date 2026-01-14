@@ -191,6 +191,7 @@ pub async fn handle_player(
     position: Option<Position>,
     limit: usize,
     team: Option<String>,
+    name: Option<String>,
 ) {
     match FplClient::fetch_bootstrap_static().await {
         Ok(data) => {
@@ -215,7 +216,15 @@ pub async fn handle_player(
                     } else {
                         true
                     };
-                    position_match && team_match
+                    let name_match = if let Some(ref n) = name {
+                        player
+                            .web_name
+                            .to_lowercase()
+                            .contains(&n.to_lowercase())
+                    } else {
+                        true
+                    };
+                    position_match && team_match && name_match
                 })
                 .collect();
 

@@ -36,6 +36,8 @@ enum Commands {
         limit: usize,
         #[arg(short, long)]
         team: Option<String>,
+        #[arg(short, long)]
+        name: Option<String>,
     },
     /// Show a manager's team picks for a specific event
     Pick {
@@ -70,7 +72,8 @@ async fn main() {
             position,
             limit,
             team,
-        } => commands::handle_player(sort, position, limit, team).await,
+            name,
+        } => commands::handle_player(sort, position, limit, team, name).await,
         Commands::Pick {
             manager_id,
             event_id,
