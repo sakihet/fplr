@@ -1,3 +1,4 @@
+use deunicode::deunicode;
 use std::collections::HashMap;
 
 use chrono::{DateTime, Utc};
@@ -217,10 +218,9 @@ pub async fn handle_player(
                         true
                     };
                     let name_match = if let Some(ref n) = name {
-                        player
-                            .web_name
-                            .to_lowercase()
-                            .contains(&n.to_lowercase())
+                        let normalized_player_name = deunicode(&player.web_name).to_lowercase();
+                        let normalized_query = deunicode(n).to_lowercase();
+                        normalized_player_name.contains(&normalized_query)
                     } else {
                         true
                     };
