@@ -1,6 +1,7 @@
 mod api;
 mod commands;
 mod models;
+mod utils;
 
 use crate::models::{Position, SortBy};
 use clap::{Parser, Subcommand};
