@@ -1,6 +1,7 @@
 mod api;
 mod commands;
 mod models;
+mod utils;
 
 use crate::models::{Position, SortBy};
 use clap::{Parser, Subcommand};
@@ -18,6 +19,16 @@ enum Commands {
     DreamTeam { event_id: u32 },
     /// Show upcoming fixtures
     Fixture {},
+    /// Show fixture difficulty rating
+    #[command(name = "fixture-difficulty-rating")]
+    FixtureDifficultyRating {
+        #[arg(short, long)]
+        team_id: Option<u64>,
+        #[arg(short, long, default_value = "5")]
+        limit: usize,
+        #[arg(short, long)]
+        all: bool,
+    },
     /// Show gameweeks
     Gameweek {},
     /// Show live player stats for a specific event
@@ -36,6 +47,8 @@ enum Commands {
         limit: usize,
         #[arg(short, long)]
         team: Option<String>,
+        #[arg(short, long)]
+        name: Option<String>,
     },
     /// Show a manager's team picks for a specific event
     Pick {
@@ -70,7 +83,8 @@ async fn main() {
             position,
             limit,
             team,
-        } => commands::handle_player(sort, position, limit, team).await,
+            name,
+        } => commands::handle_player(sort, position, limit, team, name).await,
         Commands::Pick {
             manager_id,
             event_id,
@@ -81,5 +95,10 @@ async fn main() {
         Commands::Status {} => commands::handle_status().await,
         Commands::Team {} => commands::handle_team().await,
         Commands::Fixture {} => commands::handle_fixture().await,
+        Commands::FixtureDifficultyRating {
+            team_id,
+            limit,
+            all,
+        } => commands::handle_fixture_difficulty_rating(team_id, limit, all).await,
     }
 }

@@ -119,6 +119,19 @@ pub struct BootstrapStatic {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
+pub struct Fixture {
+    pub id: u64,
+    pub code: u64,
+    pub event: Option<u64>,
+    pub finished: bool,
+    pub kickoff_time: Option<String>,
+    pub team_a: u64,
+    pub team_h: u64,
+    pub team_a_difficulty: u8,
+    pub team_h_difficulty: u8,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
 pub struct PlayerHistory {
     pub element: u64,
     pub fixture: u64,
