@@ -17,7 +17,7 @@ pub async fn handle_fixture_difficulty_rating(
                 .map(|team| (team.id, team))
                 .collect();
 
-            match FplClient::fetch_fixtures_typed().await {
+            match FplClient::fetch_fixtures().await {
                 Ok(fixtures) => {
                     let unfinished_fixtures: Vec<&Fixture> = fixtures
                         .iter()

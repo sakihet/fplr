@@ -33,7 +33,7 @@ pub async fn handle_table() {
     match FplClient::fetch_bootstrap_static().await {
         Ok(bootstrap_data) => {
             // Fetch fixture data
-            match FplClient::fetch_fixtures_typed().await {
+            match FplClient::fetch_fixtures().await {
                 Ok(fixtures) => {
                     // Calculate statistics for each team
                     let mut stats_map: HashMap<u64, TeamStats> = HashMap::new();

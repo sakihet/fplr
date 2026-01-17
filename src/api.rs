@@ -1,5 +1,4 @@
 use serde::de::DeserializeOwned;
-use serde_json::Value;
 
 use crate::models::{BootstrapStatic, DreamTeam, Fixture, LiveData, ManagerPicks, PlayerSummary};
 
@@ -21,11 +20,7 @@ impl FplClient {
         Self::fetch_json(&url).await
     }
 
-    pub async fn fetch_fixtures() -> Result<Value, Box<dyn std::error::Error>> {
-        Self::fetch_json("https://fantasy.premierleague.com/api/fixtures/").await
-    }
-
-    pub async fn fetch_fixtures_typed() -> Result<Vec<Fixture>, Box<dyn std::error::Error>> {
+    pub async fn fetch_fixtures() -> Result<Vec<Fixture>, Box<dyn std::error::Error>> {
         Self::fetch_json("https://fantasy.premierleague.com/api/fixtures/").await
     }
 
