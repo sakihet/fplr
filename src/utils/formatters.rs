@@ -1,4 +1,5 @@
 use chrono::{DateTime, Utc};
+use owo_colors::OwoColorize;
 
 pub fn format_datetime(datetime_str: &str) -> String {
     let dt = datetime_str.parse::<DateTime<Utc>>().unwrap();
@@ -9,7 +10,12 @@ pub fn difficulty_to_stars(difficulty: u8) -> String {
     "*".repeat(difficulty as usize)
 }
 
-#[allow(dead_code)]
-pub fn difficulty_colored(_difficulty: u8, text: &str) -> String {
-    text.to_string()
+pub fn colorize_difficulty(difficulty: u8) -> String {
+    let padded = format!("{:<5}", difficulty);
+    match difficulty {
+        1 | 2 => padded.green().to_string(),
+        3 => padded,
+        4 | 5 => padded.red().to_string(),
+        _ => padded,
+    }
 }

@@ -2,12 +2,7 @@ use std::collections::HashMap;
 
 use crate::api::FplClient;
 use crate::models::{Fixture, Team};
-use crate::utils::formatters::{difficulty_to_stars, format_datetime};
-
-#[allow(dead_code)]
-fn difficulty_colored(_difficulty: u8, text: &str) -> String {
-    text.to_string()
-}
+use crate::utils::formatters::{colorize_difficulty, difficulty_to_stars, format_datetime};
 
 pub async fn handle_fixture_difficulty_rating(
     team_id: Option<u64>,
@@ -184,8 +179,8 @@ fn display_all_teams_fdr(
 
         for fdr in &fdr_values {
             if let Some(difficulty) = fdr {
-                let colored = difficulty_colored(*difficulty, &difficulty.to_string());
-                print!(" {:<5}", colored);
+                let colored = colorize_difficulty(*difficulty);
+                print!(" {}", colored);
                 total += *difficulty as f32;
                 count += 1;
             } else {
