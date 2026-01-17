@@ -129,6 +129,8 @@ pub struct Fixture {
     pub team_h: u64,
     pub team_a_difficulty: u8,
     pub team_h_difficulty: u8,
+    pub team_h_score: Option<u64>,
+    pub team_a_score: Option<u64>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

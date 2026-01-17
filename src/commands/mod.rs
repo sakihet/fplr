@@ -7,6 +7,7 @@ pub mod pick;
 pub mod player;
 pub mod status;
 pub mod summary;
+pub mod table;
 pub mod team;
 
 pub use dream_team::handle_dream_team;
@@ -18,4 +19,5 @@ pub use pick::handle_pick;
 pub use player::handle_player;
 pub use status::handle_status;
 pub use summary::handle_player_summary;
+pub use table::handle_table;
 pub use team::handle_team;

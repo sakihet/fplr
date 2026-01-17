@@ -66,6 +66,8 @@ enum Commands {
     },
     /// Show status
     Status {},
+    /// Show league table
+    Table {},
     /// Show teams
     Team {},
 }
@@ -93,6 +95,7 @@ async fn main() {
             commands::handle_player_summary(player_id, graph).await
         }
         Commands::Status {} => commands::handle_status().await,
+        Commands::Table {} => commands::handle_table().await,
         Commands::Team {} => commands::handle_team().await,
         Commands::Fixture {} => commands::handle_fixture().await,
         Commands::FixtureDifficultyRating {
