@@ -3,6 +3,11 @@ use std::collections::HashMap;
 
 use crate::api::FplClient;
 
+// League position ranges for color coding
+const CL_POSITIONS: std::ops::RangeInclusive<usize> = 1..=4;      // Champions League
+const EL_POSITIONS: std::ops::RangeInclusive<usize> = 5..=6;      // Europa League
+const RELEGATION_POSITIONS: std::ops::RangeInclusive<usize> = 18..=20;
+
 #[derive(Debug, Clone)]
 struct MatchResult {
     event: u64,
@@ -155,11 +160,14 @@ pub async fn handle_table() {
                         let pos = i + 1;
 
                         // Color code by position
-                        let pos_str = match pos {
-                            1..=4 => format!("{:<4}", pos).green().to_string(),
-                            5..=6 => format!("{:<4}", pos).cyan().to_string(),
-                            18..=20 => format!("{:<4}", pos).red().to_string(),
-                            _ => format!("{:<4}", pos),
+                        let pos_str = if CL_POSITIONS.contains(&pos) {
+                            format!("{:<4}", pos).green().to_string()
+                        } else if EL_POSITIONS.contains(&pos) {
+                            format!("{:<4}", pos).cyan().to_string()
+                        } else if RELEGATION_POSITIONS.contains(&pos) {
+                            format!("{:<4}", pos).red().to_string()
+                        } else {
+                            format!("{:<4}", pos)
                         };
 
                         let gd = team.goal_difference();
