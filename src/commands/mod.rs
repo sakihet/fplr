@@ -1,3 +1,4 @@
+pub mod config;
 pub mod dream_team;
 pub mod fdr;
 pub mod fixture;
@@ -10,6 +11,7 @@ pub mod summary;
 pub mod table;
 pub mod team;
 
+pub use config::{ConfigArgs, handle_config};
 pub use dream_team::handle_dream_team;
 pub use fdr::handle_fixture_difficulty_rating;
 pub use fixture::handle_fixture;

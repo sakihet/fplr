@@ -1,5 +1,6 @@
 mod api;
 mod commands;
+mod config;
 mod models;
 mod utils;
 
@@ -15,6 +16,8 @@ struct Args {
 
 #[derive(Subcommand, Debug)]
 enum Commands {
+    /// Manage configuration
+    Config(commands::ConfigArgs),
     /// Show dream team
     DreamTeam { event_id: u32 },
     /// Show upcoming fixtures
@@ -77,6 +80,7 @@ async fn main() {
     let args = Args::parse();
 
     match args.commands {
+        Commands::Config(args) => commands::handle_config(args),
         Commands::DreamTeam { event_id } => commands::handle_dream_team(event_id).await,
         Commands::Gameweek {} => commands::handle_gameweek().await,
         Commands::Live { event, limit } => commands::handle_live(event, limit).await,

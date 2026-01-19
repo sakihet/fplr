@@ -4,8 +4,8 @@ use std::collections::HashMap;
 use crate::api::FplClient;
 
 // League position ranges for color coding
-const CL_POSITIONS: std::ops::RangeInclusive<usize> = 1..=4;      // Champions League
-const EL_POSITIONS: std::ops::RangeInclusive<usize> = 5..=6;      // Europa League
+const CL_POSITIONS: std::ops::RangeInclusive<usize> = 1..=4; // Champions League
+const EL_POSITIONS: std::ops::RangeInclusive<usize> = 5..=6; // Europa League
 const RELEGATION_POSITIONS: std::ops::RangeInclusive<usize> = 18..=20;
 
 #[derive(Debug, Clone)]
@@ -84,7 +84,9 @@ pub async fn handle_table() {
                                         'L'
                                     };
 
-                                    if let Some(fixtures_list) = team_fixtures.get_mut(&fixture.team_h) {
+                                    if let Some(fixtures_list) =
+                                        team_fixtures.get_mut(&fixture.team_h)
+                                    {
                                         fixtures_list.push(MatchResult {
                                             event,
                                             kickoff_time: kickoff.clone(),
@@ -112,7 +114,9 @@ pub async fn handle_table() {
                                         'L'
                                     };
 
-                                    if let Some(fixtures_list) = team_fixtures.get_mut(&fixture.team_a) {
+                                    if let Some(fixtures_list) =
+                                        team_fixtures.get_mut(&fixture.team_a)
+                                    {
                                         fixtures_list.push(MatchResult {
                                             event,
                                             kickoff_time: kickoff,
