@@ -40,6 +40,9 @@ enum Commands {
         #[arg(short, long, default_value = "20")]
         limit: usize,
     },
+    /// Show my team
+    #[command(name = "my-team")]
+    MyTeam(commands::MyTeamArgs),
     /// Show players
     Player {
         #[arg(short, long, default_value = "points")]
@@ -84,6 +87,7 @@ async fn main() {
         Commands::DreamTeam { event_id } => commands::handle_dream_team(event_id).await,
         Commands::Gameweek {} => commands::handle_gameweek().await,
         Commands::Live { event, limit } => commands::handle_live(event, limit).await,
+        Commands::MyTeam(args) => commands::handle_my_team(args).await,
         Commands::Player {
             sort,
             position,
