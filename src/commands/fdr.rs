@@ -4,11 +4,7 @@ use crate::api::FplClient;
 use crate::models::{Fixture, Team};
 use crate::utils::formatters::{colorize_difficulty, difficulty_to_stars, format_datetime};
 
-pub async fn handle_fixture_difficulty_rating(
-    team_id: Option<u64>,
-    limit: usize,
-    all_teams: bool,
-) {
+pub async fn handle_fixture_difficulty_rating(team_id: Option<u64>, limit: usize, all_teams: bool) {
     match FplClient::fetch_bootstrap_static().await {
         Ok(bootstrap_data) => {
             let team_map: HashMap<u64, &Team> = bootstrap_data
@@ -17,7 +13,7 @@ pub async fn handle_fixture_difficulty_rating(
                 .map(|team| (team.id, team))
                 .collect();
 
-            match FplClient::fetch_fixtures_typed().await {
+            match FplClient::fetch_fixtures().await {
                 Ok(fixtures) => {
                     let unfinished_fixtures: Vec<&Fixture> = fixtures
                         .iter()
@@ -111,11 +107,7 @@ fn display_team_fdr(
     }
 }
 
-fn display_all_teams_fdr(
-    fixtures: &[&Fixture],
-    limit: usize,
-    team_map: &HashMap<u64, &Team>,
-) {
+fn display_all_teams_fdr(fixtures: &[&Fixture], limit: usize, team_map: &HashMap<u64, &Team>) {
     // Get all unique event IDs and sort them
     let mut events: Vec<u64> = fixtures
         .iter()
@@ -135,7 +127,9 @@ fn display_all_teams_fdr(
         for event in &events_to_show {
             let team_fixtures: Vec<_> = fixtures
                 .iter()
-                .filter(|f| f.event == Some(*event) && (f.team_h == *team_id || f.team_a == *team_id))
+                .filter(|f| {
+                    f.event == Some(*event) && (f.team_h == *team_id || f.team_a == *team_id)
+                })
                 .collect();
 
             if team_fixtures.is_empty() {

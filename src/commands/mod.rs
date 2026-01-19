@@ -1,21 +1,27 @@
+pub mod config;
 pub mod dream_team;
 pub mod fdr;
 pub mod fixture;
 pub mod gameweek;
 pub mod live;
+pub mod my_team;
 pub mod pick;
 pub mod player;
 pub mod status;
 pub mod summary;
+pub mod table;
 pub mod team;
 
+pub use config::{ConfigArgs, handle_config};
 pub use dream_team::handle_dream_team;
 pub use fdr::handle_fixture_difficulty_rating;
 pub use fixture::handle_fixture;
 pub use gameweek::handle_gameweek;
 pub use live::handle_live;
+pub use my_team::{MyTeamArgs, handle_my_team};
 pub use pick::handle_pick;
 pub use player::handle_player;
 pub use status::handle_status;
 pub use summary::handle_player_summary;
+pub use table::handle_table;
 pub use team::handle_team;

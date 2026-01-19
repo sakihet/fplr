@@ -27,7 +27,7 @@ impl Position {
             Position::Forward => 4,
         }
     }
-    pub fn display_name(&self) -> &str {
+    pub fn display_name(&self) -> &'static str {
         match self {
             Position::Goalkeeper => "GKP",
             Position::Defender => "DEF",
@@ -129,6 +129,8 @@ pub struct Fixture {
     pub team_h: u64,
     pub team_a_difficulty: u8,
     pub team_h_difficulty: u8,
+    pub team_h_score: Option<u64>,
+    pub team_a_score: Option<u64>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -255,18 +257,32 @@ pub struct StatsPoints {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
+pub struct EntryHistory {
+    pub points: i64,
+    pub total_points: i64,
+    pub rank: Option<u64>,
+    pub rank_sort: Option<u64>,
+    pub overall_rank: Option<u64>,
+    pub bank: i64,
+    pub value: i64,
+    pub event_transfers: i64,
+    pub event_transfers_cost: i64,
+    pub points_on_bench: i64,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Pick {
     pub element: u64,
     pub position: u32,
     pub multiplier: u8,
     pub is_captain: bool,
     pub is_vice_captain: bool,
-    pub element_type: u8,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ManagerPicks {
     pub picks: Vec<Pick>,
+    pub entry_history: EntryHistory,
 }
 
 #[cfg(test)]

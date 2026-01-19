@@ -1,5 +1,6 @@
 mod api;
 mod commands;
+mod config;
 mod models;
 mod utils;
 
@@ -15,6 +16,8 @@ struct Args {
 
 #[derive(Subcommand, Debug)]
 enum Commands {
+    /// Manage configuration
+    Config(commands::ConfigArgs),
     /// Show dream team
     DreamTeam { event_id: u32 },
     /// Show upcoming fixtures
@@ -37,6 +40,9 @@ enum Commands {
         #[arg(short, long, default_value = "20")]
         limit: usize,
     },
+    /// Show my team
+    #[command(name = "my-team")]
+    MyTeam(commands::MyTeamArgs),
     /// Show players
     Player {
         #[arg(short, long, default_value = "points")]
@@ -66,6 +72,8 @@ enum Commands {
     },
     /// Show status
     Status {},
+    /// Show league table
+    Table {},
     /// Show teams
     Team {},
 }
@@ -75,9 +83,11 @@ async fn main() {
     let args = Args::parse();
 
     match args.commands {
+        Commands::Config(args) => commands::handle_config(args),
         Commands::DreamTeam { event_id } => commands::handle_dream_team(event_id).await,
         Commands::Gameweek {} => commands::handle_gameweek().await,
         Commands::Live { event, limit } => commands::handle_live(event, limit).await,
+        Commands::MyTeam(args) => commands::handle_my_team(args).await,
         Commands::Player {
             sort,
             position,
@@ -93,6 +103,7 @@ async fn main() {
             commands::handle_player_summary(player_id, graph).await
         }
         Commands::Status {} => commands::handle_status().await,
+        Commands::Table {} => commands::handle_table().await,
         Commands::Team {} => commands::handle_team().await,
         Commands::Fixture {} => commands::handle_fixture().await,
         Commands::FixtureDifficultyRating {
