@@ -14,16 +14,20 @@ cargo install --path .
 
 ```
 Commands:
-  dream-team      Show dream team
-  fixture         Show upcoming fixtures
-  gameweek        Show gameweeks
-  live            Show live player stats for a specific event
-  player          Show players
-  pick            Show a manager's team picks for a specific event
-  player-summary  Show player summary
-  status          Show status
-  team            Show teams
-  help            Print this message or the help of the given subcommand(s)
+  config                     Manage configuration
+  dream-team                 Show dream team
+  fixture                    Show upcoming fixtures
+  fixture-difficulty-rating  Show fixture difficulty rating
+  gameweek                   Show gameweeks
+  live                       Show live player stats for a specific event
+  my-team                    Show my team
+  player                     Show players
+  pick                       Show a manager's team picks for a specific event
+  player-summary             Show player summary
+  status                     Show status
+  table                      Show league table
+  team                       Show teams
+  help                       Print this message or the help of the given subcommand(s)
 ```
 
 ## Example
