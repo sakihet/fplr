@@ -10,12 +10,11 @@ pub fn difficulty_to_stars(difficulty: u8) -> String {
     "*".repeat(difficulty as usize)
 }
 
-pub fn colorize_difficulty(difficulty: u8) -> String {
-    let padded = format!("{:<5}", difficulty);
+pub fn colorize_text_by_difficulty(text: &str, difficulty: u8) -> String {
     match difficulty {
-        1 | 2 => padded.green().to_string(),
-        3 => padded,
-        4 | 5 => padded.red().to_string(),
-        _ => padded,
+        1 | 2 => text.green().to_string(),
+        3 => text.to_string(),
+        4 | 5 => text.red().to_string(),
+        _ => text.to_string(),
     }
 }
