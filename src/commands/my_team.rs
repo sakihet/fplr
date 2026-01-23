@@ -149,8 +149,8 @@ pub async fn handle_my_team(args: MyTeamArgs) {
     );
     println!("");
     println!(
-        "{:<4} {:<4} {:<20} {:<15} {:<5} {:<6} {:<32}",
-        "ID", "Pos", "Name", "Team", "Pts", "Cost", "Status"
+        "{:<4} {:<4} {:<20} {:<15} {:<5} {:<6} {:<6} {:<32}",
+        "ID", "Pos", "Name", "Team", "Pts", "Cost", "Form", "Status"
     );
 
     // Function to print a player row
@@ -183,13 +183,14 @@ pub async fn handle_my_team(args: MyTeamArgs) {
             let cost = format!("{:.1}", player.now_cost as f64 / 10.0);
 
             println!(
-                "{:<4} {:<4} {:<20} {:<15} {:<5} {:<6} {:<32}",
+                "{:<4} {:<4} {:<20} {:<15} {:<5} {:<6} {:<6} {:<32}",
                 player.id,
                 pos_name,
                 name_display,
                 team_name,
                 final_points,
                 cost,
+                player.form,
                 player.news.chars().take(32).collect::<String>()
             );
         } else {

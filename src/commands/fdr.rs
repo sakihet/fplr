@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::api::FplClient;
 use crate::models::{Fixture, Team};
-use crate::utils::formatters::{colorize_difficulty, difficulty_to_stars, format_datetime};
+use crate::utils::formatters::{colorize_text_by_difficulty, difficulty_to_stars, format_datetime};
 
 pub async fn handle_fixture_difficulty_rating(team_id: Option<u64>, limit: usize, all_teams: bool) {
     match FplClient::fetch_bootstrap_static().await {
@@ -118,11 +118,11 @@ fn display_all_teams_fdr(fixtures: &[&Fixture], limit: usize, team_map: &HashMap
     events.sort();
     let events_to_show: Vec<u64> = events.iter().take(limit).copied().collect();
 
-    // Build FDR data for each team
-    let mut team_fdr_data: Vec<(u64, &Team, Vec<Option<u8>>)> = Vec::new();
+    // Build FDR data for each team: (team_id, team, Vec<Vec<(display_text, difficulty)>>)
+    let mut team_fdr_data: Vec<(u64, &Team, Vec<Vec<(String, u8)>>)> = Vec::new();
 
     for (team_id, team) in team_map.iter() {
-        let mut fdr_values: Vec<Option<u8>> = Vec::new();
+        let mut fdr_values: Vec<Vec<(String, u8)>> = Vec::new();
 
         for event in &events_to_show {
             let team_fixtures: Vec<_> = fixtures
@@ -132,23 +132,23 @@ fn display_all_teams_fdr(fixtures: &[&Fixture], limit: usize, team_map: &HashMap
                 })
                 .collect();
 
-            if team_fixtures.is_empty() {
-                fdr_values.push(None);
-            } else {
-                // If multiple fixtures, take average (for double gameweeks)
-                let avg_difficulty: f32 = team_fixtures
-                    .iter()
-                    .map(|f| {
-                        if f.team_h == *team_id {
-                            f.team_h_difficulty as f32
-                        } else {
-                            f.team_a_difficulty as f32
-                        }
-                    })
-                    .sum::<f32>()
-                    / team_fixtures.len() as f32;
-                fdr_values.push(Some(avg_difficulty.round() as u8));
+            let mut gw_fixtures = Vec::new();
+            for f in team_fixtures {
+                let is_home = f.team_h == *team_id;
+                let opponent_id = if is_home { f.team_a } else { f.team_h };
+                let difficulty = if is_home {
+                    f.team_h_difficulty
+                } else {
+                    f.team_a_difficulty
+                };
+                let opponent_short = team_map
+                    .get(&opponent_id)
+                    .map(|t| t.short_name.as_str())
+                    .unwrap_or("???");
+                let location = if is_home { "H" } else { "A" };
+                gw_fixtures.push((format!("{}({})", opponent_short, location), difficulty));
             }
+            fdr_values.push(gw_fixtures);
         }
 
         team_fdr_data.push((*team_id, *team, fdr_values));
@@ -160,7 +160,7 @@ fn display_all_teams_fdr(fixtures: &[&Fixture], limit: usize, team_map: &HashMap
     // Print header
     print!("{:<20}", "Team");
     for event in &events_to_show {
-        print!(" {:<5}", format!("GW{}", event));
+        print!(" {:<8}", format!("GW{}", event));
     }
     println!(" {:<5}", "Avg");
 
@@ -171,14 +171,30 @@ fn display_all_teams_fdr(fixtures: &[&Fixture], limit: usize, team_map: &HashMap
         let mut total = 0.0;
         let mut count = 0;
 
-        for fdr in &fdr_values {
-            if let Some(difficulty) = fdr {
-                let colored = colorize_difficulty(*difficulty);
-                print!(" {}", colored);
-                total += *difficulty as f32;
-                count += 1;
+        for gw_fixtures in &fdr_values {
+            if gw_fixtures.is_empty() {
+                print!(" {:<8}", "-");
             } else {
-                print!(" {:<5}", "-");
+                let mut display_parts = Vec::new();
+                let mut visual_length = 0;
+                for (text, difficulty) in gw_fixtures {
+                    display_parts.push(colorize_text_by_difficulty(text, *difficulty));
+                    visual_length += text.len();
+                    total += *difficulty as f32;
+                    count += 1;
+                }
+                visual_length += if gw_fixtures.len() > 1 {
+                    gw_fixtures.len() - 1
+                } else {
+                    0
+                };
+                let joined = display_parts.join(" ");
+                print!(" {}", joined);
+
+                // Pad to match column width (8)
+                if visual_length < 8 {
+                    print!("{}", " ".repeat(8 - visual_length));
+                }
             }
         }
 

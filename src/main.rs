@@ -23,7 +23,7 @@ enum Commands {
     /// Show upcoming fixtures
     Fixture {},
     /// Show fixture difficulty rating
-    #[command(name = "fixture-difficulty-rating")]
+    #[command(alias = "fdr")]
     FixtureDifficultyRating {
         #[arg(short, long)]
         team_id: Option<u64>,
