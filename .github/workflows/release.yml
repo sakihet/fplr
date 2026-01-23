@@ -13,6 +13,6 @@ jobs:
       - run: cargo test
       - run: cargo build --release
 
-      - run: cargo login ${{ secrets.CARGO_REGISTRY_TOKEN }}
+      - run: cargo login ${{ secrets.CRATES_IO }}
 
       - run: cargo publish
