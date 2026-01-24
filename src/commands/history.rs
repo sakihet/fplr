@@ -1,6 +1,9 @@
+use std::collections::HashMap;
+
 use crate::api::FplClient;
 use crate::config::Config;
 use clap::Args;
+use owo_colors::OwoColorize;
 
 #[derive(Debug, Args)]
 pub struct HistoryArgs {
@@ -39,13 +42,28 @@ pub async fn handle_history(args: HistoryArgs) {
         }
     };
 
-    // 2. Fetch Manager History
-    let history = match FplClient::fetch_manager_history(manager_id).await {
+    // 2. Fetch Manager History and Bootstrap Static (for avg/max scores)
+    let (history, bootstrap) = tokio::join!(
+        FplClient::fetch_manager_history(manager_id),
+        FplClient::fetch_bootstrap_static()
+    );
+
+    let history = match history {
         Ok(data) => data,
         Err(e) => {
             eprintln!("Failed to fetch manager history: {}", e);
             return;
         }
+    };
+
+    // Build a map of event_id -> (average_score, highest_score)
+    let event_scores: HashMap<u64, (Option<u64>, Option<u64>)> = match bootstrap {
+        Ok(data) => data
+            .events
+            .into_iter()
+            .map(|e| (e.id, (e.average_entry_score, e.highest_score)))
+            .collect(),
+        Err(_) => HashMap::new(),
     };
 
     if history.current.is_empty() {
@@ -58,10 +76,9 @@ pub async fn handle_history(args: HistoryArgs) {
     println!("=== Current Season ===\n");
 
     println!(
-        "{:<3} {:>5} {:>6} {:>10} {:>10} {:>4} {:>5} {:>5}",
-        "GW", "Pts", "Total", "Rank", "ΔRank", "Trn", "Bnch", "Value"
+        "{:<3} {:>5} {:>4} {:>4} {:>6} {:>10} {:>10} {:>4} {:>5} {:>5}",
+        "GW", "Pts", "Avg", "Max", "Total", "Rank", "ΔRank", "Trn", "Bnch", "Value"
     );
-    println!("{}", "-".repeat(56));
 
     let mut prev_rank: Option<u64> = None;
 
@@ -86,10 +103,26 @@ pub async fn handle_history(args: HistoryArgs) {
 
         let value = format!("{:.1}", gw.value as f64 / 10.0);
 
+        let (avg_score, max_score) = event_scores
+            .get(&gw.event)
+            .cloned()
+            .unwrap_or((None, None));
+        let avg_str = avg_score.map(|s| s.to_string()).unwrap_or_else(|| "-".to_string());
+        let max_str = max_score.map(|s| s.to_string()).unwrap_or_else(|| "-".to_string());
+
+        // Color the points based on comparison with average
+        let pts_str = match avg_score {
+            Some(avg) if gw.points > avg as i64 => format!("{:>5}", gw.points).green().to_string(),
+            Some(avg) if gw.points < avg as i64 => format!("{:>5}", gw.points).red().to_string(),
+            _ => format!("{:>5}", gw.points),
+        };
+
         println!(
-            "{:<3} {:>5} {:>6} {:>10} {:>10} {:>4} {:>5} {:>5}",
+            "{:<3} {} {:>4} {:>4} {:>6} {:>10} {:>10} {:>4} {:>5} {:>5}",
             gw.event,
-            gw.points,
+            pts_str,
+            avg_str,
+            max_str,
             gw.total_points,
             rank_str,
             rank_change,
