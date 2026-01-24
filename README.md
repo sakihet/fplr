@@ -19,6 +19,7 @@ Commands:
   fixture                    Show upcoming fixtures
   fixture-difficulty-rating  Show fixture difficulty rating
   gameweek                   Show gameweeks
+  history                    Show manager's season history
   live                       Show live player stats for a specific event
   my-team                    Show my team
   player                     Show players
@@ -27,6 +28,7 @@ Commands:
   status                     Show status
   table                      Show league table
   team                       Show teams
+  transfer                   Show popular transfers
   help                       Print this message or the help of the given subcommand(s)
 ```
 
