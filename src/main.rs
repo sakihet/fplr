@@ -72,6 +72,13 @@ enum Commands {
         #[arg(short, long)]
         graph: bool,
     },
+    /// Show set piece takers (penalties, free kicks, corners)
+    #[command(name = "set-piece")]
+    SetPiece {
+        /// Filter by team name
+        #[arg(short, long)]
+        team: Option<String>,
+    },
     /// Show status
     Status {},
     /// Show league table
@@ -117,6 +124,7 @@ async fn main() {
         Commands::PlayerSummary { player_id, graph } => {
             commands::handle_player_summary(player_id, graph).await
         }
+        Commands::SetPiece { team } => commands::handle_set_piece(team).await,
         Commands::Status {} => commands::handle_status().await,
         Commands::Table {} => commands::handle_table().await,
         Commands::Team {} => commands::handle_team().await,

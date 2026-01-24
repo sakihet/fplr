@@ -308,6 +308,25 @@ pub struct ManagerHistory {
     pub current: Vec<SeasonHistory>,
 }
 
+#[derive(Debug, Deserialize, Serialize)]
+pub struct SetPieceNoteInfo {
+    pub external_link: bool,
+    pub info_message: String,
+    pub source_link: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct SetPieceTeam {
+    pub notes: Vec<SetPieceNoteInfo>,
+    pub id: u64,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct SetPieceNotes {
+    pub last_updated: String,
+    pub teams: Vec<SetPieceTeam>,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
