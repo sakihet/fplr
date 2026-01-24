@@ -12,6 +12,7 @@ pub mod status;
 pub mod summary;
 pub mod table;
 pub mod team;
+pub mod transfer;
 
 pub use config::{ConfigArgs, handle_config};
 pub use dream_team::handle_dream_team;
@@ -27,3 +28,4 @@ pub use status::handle_status;
 pub use summary::handle_player_summary;
 pub use table::handle_table;
 pub use team::handle_team;
+pub use transfer::{TransferArgs, handle_transfer};

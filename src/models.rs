@@ -88,6 +88,10 @@ pub struct Element {
     pub form: String,
     pub total_points: i64,
     pub news: String,
+    pub transfers_in: u64,
+    pub transfers_out: u64,
+    pub transfers_in_event: u64,
+    pub transfers_out_event: u64,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
