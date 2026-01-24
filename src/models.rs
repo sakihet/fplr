@@ -285,6 +285,25 @@ pub struct ManagerPicks {
     pub entry_history: EntryHistory,
 }
 
+#[derive(Debug, Deserialize, Serialize)]
+pub struct SeasonHistory {
+    pub event: u64,
+    pub points: i64,
+    pub total_points: i64,
+    pub rank: Option<u64>,
+    pub overall_rank: Option<u64>,
+    pub bank: i64,
+    pub value: i64,
+    pub event_transfers: u64,
+    pub event_transfers_cost: i64,
+    pub points_on_bench: i64,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct ManagerHistory {
+    pub current: Vec<SeasonHistory>,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

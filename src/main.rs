@@ -34,6 +34,8 @@ enum Commands {
     },
     /// Show gameweeks
     Gameweek {},
+    /// Show manager's season history
+    History(commands::HistoryArgs),
     /// Show live player stats for a specific event
     Live {
         event: u32,
@@ -86,6 +88,7 @@ async fn main() {
         Commands::Config(args) => commands::handle_config(args),
         Commands::DreamTeam { event_id } => commands::handle_dream_team(event_id).await,
         Commands::Gameweek {} => commands::handle_gameweek().await,
+        Commands::History(args) => commands::handle_history(args).await,
         Commands::Live { event, limit } => commands::handle_live(event, limit).await,
         Commands::MyTeam(args) => commands::handle_my_team(args).await,
         Commands::Player {
