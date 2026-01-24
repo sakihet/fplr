@@ -78,6 +78,16 @@ enum Commands {
     Table {},
     /// Show teams
     Team {},
+    /// Show team performance based on player points per GW
+    #[command(name = "team-perf")]
+    TeamPerf {
+        /// Specific gameweek (defaults to current)
+        #[arg(short, long)]
+        gw: Option<u32>,
+        /// Number of recent gameweeks to show
+        #[arg(short, long, default_value = "5")]
+        last: usize,
+    },
     /// Show popular transfers
     Transfer(commands::TransferArgs),
 }
@@ -110,6 +120,7 @@ async fn main() {
         Commands::Status {} => commands::handle_status().await,
         Commands::Table {} => commands::handle_table().await,
         Commands::Team {} => commands::handle_team().await,
+        Commands::TeamPerf { gw, last } => commands::handle_team_perf(gw, last).await,
         Commands::Fixture {} => commands::handle_fixture().await,
         Commands::FixtureDifficultyRating {
             team_id,
