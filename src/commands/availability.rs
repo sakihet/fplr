@@ -61,6 +61,7 @@ pub async fn handle_availability(team: Option<String>, all: bool, limit: usize) 
                     "d" => "Doubtful",
                     "s" => "Suspended",
                     "n" => "Not Available",
+                    "u" => "Unavail",
                     _ => &player.status,
                 };
 
