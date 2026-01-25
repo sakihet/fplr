@@ -23,8 +23,12 @@ pub async fn handle_set_piece(team_name: Option<String>) {
 
                 // Apply filter if provided
                 if let Some(ref filter) = team_name {
-                    if !team_short_name.to_lowercase().contains(&filter.to_lowercase())
-                        && !team_full_name.to_lowercase().contains(&filter.to_lowercase())
+                    if !team_short_name
+                        .to_lowercase()
+                        .contains(&filter.to_lowercase())
+                        && !team_full_name
+                            .to_lowercase()
+                            .contains(&filter.to_lowercase())
                     {
                         continue;
                     }

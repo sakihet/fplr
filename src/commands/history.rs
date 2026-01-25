@@ -103,12 +103,13 @@ pub async fn handle_history(args: HistoryArgs) {
 
         let value = format!("{:.1}", gw.value as f64 / 10.0);
 
-        let (avg_score, max_score) = event_scores
-            .get(&gw.event)
-            .cloned()
-            .unwrap_or((None, None));
-        let avg_str = avg_score.map(|s| s.to_string()).unwrap_or_else(|| "-".to_string());
-        let max_str = max_score.map(|s| s.to_string()).unwrap_or_else(|| "-".to_string());
+        let (avg_score, max_score) = event_scores.get(&gw.event).cloned().unwrap_or((None, None));
+        let avg_str = avg_score
+            .map(|s| s.to_string())
+            .unwrap_or_else(|| "-".to_string());
+        let max_str = max_score
+            .map(|s| s.to_string())
+            .unwrap_or_else(|| "-".to_string());
 
         // Color the points based on comparison with average
         let pts_str = match avg_score {

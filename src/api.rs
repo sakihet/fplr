@@ -1,6 +1,9 @@
 use serde::de::DeserializeOwned;
 
-use crate::models::{BootstrapStatic, DreamTeam, Fixture, LiveData, ManagerHistory, ManagerPicks, PlayerSummary, SetPieceNotes};
+use crate::models::{
+    BootstrapStatic, DreamTeam, Fixture, LiveData, ManagerHistory, ManagerPicks, PlayerSummary,
+    SetPieceNotes,
+};
 
 const BASE_URL: &str = "https://fantasy.premierleague.com/api";
 

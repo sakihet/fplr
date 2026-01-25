@@ -1,3 +1,4 @@
+pub mod availability;
 pub mod config;
 pub mod dream_team;
 pub mod fdr;
@@ -16,6 +17,7 @@ pub mod team;
 pub mod team_perf;
 pub mod transfer;
 
+pub use availability::handle_availability;
 pub use config::{ConfigArgs, handle_config};
 pub use dream_team::handle_dream_team;
 pub use fdr::handle_fixture_difficulty_rating;

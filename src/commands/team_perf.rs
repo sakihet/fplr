@@ -147,7 +147,16 @@ pub async fn handle_team_perf(gw: Option<u32>, last: usize) {
                         "→"
                     };
 
-                    team_stats.push((team.id, team.name.clone(), points, avg, min, max, season_avg, trend));
+                    team_stats.push((
+                        team.id,
+                        team.name.clone(),
+                        points,
+                        avg,
+                        min,
+                        max,
+                        season_avg,
+                        trend,
+                    ));
                 }
             }
 
@@ -160,17 +169,25 @@ pub async fn handle_team_perf(gw: Option<u32>, last: usize) {
                 header.push_str(&format!(" {:>5}", format!("GW{}", gw)));
             }
             let avg_label = format!("Avg({})", gw_list.len());
-            header.push_str(&format!(" {:>5} {:>5} {:>8} {:>8} {:>5}", "Min", "Max", avg_label, "Avg(all)", "Trend"));
+            header.push_str(&format!(
+                " {:>5} {:>5} {:>8} {:>8} {:>5}",
+                "Min", "Max", avg_label, "Avg(all)", "Trend"
+            ));
             println!("{}", header);
 
             // Print data
-            for (rank, (team_id, name, points, avg, min, max, season_avg, trend)) in team_stats.iter().enumerate() {
+            for (rank, (team_id, name, points, avg, min, max, season_avg, trend)) in
+                team_stats.iter().enumerate()
+            {
                 let mut row = format!("{:<5} {:<4} {:<20}", rank + 1, team_id, name);
                 for p in points {
                     row.push_str(&format!(" {:>5}", p));
                 }
-                row.push_str(&format!(" {:>5} {:>5} {:>8.1} {:>8.1} ", min, max, avg, season_avg));
-                
+                row.push_str(&format!(
+                    " {:>5} {:>5} {:>8.1} {:>8.1} ",
+                    min, max, avg, season_avg
+                ));
+
                 let trend_colored = match *trend {
                     "↑" => format!("{:>5}", trend).green().to_string(),
                     "↓" => format!("{:>5}", trend).red().to_string(),
