@@ -14,6 +14,7 @@ cargo install --path .
 
 ```
 Commands:
+  availability               Show player availability (injuries, suspensions, etc.)
   config                     Manage configuration
   dream-team                 Show dream team
   fixture                    Show upcoming fixtures
@@ -25,9 +26,11 @@ Commands:
   player                     Show players
   pick                       Show a manager's team picks for a specific event
   player-summary             Show player summary
+  set-piece                  Show set piece takers (penalties, free kicks, corners)
   status                     Show status
   table                      Show league table
   team                       Show teams
+  team-perf                  Show team performance based on player points per GW
   transfer                   Show popular transfers
   help                       Print this message or the help of the given subcommand(s)
 ```
