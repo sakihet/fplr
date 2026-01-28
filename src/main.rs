@@ -16,6 +16,18 @@ struct Args {
 
 #[derive(Subcommand, Debug)]
 enum Commands {
+    /// Show player availability (injuries, suspensions, etc.)
+    Availability {
+        /// Filter by team name
+        #[arg(short, long)]
+        team: Option<String>,
+        /// Show all players, not just those with issues
+        #[arg(short, long)]
+        all: bool,
+        /// Number of players to show
+        #[arg(short, long, default_value = "20")]
+        limit: usize,
+    },
     /// Manage configuration
     Config(commands::ConfigArgs),
     /// Show dream team
@@ -72,12 +84,29 @@ enum Commands {
         #[arg(short, long)]
         graph: bool,
     },
+    /// Show set piece takers (penalties, free kicks, corners)
+    #[command(name = "set-piece")]
+    SetPiece {
+        /// Filter by team name
+        #[arg(short, long)]
+        team: Option<String>,
+    },
     /// Show status
     Status {},
     /// Show league table
     Table {},
     /// Show teams
     Team {},
+    /// Show team performance based on player points per GW
+    #[command(name = "team-perf")]
+    TeamPerf {
+        /// Specific gameweek (defaults to current)
+        #[arg(short, long)]
+        gw: Option<u32>,
+        /// Number of recent gameweeks to show
+        #[arg(short, long, default_value = "5")]
+        last: usize,
+    },
     /// Show popular transfers
     Transfer(commands::TransferArgs),
 }
@@ -87,6 +116,9 @@ async fn main() {
     let args = Args::parse();
 
     match args.commands {
+        Commands::Availability { team, all, limit } => {
+            commands::handle_availability(team, all, limit).await
+        }
         Commands::Config(args) => commands::handle_config(args),
         Commands::DreamTeam { event_id } => commands::handle_dream_team(event_id).await,
         Commands::Gameweek {} => commands::handle_gameweek().await,
@@ -107,9 +139,11 @@ async fn main() {
         Commands::PlayerSummary { player_id, graph } => {
             commands::handle_player_summary(player_id, graph).await
         }
+        Commands::SetPiece { team } => commands::handle_set_piece(team).await,
         Commands::Status {} => commands::handle_status().await,
         Commands::Table {} => commands::handle_table().await,
         Commands::Team {} => commands::handle_team().await,
+        Commands::TeamPerf { gw, last } => commands::handle_team_perf(gw, last).await,
         Commands::Fixture {} => commands::handle_fixture().await,
         Commands::FixtureDifficultyRating {
             team_id,

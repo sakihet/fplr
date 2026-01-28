@@ -88,6 +88,9 @@ pub struct Element {
     pub form: String,
     pub total_points: i64,
     pub news: String,
+    pub news_added: Option<String>,
+    pub status: String,
+    pub chance_of_playing_next_round: Option<u64>,
     pub transfers_in: u64,
     pub transfers_out: u64,
     pub transfers_in_event: u64,
@@ -306,6 +309,25 @@ pub struct SeasonHistory {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ManagerHistory {
     pub current: Vec<SeasonHistory>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct SetPieceNoteInfo {
+    pub external_link: bool,
+    pub info_message: String,
+    pub source_link: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct SetPieceTeam {
+    pub notes: Vec<SetPieceNoteInfo>,
+    pub id: u64,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct SetPieceNotes {
+    pub last_updated: String,
+    pub teams: Vec<SetPieceTeam>,
 }
 
 #[cfg(test)]

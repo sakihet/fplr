@@ -1,6 +1,9 @@
 use serde::de::DeserializeOwned;
 
-use crate::models::{BootstrapStatic, DreamTeam, Fixture, LiveData, ManagerHistory, ManagerPicks, PlayerSummary};
+use crate::models::{
+    BootstrapStatic, DreamTeam, Fixture, LiveData, ManagerHistory, ManagerPicks, PlayerSummary,
+    SetPieceNotes,
+};
 
 const BASE_URL: &str = "https://fantasy.premierleague.com/api";
 
@@ -47,5 +50,9 @@ impl FplClient {
         manager_id: u64,
     ) -> Result<ManagerHistory, Box<dyn std::error::Error>> {
         Self::fetch(&format!("/entry/{}/history/", manager_id)).await
+    }
+
+    pub async fn fetch_set_piece_notes() -> Result<SetPieceNotes, Box<dyn std::error::Error>> {
+        Self::fetch("/team/set-piece-notes/").await
     }
 }
