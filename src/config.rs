@@ -3,6 +3,8 @@ use std::fs;
 use std::io::Write;
 use std::path::PathBuf;
 
+use crate::error::{FplrError, Result};
+
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UserConfig {
     pub manager_id: Option<String>,
@@ -23,8 +25,8 @@ impl Config {
         Some(path)
     }
 
-    pub fn load() -> Result<Self, Box<dyn std::error::Error>> {
-        let path = Self::get_config_path().ok_or("Could not determine config path")?;
+    pub fn load() -> Result<Self> {
+        let path = Self::get_config_path().ok_or(FplrError::ConfigPathNotFound)?;
 
         if !path.exists() {
             return Ok(Config::default());
@@ -35,8 +37,8 @@ impl Config {
         Ok(config)
     }
 
-    pub fn save(&self) -> Result<(), Box<dyn std::error::Error>> {
-        let path = Self::get_config_path().ok_or("Could not determine config path")?;
+    pub fn save(&self) -> Result<()> {
+        let path = Self::get_config_path().ok_or(FplrError::ConfigPathNotFound)?;
 
         if let Some(parent) = path.parent() {
             fs::create_dir_all(parent)?;
@@ -46,5 +48,18 @@ impl Config {
         let mut file = fs::File::create(path)?;
         file.write_all(content.as_bytes())?;
         Ok(())
+    }
+
+    /// Get manager ID from config, returning an error if not set
+    pub fn get_manager_id(&self) -> Result<u64> {
+        let id_str = self
+            .user
+            .as_ref()
+            .and_then(|u| u.manager_id.as_ref())
+            .ok_or(FplrError::ManagerIdNotSet)?;
+
+        id_str
+            .parse()
+            .map_err(|_| FplrError::InvalidManagerId(id_str.clone()))
     }
 }

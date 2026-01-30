@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use crate::api::FplClient;
 use crate::config::Config;
+use crate::error::Result;
 use clap::Args;
 use owo_colors::OwoColorize;
 
@@ -12,34 +13,12 @@ pub struct HistoryArgs {
     manager_id: Option<u64>,
 }
 
-pub async fn handle_history(args: HistoryArgs) {
+pub async fn handle_history(args: HistoryArgs) -> Result<()> {
     // 1. Determine Manager ID
     let manager_id = if let Some(id) = args.manager_id {
         id
     } else {
-        let config = match Config::load() {
-            Ok(c) => c,
-            Err(e) => {
-                eprintln!("Failed to load config: {}", e);
-                return;
-            }
-        };
-
-        match config.user.and_then(|u| u.manager_id) {
-            Some(id_str) => match id_str.parse::<u64>() {
-                Ok(id) => id,
-                Err(_) => {
-                    eprintln!("Invalid manager_id in config. Please set a numeric ID.");
-                    return;
-                }
-            },
-            None => {
-                eprintln!(
-                    "Manager ID not set. Please run `fplr config set manager-id <ID>` or use --manager-id option."
-                );
-                return;
-            }
-        }
+        Config::load()?.get_manager_id()?
     };
 
     // 2. Fetch Manager History and Bootstrap Static (for avg/max scores)
@@ -48,13 +27,7 @@ pub async fn handle_history(args: HistoryArgs) {
         FplClient::fetch_bootstrap_static()
     );
 
-    let history = match history {
-        Ok(data) => data,
-        Err(e) => {
-            eprintln!("Failed to fetch manager history: {}", e);
-            return;
-        }
-    };
+    let history = history?;
 
     // Build a map of event_id -> (average_score, highest_score)
     let event_scores: HashMap<u64, (Option<u64>, Option<u64>)> = match bootstrap {
@@ -68,7 +41,7 @@ pub async fn handle_history(args: HistoryArgs) {
 
     if history.current.is_empty() {
         println!("No history data available for Manager ID: {}", manager_id);
-        return;
+        return Ok(());
     }
 
     // 3. Display Current Season History
@@ -171,6 +144,8 @@ pub async fn handle_history(args: HistoryArgs) {
     if let Some(worst) = worst_gw {
         println!("Worst GW:        {} ({} pts)", worst.event, worst.points);
     }
+
+    Ok(())
 }
 
 fn format_number(n: u64) -> String {

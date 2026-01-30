@@ -1,45 +1,36 @@
 use std::collections::HashMap;
 
 use crate::api::FplClient;
+use crate::error::{FplrError, Result};
 use crate::models::{Fixture, Team};
 use crate::utils::formatters::{colorize_text_by_difficulty, difficulty_to_stars, format_datetime};
 
-pub async fn handle_fixture_difficulty_rating(team_id: Option<u64>, limit: usize, all_teams: bool) {
-    match FplClient::fetch_bootstrap_static().await {
-        Ok(bootstrap_data) => {
-            let team_map: HashMap<u64, &Team> = bootstrap_data
-                .teams
-                .iter()
-                .map(|team| (team.id, team))
-                .collect();
+pub async fn handle_fixture_difficulty_rating(team_id: Option<u64>, limit: usize, all_teams: bool) -> Result<()> {
+    let bootstrap_data = FplClient::fetch_bootstrap_static().await?;
+    let team_map: HashMap<u64, &Team> = bootstrap_data
+        .teams
+        .iter()
+        .map(|team| (team.id, team))
+        .collect();
 
-            match FplClient::fetch_fixtures().await {
-                Ok(fixtures) => {
-                    let unfinished_fixtures: Vec<&Fixture> = fixtures
-                        .iter()
-                        .filter(|f| !f.finished && f.event.is_some())
-                        .collect();
+    let fixtures = FplClient::fetch_fixtures().await?;
+    let unfinished_fixtures: Vec<&Fixture> = fixtures
+        .iter()
+        .filter(|f| !f.finished && f.event.is_some())
+        .collect();
 
-                    if let Some(tid) = team_id {
-                        // Show fixtures for a specific team
-                        display_team_fdr(&unfinished_fixtures, tid, limit, &team_map);
-                    } else if all_teams {
-                        // Show FDR matrix for all teams
-                        display_all_teams_fdr(&unfinished_fixtures, limit, &team_map);
-                    } else {
-                        // Default: show all teams
-                        display_all_teams_fdr(&unfinished_fixtures, limit, &team_map);
-                    }
-                }
-                Err(e) => {
-                    eprintln!("Error fetching fixtures: {}", e);
-                }
-            }
-        }
-        Err(e) => {
-            eprintln!("Error fetching bootstrap data: {}", e);
-        }
+    if let Some(tid) = team_id {
+        // Show fixtures for a specific team
+        display_team_fdr(&unfinished_fixtures, tid, limit, &team_map)?;
+    } else if all_teams {
+        // Show FDR matrix for all teams
+        display_all_teams_fdr(&unfinished_fixtures, limit, &team_map);
+    } else {
+        // Default: show all teams
+        display_all_teams_fdr(&unfinished_fixtures, limit, &team_map);
     }
+
+    Ok(())
 }
 
 fn display_team_fdr(
@@ -47,13 +38,10 @@ fn display_team_fdr(
     team_id: u64,
     limit: usize,
     team_map: &HashMap<u64, &Team>,
-) {
-    let team = team_map.get(&team_id);
-    if team.is_none() {
-        eprintln!("Team not found: {}", team_id);
-        return;
-    }
-    let team = team.unwrap();
+) -> Result<()> {
+    let team = team_map
+        .get(&team_id)
+        .ok_or(FplrError::TeamNotFound(team_id))?;
 
     println!("Team: {} ({})", team.name, team.short_name);
     println!(
@@ -105,6 +93,8 @@ fn display_team_fdr(
             event, kickoff, opponent, location, difficulty_display
         );
     }
+
+    Ok(())
 }
 
 fn display_all_teams_fdr(fixtures: &[&Fixture], limit: usize, team_map: &HashMap<u64, &Team>) {

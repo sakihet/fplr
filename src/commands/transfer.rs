@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use crate::api::FplClient;
+use crate::error::Result;
 use crate::models::Position;
 use clap::Args;
 use owo_colors::OwoColorize;
@@ -24,14 +25,8 @@ pub struct TransferArgs {
     all_time: bool,
 }
 
-pub async fn handle_transfer(args: TransferArgs) {
-    let bootstrap = match FplClient::fetch_bootstrap_static().await {
-        Ok(data) => data,
-        Err(e) => {
-            eprintln!("Failed to fetch data: {}", e);
-            return;
-        }
-    };
+pub async fn handle_transfer(args: TransferArgs) -> Result<()> {
+    let bootstrap = FplClient::fetch_bootstrap_static().await?;
 
     // Build team name map
     let team_map: HashMap<u64, String> = bootstrap
@@ -134,6 +129,7 @@ pub async fn handle_transfer(args: TransferArgs) {
     }
 
     println!();
+    Ok(())
 }
 
 fn format_number(n: u64) -> String {

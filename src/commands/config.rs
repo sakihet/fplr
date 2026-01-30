@@ -1,4 +1,5 @@
 use crate::config::Config;
+use crate::error::{FplrError, Result};
 use clap::{Args, Subcommand};
 
 #[derive(Debug, Args)]
@@ -25,7 +26,7 @@ pub enum ConfigCommands {
     List,
 }
 
-pub fn handle_config(args: ConfigArgs) {
+pub fn handle_config(args: ConfigArgs) -> Result<()> {
     match args.command {
         ConfigCommands::Set { key, value } => {
             let mut config = Config::load().unwrap_or_default();
@@ -35,16 +36,11 @@ pub fn handle_config(args: ConfigArgs) {
                     let mut user = config.user.unwrap_or_default();
                     user.manager_id = Some(value.clone());
                     config.user = Some(user);
-
-                    if let Err(e) = config.save() {
-                        eprintln!("Failed to save config: {}", e);
-                    } else {
-                        println!("Successfully updated manager-id to {}", value);
-                    }
+                    config.save()?;
+                    println!("Successfully updated manager-id to {}", value);
                 }
                 _ => {
-                    eprintln!("Unknown configuration key: {}", key);
-                    eprintln!("Available keys: manager-id");
+                    return Err(FplrError::UnknownConfigKey(key));
                 }
             }
         }
@@ -63,7 +59,7 @@ pub fn handle_config(args: ConfigArgs) {
                     }
                 }
                 _ => {
-                    eprintln!("Unknown configuration key: {}", key);
+                    return Err(FplrError::UnknownConfigKey(key));
                 }
             }
         }
@@ -84,4 +80,5 @@ pub fn handle_config(args: ConfigArgs) {
             }
         }
     }
+    Ok(())
 }

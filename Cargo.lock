@@ -332,6 +332,7 @@ dependencies = [
  "serde",
  "serde_json",
  "textplots",
+ "thiserror",
  "tokio",
  "toml",
 ]

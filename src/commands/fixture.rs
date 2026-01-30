@@ -1,33 +1,19 @@
 use crate::api::FplClient;
+use crate::error::{FplrError, Result};
 use crate::utils::formatters::format_datetime;
 use crate::utils::team_helpers::create_team_map;
 
-pub async fn handle_fixture() {
-    let bootstrap_data = match FplClient::fetch_bootstrap_static().await {
-        Ok(data) => data,
-        Err(e) => {
-            eprintln!("Error fetching bootstrap data: {}", e);
-            return;
-        }
-    };
-
+pub async fn handle_fixture() -> Result<()> {
+    let bootstrap_data = FplClient::fetch_bootstrap_static().await?;
     let team_map = create_team_map(&bootstrap_data.teams);
 
-    let next_event = match bootstrap_data.events.iter().find(|e| e.is_next) {
-        Some(event) => event,
-        None => {
-            eprintln!("No next event found");
-            return;
-        }
-    };
+    let next_event = bootstrap_data
+        .events
+        .iter()
+        .find(|e| e.is_next)
+        .ok_or(FplrError::NoNextEvent)?;
 
-    let fixtures = match FplClient::fetch_fixtures().await {
-        Ok(data) => data,
-        Err(e) => {
-            eprintln!("Error fetching fixtures: {}", e);
-            return;
-        }
-    };
+    let fixtures = FplClient::fetch_fixtures().await?;
 
     let mut next_fixtures: Vec<_> = fixtures
         .iter()
@@ -60,4 +46,6 @@ pub async fn handle_fixture() {
             away_team
         );
     }
+
+    Ok(())
 }
