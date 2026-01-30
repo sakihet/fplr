@@ -1,5 +1,6 @@
 use crate::api::FplClient;
 use crate::error::{FplrError, Result};
+use crate::utils::event_helpers::find_next_event;
 use crate::utils::formatters::format_datetime;
 use crate::utils::team_helpers::create_team_map;
 
@@ -7,11 +8,7 @@ pub async fn handle_fixture() -> Result<()> {
     let bootstrap_data = FplClient::fetch_bootstrap_static().await?;
     let team_map = create_team_map(&bootstrap_data.teams);
 
-    let next_event = bootstrap_data
-        .events
-        .iter()
-        .find(|e| e.is_next)
-        .ok_or(FplrError::NoNextEvent)?;
+    let next_event = find_next_event(&bootstrap_data.events).ok_or(FplrError::NoNextEvent)?;
 
     let fixtures = FplClient::fetch_fixtures().await?;
 

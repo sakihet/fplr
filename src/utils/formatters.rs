@@ -18,3 +18,62 @@ pub fn colorize_text_by_difficulty(text: &str, difficulty: u8) -> String {
         _ => text.to_string(),
     }
 }
+
+// ============================================
+// Color helpers for common output patterns
+// ============================================
+
+/// Color a trend indicator: ↑ green, ↓ red, → default
+pub fn color_trend(trend: &str) -> String {
+    match trend {
+        "↑" => trend.green().to_string(),
+        "↓" => trend.red().to_string(),
+        _ => trend.to_string(),
+    }
+}
+
+/// Color a match result: W green, L red, D yellow
+pub fn color_form_result(result: char) -> String {
+    match result {
+        'W' => result.to_string().green().to_string(),
+        'L' => result.to_string().red().to_string(),
+        'D' => result.to_string().yellow().to_string(),
+        _ => result.to_string(),
+    }
+}
+
+/// Color a value based on comparison with baseline: above=green, below=red, equal=default
+pub fn color_by_comparison(value: i64, baseline: i64) -> String {
+    let value_str = format!("{:>5}", value);
+    if value > baseline {
+        value_str.green().to_string()
+    } else if value < baseline {
+        value_str.red().to_string()
+    } else {
+        value_str
+    }
+}
+
+/// Color league position: CL (1-4) green, EL (5-6) cyan, Relegation (18-20) red
+pub fn color_league_position(pos: usize, width: usize) -> String {
+    let pos_str = format!("{:<width$}", pos, width = width);
+    match pos {
+        1..=4 => pos_str.green().to_string(), // Champions League
+        5..=6 => pos_str.cyan().to_string(),  // Europa League
+        18..=20 => pos_str.red().to_string(), // Relegation
+        _ => pos_str,
+    }
+}
+
+// ============================================
+// Number formatting helpers
+// ============================================
+
+/// Format a number with sign (+/-) and optional padding
+pub fn format_signed_number(n: i64) -> String {
+    if n > 0 {
+        format!("+{}", n)
+    } else {
+        n.to_string()
+    }
+}

@@ -1,6 +1,7 @@
 use crate::api::FplClient;
 use crate::config::Config;
 use crate::error::Result;
+use crate::utils::event_helpers::{find_current_event, find_next_event};
 use crate::utils::formatters::format_datetime;
 
 pub async fn handle_status() -> Result<()> {
@@ -8,8 +9,8 @@ pub async fn handle_status() -> Result<()> {
     let manager_id = config.get_manager_id().ok();
 
     let data = FplClient::fetch_bootstrap_static().await?;
-    let current_event = data.events.iter().find(|e| e.is_current);
-    let next_event = data.events.iter().find(|e| e.is_next);
+    let current_event = find_current_event(&data.events);
+    let next_event = find_next_event(&data.events);
 
     let my_team_score: String = if let Some(mid) = manager_id {
         if let Some(current) = current_event {

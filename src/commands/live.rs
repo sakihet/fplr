@@ -13,21 +13,7 @@ pub async fn handle_live(event: u32, limit: usize) -> Result<()> {
 
     println!(
         "{:<4} {:<20} {:<8} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4}",
-        "ID",
-        "Name",
-        "Total",
-        "Min",
-        "G",
-        "A",
-        "CS",
-        "GC",
-        "S",
-        "PS",
-        "PM",
-        "YC",
-        "RC",
-        "OG",
-        "B"
+        "ID", "Name", "Total", "Min", "G", "A", "CS", "GC", "S", "PS", "PM", "YC", "RC", "OG", "B"
     );
     for element in elements.iter().take(limit) {
         let name = player_map

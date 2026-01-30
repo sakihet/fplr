@@ -2,6 +2,7 @@ use crate::api::FplClient;
 use crate::config::Config;
 use crate::error::Result;
 use crate::models::{Pick, Position};
+use crate::utils::event_helpers::get_effective_event_id;
 use crate::utils::team_helpers::create_team_map;
 use clap::Args;
 use std::collections::HashMap;
@@ -21,33 +22,12 @@ pub async fn handle_my_team(args: MyTeamArgs) -> Result<()> {
     // 2. Fetch Bootstrap Static to get current GW and player details
     let bootstrap = FplClient::fetch_bootstrap_static().await?;
 
-    // Determine Gameweek
-    let event_id = if let Some(gw) = args.gw {
-        gw
-    } else {
-        match bootstrap.events.iter().find(|e| e.is_current) {
-            Some(e) => e.id as u32,
-            None => {
-                // Fallback: if no current event, maybe look for next one and pick previous?
-                // Or simply pick the last one that finished?
-                // For now, let's try to find the one with is_next=true and subtract 1, or just error.
-                if let Some(next) = bootstrap.events.iter().find(|e| e.is_next) {
-                    if next.id > 1 {
-                        (next.id - 1) as u32
-                    } else {
-                        println!("Season hasn't started yet.");
-                        return Ok(());
-                    }
-                } else {
-                    // Maybe season finished? Get the last event
-                    if let Some(last) = bootstrap.events.last() {
-                        last.id as u32
-                    } else {
-                        println!("Could not determine current Gameweek.");
-                        return Ok(());
-                    }
-                }
-            }
+    // Determine Gameweek using helper
+    let event_id = match get_effective_event_id(&bootstrap.events, args.gw) {
+        Some(id) => id,
+        None => {
+            println!("Could not determine current Gameweek.");
+            return Ok(());
         }
     };
 

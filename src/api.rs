@@ -34,22 +34,15 @@ impl FplClient {
         Self::fetch(&format!("/event/{}/live/", event_id)).await
     }
 
-    pub async fn fetch_manager_picks(
-        manager_id: u64,
-        event_id: u32,
-    ) -> Result<ManagerPicks> {
+    pub async fn fetch_manager_picks(manager_id: u64, event_id: u32) -> Result<ManagerPicks> {
         Self::fetch(&format!("/entry/{}/event/{}/picks/", manager_id, event_id)).await
     }
 
-    pub async fn fetch_player_summary(
-        player_id: u64,
-    ) -> Result<PlayerSummary> {
+    pub async fn fetch_player_summary(player_id: u64) -> Result<PlayerSummary> {
         Self::fetch(&format!("/element-summary/{}/", player_id)).await
     }
 
-    pub async fn fetch_manager_history(
-        manager_id: u64,
-    ) -> Result<ManagerHistory> {
+    pub async fn fetch_manager_history(manager_id: u64) -> Result<ManagerHistory> {
         Self::fetch(&format!("/entry/{}/history/", manager_id)).await
     }
 

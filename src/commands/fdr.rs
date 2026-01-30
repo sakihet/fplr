@@ -4,14 +4,15 @@ use crate::api::FplClient;
 use crate::error::{FplrError, Result};
 use crate::models::{Fixture, Team};
 use crate::utils::formatters::{colorize_text_by_difficulty, difficulty_to_stars, format_datetime};
+use crate::utils::team_helpers::create_team_ref_map;
 
-pub async fn handle_fixture_difficulty_rating(team_id: Option<u64>, limit: usize, all_teams: bool) -> Result<()> {
+pub async fn handle_fixture_difficulty_rating(
+    team_id: Option<u64>,
+    limit: usize,
+    all_teams: bool,
+) -> Result<()> {
     let bootstrap_data = FplClient::fetch_bootstrap_static().await?;
-    let team_map: HashMap<u64, &Team> = bootstrap_data
-        .teams
-        .iter()
-        .map(|team| (team.id, team))
-        .collect();
+    let team_map = create_team_ref_map(&bootstrap_data.teams);
 
     let fixtures = FplClient::fetch_fixtures().await?;
     let unfinished_fixtures: Vec<&Fixture> = fixtures

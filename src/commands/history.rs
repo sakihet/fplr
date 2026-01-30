@@ -3,8 +3,8 @@ use std::collections::HashMap;
 use crate::api::FplClient;
 use crate::config::Config;
 use crate::error::Result;
+use crate::utils::formatters::color_by_comparison;
 use clap::Args;
-use owo_colors::OwoColorize;
 
 #[derive(Debug, Args)]
 pub struct HistoryArgs {
@@ -86,8 +86,7 @@ pub async fn handle_history(args: HistoryArgs) -> Result<()> {
 
         // Color the points based on comparison with average
         let pts_str = match avg_score {
-            Some(avg) if gw.points > avg as i64 => format!("{:>5}", gw.points).green().to_string(),
-            Some(avg) if gw.points < avg as i64 => format!("{:>5}", gw.points).red().to_string(),
+            Some(avg) => color_by_comparison(gw.points, avg as i64),
             _ => format!("{:>5}", gw.points),
         };
 

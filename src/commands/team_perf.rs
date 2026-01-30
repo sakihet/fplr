@@ -1,19 +1,15 @@
 use std::collections::HashMap;
 
-use owo_colors::OwoColorize;
-
 use crate::api::FplClient;
 use crate::error::Result;
+use crate::utils::event_helpers::get_current_event_id;
+use crate::utils::formatters::color_trend;
 
 pub async fn handle_team_perf(gw: Option<u32>, last: usize) -> Result<()> {
     let bootstrap_data = FplClient::fetch_bootstrap_static().await?;
 
-    // Find current gameweek if not specified
-    let current_gw = bootstrap_data
-        .events
-        .iter()
-        .find(|e| e.is_current)
-        .map(|e| e.id as u32);
+    // Find current gameweek if not specified using helper
+    let current_gw = get_current_event_id(&bootstrap_data.events);
 
     let end_gw = gw.or(current_gw).unwrap_or(1);
     let start_gw = if end_gw > last as u32 {
@@ -76,8 +72,7 @@ pub async fn handle_team_perf(gw: Option<u32>, last: usize) -> Result<()> {
 
                 for element in &live_data.elements {
                     if let Some(&team_id) = player_team_map.get(&element.id) {
-                        *team_points.entry(team_id).or_insert(0) +=
-                            element.stats.total_points;
+                        *team_points.entry(team_id).or_insert(0) += element.stats.total_points;
                     }
                 }
 
@@ -189,11 +184,7 @@ pub async fn handle_team_perf(gw: Option<u32>, last: usize) -> Result<()> {
             min, max, avg, season_avg
         ));
 
-        let trend_colored = match *trend {
-            "↑" => format!("{:>5}", trend).green().to_string(),
-            "↓" => format!("{:>5}", trend).red().to_string(),
-            _ => format!("{:>5}", trend),
-        };
+        let trend_colored = color_trend(&format!("{:>5}", trend));
         println!("{}{}", row, trend_colored);
     }
 

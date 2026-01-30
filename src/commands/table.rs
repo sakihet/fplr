@@ -1,13 +1,8 @@
-use owo_colors::OwoColorize;
 use std::collections::HashMap;
 
 use crate::api::FplClient;
 use crate::error::Result;
-
-// League position ranges for color coding
-const CL_POSITIONS: std::ops::RangeInclusive<usize> = 1..=4; // Champions League
-const EL_POSITIONS: std::ops::RangeInclusive<usize> = 5..=6; // Europa League
-const RELEGATION_POSITIONS: std::ops::RangeInclusive<usize> = 18..=20;
+use crate::utils::formatters::{color_form_result, color_league_position, format_signed_number};
 
 #[derive(Debug, Clone)]
 struct MatchResult {
@@ -58,9 +53,7 @@ pub async fn handle_table() -> Result<()> {
     // Calculate statistics from finished fixtures
     for fixture in &fixtures {
         if fixture.finished {
-            if let (Some(h_score), Some(a_score)) =
-                (fixture.team_h_score, fixture.team_a_score)
-            {
+            if let (Some(h_score), Some(a_score)) = (fixture.team_h_score, fixture.team_a_score) {
                 let event = fixture.event.unwrap_or(0);
                 let kickoff = fixture.kickoff_time.clone().unwrap_or_default();
 
@@ -83,9 +76,7 @@ pub async fn handle_table() -> Result<()> {
                         'L'
                     };
 
-                    if let Some(fixtures_list) =
-                        team_fixtures.get_mut(&fixture.team_h)
-                    {
+                    if let Some(fixtures_list) = team_fixtures.get_mut(&fixture.team_h) {
                         fixtures_list.push(MatchResult {
                             event,
                             kickoff_time: kickoff.clone(),
@@ -113,9 +104,7 @@ pub async fn handle_table() -> Result<()> {
                         'L'
                     };
 
-                    if let Some(fixtures_list) =
-                        team_fixtures.get_mut(&fixture.team_a)
-                    {
+                    if let Some(fixtures_list) = team_fixtures.get_mut(&fixture.team_a) {
                         fixtures_list.push(MatchResult {
                             event,
                             kickoff_time: kickoff,
@@ -162,35 +151,14 @@ pub async fn handle_table() -> Result<()> {
     for (i, team) in teams.iter().enumerate() {
         let pos = i + 1;
 
-        // Color code by position
-        let pos_str = if CL_POSITIONS.contains(&pos) {
-            format!("{:<4}", pos).green().to_string()
-        } else if EL_POSITIONS.contains(&pos) {
-            format!("{:<4}", pos).cyan().to_string()
-        } else if RELEGATION_POSITIONS.contains(&pos) {
-            format!("{:<4}", pos).red().to_string()
-        } else {
-            format!("{:<4}", pos)
-        };
+        // Color code by position using helper
+        let pos_str = color_league_position(pos, 4);
 
         let gd = team.goal_difference();
-        let gd_str = if gd > 0 {
-            format!("+{}", gd)
-        } else {
-            gd.to_string()
-        };
+        let gd_str = format_signed_number(gd);
 
-        // Format form with color coding
-        let form_str: String = team
-            .form
-            .iter()
-            .map(|&c| match c {
-                'W' => c.to_string().green().to_string(),
-                'L' => c.to_string().red().to_string(),
-                'D' => c.to_string().yellow().to_string(),
-                _ => c.to_string(),
-            })
-            .collect();
+        // Format form with color coding using helper
+        let form_str: String = team.form.iter().map(|&c| color_form_result(c)).collect();
 
         println!(
             "{} {:<20} {:<4} {:<4} {:<4} {:<4} {:<6} {:<6} {:<5} {:<4} {}",
