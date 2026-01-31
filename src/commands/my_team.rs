@@ -90,6 +90,10 @@ pub async fn handle_my_team(args: MyTeamArgs) -> Result<()> {
             .map(|r| r.to_string())
             .unwrap_or("N/A".to_string())
     );
+    println!(
+        "Bank:         £{:.1}m",
+        picks_data.entry_history.bank as f64 / 10.0
+    );
     println!("");
     println!(
         "{:<4} {:<4} {:<20} {:<15} {:<5} {:<6} {:<6} {:<32}",
