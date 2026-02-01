@@ -1,6 +1,8 @@
 use crate::api::FplClient;
 use crate::config::Config;
+use crate::error::Result;
 use crate::models::{Pick, Position};
+use crate::utils::event_helpers::get_effective_event_id;
 use crate::utils::team_helpers::create_team_map;
 use clap::Args;
 use std::collections::HashMap;
@@ -12,66 +14,20 @@ pub struct MyTeamArgs {
     gw: Option<u32>,
 }
 
-pub async fn handle_my_team(args: MyTeamArgs) {
-    // 1. Load Config
-    let config = match Config::load() {
-        Ok(c) => c,
-        Err(e) => {
-            eprintln!("Failed to load config: {}", e);
-            return;
-        }
-    };
-
-    let manager_id = match config.user.and_then(|u| u.manager_id) {
-        Some(id_str) => match id_str.parse::<u64>() {
-            Ok(id) => id,
-            Err(_) => {
-                eprintln!("Invalid manager_id in config. Please set a numeric ID.");
-                return;
-            }
-        },
-        None => {
-            eprintln!("Manager ID not set. Please run `fplr config set manager-id <ID>` first.");
-            return;
-        }
-    };
+pub async fn handle_my_team(args: MyTeamArgs) -> Result<()> {
+    // 1. Load Config and get manager ID
+    let config = Config::load()?;
+    let manager_id = config.get_manager_id()?;
 
     // 2. Fetch Bootstrap Static to get current GW and player details
-    let bootstrap = match FplClient::fetch_bootstrap_static().await {
-        Ok(data) => data,
-        Err(e) => {
-            eprintln!("Failed to fetch bootstrap data: {}", e);
-            return;
-        }
-    };
+    let bootstrap = FplClient::fetch_bootstrap_static().await?;
 
-    // Determine Gameweek
-    let event_id = if let Some(gw) = args.gw {
-        gw
-    } else {
-        match bootstrap.events.iter().find(|e| e.is_current) {
-            Some(e) => e.id as u32,
-            None => {
-                // Fallback: if no current event, maybe look for next one and pick previous?
-                // Or simply pick the last one that finished?
-                // For now, let's try to find the one with is_next=true and subtract 1, or just error.
-                if let Some(next) = bootstrap.events.iter().find(|e| e.is_next) {
-                    if next.id > 1 {
-                        (next.id - 1) as u32
-                    } else {
-                        eprintln!("Season hasn't started yet.");
-                        return;
-                    }
-                } else {
-                    // Maybe season finished? Get the last event
-                    if let Some(last) = bootstrap.events.last() {
-                        last.id as u32
-                    } else {
-                        eprintln!("Could not determine current Gameweek.");
-                        return;
-                    }
-                }
-            }
+    // Determine Gameweek using helper
+    let event_id = match get_effective_event_id(&bootstrap.events, args.gw) {
+        Some(id) => id,
+        None => {
+            println!("Could not determine current Gameweek.");
+            return Ok(());
         }
     };
 
@@ -81,23 +37,10 @@ pub async fn handle_my_team(args: MyTeamArgs) {
     );
 
     // 3. Fetch Manager Picks
-    let picks_data = match FplClient::fetch_manager_picks(manager_id, event_id).await {
-        Ok(data) => data,
-        Err(e) => {
-            eprintln!("Failed to fetch manager picks: {}", e);
-            return;
-        }
-    };
+    let picks_data = FplClient::fetch_manager_picks(manager_id, event_id).await?;
 
     // 4. Fetch Live Data for points
-    let live_data = match FplClient::fetch_live(event_id).await {
-        Ok(data) => data,
-        Err(e) => {
-            eprintln!("Failed to fetch live data: {}", e);
-            // We can continue without live points if needed, but for now let's return
-            return;
-        }
-    };
+    let live_data = FplClient::fetch_live(event_id).await?;
 
     // Helper maps
     let team_map = create_team_map(&bootstrap.teams);
@@ -146,6 +89,10 @@ pub async fn handle_my_team(args: MyTeamArgs) {
             .overall_rank
             .map(|r| r.to_string())
             .unwrap_or("N/A".to_string())
+    );
+    println!(
+        "Bank:         £{:.1}m",
+        picks_data.entry_history.bank as f64 / 10.0
     );
     println!("");
     println!(
@@ -207,4 +154,6 @@ pub async fn handle_my_team(args: MyTeamArgs) {
     for pick in bench {
         print_player(pick, true);
     }
+
+    Ok(())
 }

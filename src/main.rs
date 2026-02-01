@@ -1,9 +1,11 @@
 mod api;
 mod commands;
 mod config;
+mod error;
 mod models;
 mod utils;
 
+use crate::error::{FplrError, Result};
 use crate::models::{Position, SortBy};
 use clap::{Parser, Subcommand};
 
@@ -35,7 +37,7 @@ enum Commands {
     /// Show upcoming fixtures
     Fixture {},
     /// Show fixture difficulty rating
-    #[command(alias = "fdr")]
+    #[command(visible_alias = "fdr")]
     FixtureDifficultyRating {
         #[arg(short, long)]
         team_id: Option<u64>,
@@ -69,6 +71,13 @@ enum Commands {
         team: Option<String>,
         #[arg(short, long)]
         name: Option<String>,
+        #[arg(long)]
+        min_cost: Option<f64>,
+        #[arg(long)]
+        max_cost: Option<f64>,
+        /// Show only available players
+        #[arg(short, long)]
+        available: bool,
     },
     /// Show a manager's team picks for a specific event
     Pick {
@@ -97,6 +106,9 @@ enum Commands {
     Table {},
     /// Show teams
     Team {},
+    /// Show team form based on total player form
+    #[command(name = "team-form")]
+    TeamForm {},
     /// Show team performance based on player points per GW
     #[command(name = "team-perf")]
     TeamPerf {
@@ -113,43 +125,75 @@ enum Commands {
 
 #[tokio::main]
 async fn main() {
+    if let Err(e) = run().await {
+        print_error(&e);
+        std::process::exit(1);
+    }
+}
+
+async fn run() -> Result<()> {
     let args = Args::parse();
 
     match args.commands {
         Commands::Availability { team, all, limit } => {
-            commands::handle_availability(team, all, limit).await
+            commands::handle_availability(team, all, limit).await?
         }
-        Commands::Config(args) => commands::handle_config(args),
-        Commands::DreamTeam { event_id } => commands::handle_dream_team(event_id).await,
-        Commands::Gameweek {} => commands::handle_gameweek().await,
-        Commands::History(args) => commands::handle_history(args).await,
-        Commands::Live { event, limit } => commands::handle_live(event, limit).await,
-        Commands::MyTeam(args) => commands::handle_my_team(args).await,
+        Commands::Config(args) => commands::handle_config(args)?,
+        Commands::DreamTeam { event_id } => commands::handle_dream_team(event_id).await?,
+        Commands::Gameweek {} => commands::handle_gameweek().await?,
+        Commands::History(args) => commands::handle_history(args).await?,
+        Commands::Live { event, limit } => commands::handle_live(event, limit).await?,
+        Commands::MyTeam(args) => commands::handle_my_team(args).await?,
         Commands::Player {
             sort,
             position,
             limit,
             team,
             name,
-        } => commands::handle_player(sort, position, limit, team, name).await,
+            min_cost,
+            max_cost,
+            available,
+        } => {
+            commands::handle_player(
+                sort, position, limit, team, name, min_cost, max_cost, available,
+            )
+            .await?
+        }
         Commands::Pick {
             manager_id,
             event_id,
-        } => commands::handle_pick(manager_id, event_id).await,
+        } => commands::handle_pick(manager_id, event_id).await?,
         Commands::PlayerSummary { player_id, graph } => {
-            commands::handle_player_summary(player_id, graph).await
+            commands::handle_player_summary(player_id, graph).await?
         }
-        Commands::SetPiece { team } => commands::handle_set_piece(team).await,
-        Commands::Status {} => commands::handle_status().await,
-        Commands::Table {} => commands::handle_table().await,
-        Commands::Team {} => commands::handle_team().await,
-        Commands::TeamPerf { gw, last } => commands::handle_team_perf(gw, last).await,
-        Commands::Fixture {} => commands::handle_fixture().await,
+        Commands::SetPiece { team } => commands::handle_set_piece(team).await?,
+        Commands::Status {} => commands::handle_status().await?,
+        Commands::Table {} => commands::handle_table().await?,
+        Commands::Team {} => commands::handle_team().await?,
+        Commands::TeamForm {} => commands::handle_team_form().await?,
+        Commands::TeamPerf { gw, last } => commands::handle_team_perf(gw, last).await?,
+        Commands::Fixture {} => commands::handle_fixture().await?,
         Commands::FixtureDifficultyRating {
             team_id,
             limit,
             all,
-        } => commands::handle_fixture_difficulty_rating(team_id, limit, all).await,
-        Commands::Transfer(args) => commands::handle_transfer(args).await,
+        } => commands::handle_fixture_difficulty_rating(team_id, limit, all).await?,
+        Commands::Transfer(args) => commands::handle_transfer(args).await?,
+    }
+    Ok(())
+}
+
+fn print_error(e: &FplrError) {
+    eprintln!("Error: {}", e);
+
+    // Print additional hints for common errors
+    match e {
+        FplrError::ManagerIdNotSet => {
+            eprintln!("Hint: Run `fplr config set manager-id <ID>` to set your manager ID");
+        }
+        FplrError::Api(_) => {
+            eprintln!("Hint: Check your internet connection or try again later");
+        }
+        _ => {}
     }
 }

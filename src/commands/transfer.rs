@@ -1,7 +1,8 @@
-use std::collections::HashMap;
-
 use crate::api::FplClient;
+use crate::error::Result;
 use crate::models::Position;
+use crate::utils::event_helpers::get_current_event_id;
+use crate::utils::team_helpers::create_team_short_name_map;
 use clap::Args;
 use owo_colors::OwoColorize;
 
@@ -24,29 +25,14 @@ pub struct TransferArgs {
     all_time: bool,
 }
 
-pub async fn handle_transfer(args: TransferArgs) {
-    let bootstrap = match FplClient::fetch_bootstrap_static().await {
-        Ok(data) => data,
-        Err(e) => {
-            eprintln!("Failed to fetch data: {}", e);
-            return;
-        }
-    };
+pub async fn handle_transfer(args: TransferArgs) -> Result<()> {
+    let bootstrap = FplClient::fetch_bootstrap_static().await?;
 
-    // Build team name map
-    let team_map: HashMap<u64, String> = bootstrap
-        .teams
-        .iter()
-        .map(|t| (t.id, t.short_name.clone()))
-        .collect();
+    // Build team name map using helper
+    let team_map = create_team_short_name_map(&bootstrap.teams);
 
-    // Find current gameweek
-    let current_gw = bootstrap
-        .events
-        .iter()
-        .find(|e| e.is_current)
-        .map(|e| e.id)
-        .unwrap_or(1);
+    // Find current gameweek using helper
+    let current_gw = get_current_event_id(&bootstrap.events).unwrap_or(1);
 
     // Sort players by transfer direction (default is IN)
     let mut players = bootstrap.elements;
@@ -134,6 +120,7 @@ pub async fn handle_transfer(args: TransferArgs) {
     }
 
     println!();
+    Ok(())
 }
 
 fn format_number(n: u64) -> String {

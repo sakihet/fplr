@@ -14,6 +14,7 @@ pub mod status;
 pub mod summary;
 pub mod table;
 pub mod team;
+pub mod team_form;
 pub mod team_perf;
 pub mod transfer;
 
@@ -33,5 +34,6 @@ pub use status::handle_status;
 pub use summary::handle_player_summary;
 pub use table::handle_table;
 pub use team::handle_team;
+pub use team_form::handle_team_form;
 pub use team_perf::handle_team_perf;
 pub use transfer::{TransferArgs, handle_transfer};

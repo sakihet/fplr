@@ -32,7 +32,7 @@ Commands:
   config                     Manage configuration
   dream-team                 Show dream team
   fixture                    Show upcoming fixtures
-  fixture-difficulty-rating  Show fixture difficulty rating
+  fixture-difficulty-rating  Show fixture difficulty rating [aliases: fdr]
   gameweek                   Show gameweeks
   history                    Show manager's season history
   live                       Show live player stats for a specific event
@@ -44,6 +44,7 @@ Commands:
   status                     Show status
   table                      Show league table
   team                       Show teams
+  team-form                  Show team form based on total player form
   team-perf                  Show team performance based on player points per GW
   transfer                   Show popular transfers
   help                       Print this message or the help of the given subcommand(s)
