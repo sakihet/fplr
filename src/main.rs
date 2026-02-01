@@ -106,6 +106,9 @@ enum Commands {
     Table {},
     /// Show teams
     Team {},
+    /// Show team form based on total player form
+    #[command(name = "team-form")]
+    TeamForm {},
     /// Show team performance based on player points per GW
     #[command(name = "team-perf")]
     TeamPerf {
@@ -167,6 +170,7 @@ async fn run() -> Result<()> {
         Commands::Status {} => commands::handle_status().await?,
         Commands::Table {} => commands::handle_table().await?,
         Commands::Team {} => commands::handle_team().await?,
+        Commands::TeamForm {} => commands::handle_team_form().await?,
         Commands::TeamPerf { gw, last } => commands::handle_team_perf(gw, last).await?,
         Commands::Fixture {} => commands::handle_fixture().await?,
         Commands::FixtureDifficultyRating {
