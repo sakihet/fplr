@@ -43,7 +43,7 @@ pub struct Element {
     pub total_points: i64,
     pub news: String,
     pub news_added: Option<String>,
-    pub status: String,
+    pub status: super::PlayerStatus,
     pub chance_of_playing_next_round: Option<u64>,
     pub transfers_in: u64,
     pub transfers_out: u64,

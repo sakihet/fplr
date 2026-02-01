@@ -1,4 +1,5 @@
 use clap::ValueEnum;
+use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Default, ValueEnum)]
 pub enum SortBy {
@@ -7,6 +8,45 @@ pub enum SortBy {
     Form,
     #[default]
     Points,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub enum PlayerStatus {
+    #[serde(rename = "a")]
+    Available,
+    #[serde(rename = "d")]
+    Doubtful,
+    #[serde(rename = "i")]
+    Injured,
+    #[serde(rename = "s")]
+    Suspended,
+    #[serde(rename = "u")]
+    Unavailable,
+    #[serde(rename = "n")]
+    NotAvailable,
+    #[serde(other)]
+    Unknown,
+}
+
+impl PlayerStatus {
+    pub fn is_available(&self, chance: Option<u64>) -> bool {
+        match self {
+            Self::Available => true,
+            _ => chance == Some(100),
+        }
+    }
+
+    pub fn display_name(&self) -> &'static str {
+        match self {
+            Self::Available => "Available",
+            Self::Doubtful => "Doubtful",
+            Self::Injured => "Injured",
+            Self::Suspended => "Suspended",
+            Self::Unavailable => "Unavailable",
+            Self::NotAvailable => "Not Available",
+            Self::Unknown => "Unknown",
+        }
+    }
 }
 
 #[derive(Clone, Debug, ValueEnum)]

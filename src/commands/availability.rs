@@ -29,7 +29,12 @@ pub async fn handle_availability(team: Option<String>, all: bool, limit: usize) 
             }
 
             // If not "all", only show players with news or non-available status
-            if !all && player.status == "a" && player.news.is_empty() {
+            if !all
+                && player
+                    .status
+                    .is_available(player.chance_of_playing_next_round)
+                && player.news.is_empty()
+            {
                 return false;
             }
 
@@ -56,15 +61,7 @@ pub async fn handle_availability(team: Option<String>, all: bool, limit: usize) 
             .map(|s| s.as_str())
             .unwrap_or("Unknown");
 
-        let status_desc = match player.status.as_str() {
-            "a" => "Available",
-            "i" => "Injured",
-            "d" => "Doubtful",
-            "s" => "Suspended",
-            "n" => "Not Available",
-            "u" => "Unavail",
-            _ => &player.status,
-        };
+        let status_desc = player.status.display_name();
 
         let chance_val = player.chance_of_playing_next_round;
         let chance_str = chance_val

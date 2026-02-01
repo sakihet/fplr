@@ -60,7 +60,9 @@ pub async fn handle_player(
                 min_match && max_match
             };
             let available_match = if available {
-                player.status == "a" || player.chance_of_playing_next_round == Some(100)
+                player
+                    .status
+                    .is_available(player.chance_of_playing_next_round)
             } else {
                 true
             };

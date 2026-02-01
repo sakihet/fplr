@@ -11,7 +11,9 @@ pub async fn handle_team_form() -> Result<()> {
 
     for player in data.elements.iter() {
         // Availability check (same logic as player command)
-        let is_available = player.status == "a" || player.chance_of_playing_next_round == Some(100);
+        let is_available = player
+            .status
+            .is_available(player.chance_of_playing_next_round);
         if !is_available {
             continue;
         }
