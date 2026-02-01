@@ -2,11 +2,13 @@ use std::collections::HashMap;
 
 use crate::api::FplClient;
 use crate::error::Result;
+use crate::models::Fixture;
 use crate::utils::event_helpers::get_current_event_id;
 use crate::utils::formatters::color_trend;
 
 pub async fn handle_team_perf(gw: Option<u32>, last: usize) -> Result<()> {
     let bootstrap_data = FplClient::fetch_bootstrap_static().await?;
+    let all_fixtures = FplClient::fetch_fixtures().await?;
 
     // Find current gameweek if not specified using helper
     let current_gw = get_current_event_id(&bootstrap_data.events);
@@ -45,6 +47,17 @@ pub async fn handle_team_perf(gw: Option<u32>, last: usize) -> Result<()> {
     let mut team_gw_points: HashMap<u64, Vec<(u32, i64)>> = HashMap::new();
     for team in &bootstrap_data.teams {
         team_gw_points.insert(team.id, Vec::new());
+    }
+
+    // Determine completeness of GWs
+    let mut gw_completion_status: HashMap<u32, bool> = HashMap::new();
+    for gw_num in start_gw..=end_gw {
+        let fixtures: Vec<&Fixture> = all_fixtures
+            .iter()
+            .filter(|f| f.event == Some(gw_num as u64))
+            .collect();
+        let is_complete = fixtures.is_empty() || fixtures.iter().all(|f| f.finished);
+        gw_completion_status.insert(gw_num, is_complete);
     }
 
     // Fetch live data for each GW
@@ -96,29 +109,36 @@ pub async fn handle_team_perf(gw: Option<u32>, last: usize) -> Result<()> {
 
     // Calculate average and trend for each team
     // (team_id, name, points_vec, avg, min, max, season_avg, trend)
-    let mut team_stats: Vec<(u64, String, Vec<i64>, f64, i64, i64, f64, &str)> = Vec::new();
+    let mut team_stats: Vec<(u64, String, Vec<Option<i64>>, f64, i64, i64, f64, &str)> = Vec::new();
 
     for team in &bootstrap_data.teams {
         if let Some(gw_points) = team_gw_points.get(&team.id) {
-            let points: Vec<i64> = gw_list
+            let points: Vec<Option<i64>> = gw_list
                 .iter()
                 .map(|gw| {
-                    gw_points
-                        .iter()
-                        .find(|(g, _)| g == gw)
-                        .map(|(_, p)| *p)
-                        .unwrap_or(0)
+                    let is_complete = *gw_completion_status.get(gw).unwrap_or(&false);
+                    if is_complete {
+                        gw_points
+                            .iter()
+                            .find(|(g, _)| g == gw)
+                            .map(|(_, p)| Some(*p))
+                            .unwrap_or(Some(0))
+                    } else {
+                        None
+                    }
                 })
                 .collect();
 
-            let avg = if !points.is_empty() {
-                points.iter().sum::<i64>() as f64 / points.len() as f64
+            let valid_points: Vec<i64> = points.iter().filter_map(|&p| p).collect();
+
+            let avg = if !valid_points.is_empty() {
+                valid_points.iter().sum::<i64>() as f64 / valid_points.len() as f64
             } else {
                 0.0
             };
 
-            let min = points.iter().copied().min().unwrap_or(0);
-            let max = points.iter().copied().max().unwrap_or(0);
+            let min = valid_points.iter().copied().min().unwrap_or(0);
+            let max = valid_points.iter().copied().max().unwrap_or(0);
 
             // Season average
             let season_total = *team_season_points.get(&team.id).unwrap_or(&0);
@@ -128,10 +148,10 @@ pub async fn handle_team_perf(gw: Option<u32>, last: usize) -> Result<()> {
                 0.0
             };
 
-            // Calculate trend (compare last 2 GWs)
-            let trend = if points.len() >= 2 {
-                let last = points[points.len() - 1];
-                let prev = points[points.len() - 2];
+            // Calculate trend (compare last 2 VALID GWs)
+            let trend = if valid_points.len() >= 2 {
+                let last = valid_points[valid_points.len() - 1];
+                let prev = valid_points[valid_points.len() - 2];
                 if last > prev {
                     "↑"
                 } else if last < prev {
@@ -177,7 +197,10 @@ pub async fn handle_team_perf(gw: Option<u32>, last: usize) -> Result<()> {
     {
         let mut row = format!("{:<5} {:<4} {:<20}", rank + 1, team_id, name);
         for p in points {
-            row.push_str(&format!(" {:>5}", p));
+            match p {
+                Some(val) => row.push_str(&format!(" {:>5}", val)),
+                None => row.push_str("     -"),
+            }
         }
         row.push_str(&format!(
             " {:>5} {:>5} {:>8.1} {:>8.1} ",
