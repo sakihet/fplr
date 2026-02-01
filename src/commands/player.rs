@@ -13,6 +13,7 @@ pub async fn handle_player(
     name: Option<String>,
     min_cost: Option<f64>,
     max_cost: Option<f64>,
+    available: bool,
 ) -> Result<()> {
     let data = FplClient::fetch_bootstrap_static().await?;
 
@@ -58,7 +59,12 @@ pub async fn handle_player(
                 };
                 min_match && max_match
             };
-            position_match && team_match && name_match && cost_match
+            let available_match = if available {
+                player.status == "a" || player.chance_of_playing_next_round == Some(100)
+            } else {
+                true
+            };
+            position_match && team_match && name_match && cost_match && available_match
         })
         .collect();
 

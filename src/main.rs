@@ -75,6 +75,9 @@ enum Commands {
         min_cost: Option<f64>,
         #[arg(long)]
         max_cost: Option<f64>,
+        /// Show only available players
+        #[arg(short, long)]
+        available: bool,
     },
     /// Show a manager's team picks for a specific event
     Pick {
@@ -146,7 +149,13 @@ async fn run() -> Result<()> {
             name,
             min_cost,
             max_cost,
-        } => commands::handle_player(sort, position, limit, team, name, min_cost, max_cost).await?,
+            available,
+        } => {
+            commands::handle_player(
+                sort, position, limit, team, name, min_cost, max_cost, available,
+            )
+            .await?
+        }
         Commands::Pick {
             manager_id,
             event_id,
