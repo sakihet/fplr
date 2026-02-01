@@ -3,7 +3,7 @@ use deunicode::deunicode;
 use crate::api::FplClient;
 use crate::error::Result;
 use crate::models::{Element, Position, SortBy};
-use crate::utils::team_helpers::{create_team_map, find_team_ids_by_name};
+use crate::utils::team_helpers::{create_team_short_name_map, find_team_ids_by_name};
 
 pub async fn handle_player(
     sort: SortBy,
@@ -14,7 +14,7 @@ pub async fn handle_player(
 ) -> Result<()> {
     let data = FplClient::fetch_bootstrap_static().await?;
 
-    let team_map = create_team_map(&data.teams);
+    let team_map = create_team_short_name_map(&data.teams);
     let target_team_ids = if let Some(ref team_name) = team {
         find_team_ids_by_name(&data.teams, team_name)
     } else {
@@ -62,7 +62,7 @@ pub async fn handle_player(
     }
 
     println!(
-        "{:<4} {:<20} {:<4} {:<16} {:<8} {:<8} {:<8} {:<8} {:<30}",
+        "{:<4} {:<20} {:<4} {:<6} {:<6} {:<8} {:<6} {:<8} {:<30}",
         "ID", "Name", "Pos", "Team", "Cost", "Selected", "Form", "Points", "News"
     );
 
@@ -73,7 +73,7 @@ pub async fn handle_player(
             .unwrap_or("Unknown");
 
         println!(
-            "{:<4} {:<20} {:<4} {:<16} {:<8} {:<8} {:<8} {:<8} {:<30}",
+            "{:<4} {:<20} {:<4} {:<6} {:<6} {:<8} {:<6} {:<8} {:<30}",
             player.id,
             player.web_name,
             Position::from_element_type_id(player.element_type)
