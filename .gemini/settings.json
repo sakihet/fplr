@@ -2,7 +2,7 @@
     "tools": {
         "allowed": [
             "run_shell_command(cargo)",
-            "run_shell_command(git)"
+            "run_shell_command(git diff)"
         ]
     }
 }
