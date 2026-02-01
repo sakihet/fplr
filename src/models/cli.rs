@@ -11,9 +11,13 @@ pub enum SortBy {
 
 #[derive(Clone, Debug, ValueEnum)]
 pub enum Position {
+    #[value(alias = "gkp", alias = "gk")]
     Goalkeeper,
+    #[value(alias = "def")]
     Defender,
+    #[value(alias = "mid")]
     Midfielder,
+    #[value(alias = "fwd")]
     Forward,
 }
 
