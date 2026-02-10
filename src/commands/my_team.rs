@@ -5,7 +5,7 @@ use crate::models::{Pick, Position};
 use crate::utils::event_helpers::get_effective_event_id;
 use crate::utils::team_helpers::create_team_map;
 use clap::Args;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 #[derive(Debug, Args)]
 pub struct MyTeamArgs {
@@ -42,6 +42,16 @@ pub async fn handle_my_team(args: MyTeamArgs) -> Result<()> {
     // 4. Fetch Live Data for points
     let live_data = FplClient::fetch_live(event_id).await?;
 
+    // 5. Fetch Fixtures to check if matches have started
+    let fixtures = FplClient::fetch_fixtures_by_event(event_id).await?;
+    let mut started_teams = HashSet::new();
+    for fixture in fixtures {
+        if fixture.started {
+            started_teams.insert(fixture.team_h);
+            started_teams.insert(fixture.team_a);
+        }
+    }
+
     // Helper maps
     let team_map = create_team_map(&bootstrap.teams);
     let player_map: HashMap<u64, &crate::models::Element> =
@@ -53,7 +63,7 @@ pub async fn handle_my_team(args: MyTeamArgs) -> Result<()> {
         .map(|e| (e.id, &e.stats))
         .collect();
 
-    // 5. Display
+    // 6. Display
     // Sort picks by position: GKP(1), DEF(2), MID(3), FWD(4), then Sub
     // Picks 1-11 are starters, 12-15 are bench.
 
@@ -127,6 +137,12 @@ pub async fn handle_my_team(args: MyTeamArgs) -> Result<()> {
             // Apply multiplier for display (e.g. Captain points doubled)
             let final_points = points * (pick.multiplier as i64);
 
+            let points_display = if !started_teams.contains(&player.team) && points == 0 {
+                "-".to_string()
+            } else {
+                final_points.to_string()
+            };
+
             let cost = format!("{:.1}", player.now_cost as f64 / 10.0);
 
             println!(
@@ -135,7 +151,7 @@ pub async fn handle_my_team(args: MyTeamArgs) -> Result<()> {
                 pos_name,
                 name_display,
                 team_name,
-                final_points,
+                points_display,
                 cost,
                 player.form,
                 player.news.chars().take(32).collect::<String>()
