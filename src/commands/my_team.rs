@@ -46,7 +46,7 @@ pub async fn handle_my_team(args: MyTeamArgs) -> Result<()> {
     let fixtures = FplClient::fetch_fixtures_by_event(event_id).await?;
     let mut started_teams = HashSet::new();
     for fixture in fixtures {
-        if fixture.started {
+        if fixture.started.unwrap_or(false) {
             started_teams.insert(fixture.team_h);
             started_teams.insert(fixture.team_a);
         }
