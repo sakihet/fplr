@@ -154,9 +154,16 @@ async fn run() -> Result<()> {
             max_cost,
             available,
         } => {
-            commands::handle_player(
-                sort, position, limit, team, name, min_cost, max_cost, available,
-            )
+            commands::handle_player(commands::PlayerFilterArgs {
+                sort,
+                position,
+                limit,
+                team,
+                name,
+                min_cost,
+                max_cost,
+                available,
+            })
             .await?
         }
         Commands::Pick {

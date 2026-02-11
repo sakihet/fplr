@@ -6,6 +6,8 @@ use crate::models::{Fixture, Team};
 use crate::utils::formatters::{colorize_text_by_difficulty, difficulty_to_stars, format_datetime};
 use crate::utils::team_helpers::create_team_ref_map;
 
+type TeamFdrData<'a> = (u64, &'a Team, Vec<Vec<(String, u8)>>);
+
 pub async fn handle_fixture_difficulty_rating(
     team_id: Option<u64>,
     limit: usize,
@@ -110,7 +112,7 @@ fn display_all_teams_fdr(fixtures: &[&Fixture], limit: usize, team_map: &HashMap
     let events_to_show: Vec<u64> = events.iter().take(limit).copied().collect();
 
     // Build FDR data for each team: (team_id, team, Vec<Vec<(display_text, difficulty)>>)
-    let mut team_fdr_data: Vec<(u64, &Team, Vec<Vec<(String, u8)>>)> = Vec::new();
+    let mut team_fdr_data: Vec<TeamFdrData> = Vec::new();
 
     for (team_id, team) in team_map.iter() {
         let mut fdr_values: Vec<Vec<(String, u8)>> = Vec::new();

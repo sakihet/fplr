@@ -104,7 +104,7 @@ pub async fn handle_my_team(args: MyTeamArgs) -> Result<()> {
         "Bank:         £{:.1}m",
         picks_data.entry_history.bank as f64 / 10.0
     );
-    println!("");
+    println!();
     println!(
         "{:<4} {:<4} {:<20} {:<15} {:<5} {:<6} {:<6} {:<32}",
         "ID", "Pos", "Name", "Team", "Pts", "Cost", "Form", "Status"

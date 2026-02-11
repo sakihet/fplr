@@ -44,12 +44,10 @@ pub async fn handle_transfer(args: TransferArgs) -> Result<()> {
         } else {
             players.sort_by(|a, b| b.transfers_out_event.cmp(&a.transfers_out_event));
         }
+    } else if args.all_time {
+        players.sort_by(|a, b| b.transfers_in.cmp(&a.transfers_in));
     } else {
-        if args.all_time {
-            players.sort_by(|a, b| b.transfers_in.cmp(&a.transfers_in));
-        } else {
-            players.sort_by(|a, b| b.transfers_in_event.cmp(&a.transfers_in_event));
-        }
+        players.sort_by(|a, b| b.transfers_in_event.cmp(&a.transfers_in_event));
     }
 
     // Print header

@@ -23,10 +23,10 @@ pub fn format_datetime_local(datetime_str: &str) -> String {
 
 fn get_system_timezone() -> Option<Tz> {
     // Try TZ environment variable first
-    if let Ok(tz_str) = std::env::var("TZ") {
-        if let Ok(tz) = tz_str.parse::<Tz>() {
-            return Some(tz);
-        }
+    if let Ok(tz_str) = std::env::var("TZ")
+        && let Ok(tz) = tz_str.parse::<Tz>()
+    {
+        return Some(tz);
     }
 
     // On macOS/Linux, try to read from /etc/localtime symlink

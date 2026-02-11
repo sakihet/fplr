@@ -27,10 +27,10 @@ pub fn get_effective_event_id(events: &[Event], specified: Option<u32>) -> Optio
     }
 
     // Try next event - 1 (between gameweeks)
-    if let Some(next) = find_next_event(events) {
-        if next.id > 1 {
-            return Some((next.id - 1) as u32);
-        }
+    if let Some(next) = find_next_event(events)
+        && next.id > 1
+    {
+        return Some((next.id - 1) as u32);
     }
 
     // Fall back to last event (season ended)

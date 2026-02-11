@@ -6,7 +6,7 @@ pub async fn handle_set_piece(team_name: Option<String>) -> Result<()> {
     let bootstrap = FplClient::fetch_bootstrap_static().await?;
     let data = FplClient::fetch_set_piece_notes().await?;
 
-    println!("{:<20} {}", "Team", "Set Piece Info");
+    println!("{:<20} Set Piece Info", "Team");
 
     for team_notes in data.teams {
         // Get team name from team_id
@@ -17,12 +17,9 @@ pub async fn handle_set_piece(team_name: Option<String>) -> Result<()> {
 
         // Apply filter if provided
         if let Some(ref filter) = team_name {
-            if !team_short_name
-                .to_lowercase()
-                .contains(&filter.to_lowercase())
-                && !team_full_name
-                    .to_lowercase()
-                    .contains(&filter.to_lowercase())
+            let filter_lower = filter.to_lowercase();
+            if !team_short_name.to_lowercase().contains(&filter_lower)
+                && !team_full_name.to_lowercase().contains(&filter_lower)
             {
                 continue;
             }
