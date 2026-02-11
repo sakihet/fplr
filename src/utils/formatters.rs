@@ -1,9 +1,50 @@
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Local, Utc};
+use chrono_tz::Tz;
 use owo_colors::OwoColorize;
 
 pub fn format_datetime(datetime_str: &str) -> String {
     let dt = datetime_str.parse::<DateTime<Utc>>().unwrap();
     dt.format("%Y-%m-%d %H:%M UTC").to_string()
+}
+
+pub fn format_datetime_local(datetime_str: &str) -> String {
+    let dt = datetime_str.parse::<DateTime<Utc>>().unwrap();
+
+    // Try to get system timezone name and use chrono-tz for proper abbreviation
+    if let Some(tz) = get_system_timezone() {
+        let local_dt = dt.with_timezone(&tz);
+        return local_dt.format("%Y-%m-%d %H:%M %Z").to_string();
+    }
+
+    // Fallback to offset format
+    let local_dt = dt.with_timezone(&Local);
+    local_dt.format("%Y-%m-%d %H:%M %:z").to_string()
+}
+
+fn get_system_timezone() -> Option<Tz> {
+    // Try TZ environment variable first
+    if let Ok(tz_str) = std::env::var("TZ") {
+        if let Ok(tz) = tz_str.parse::<Tz>() {
+            return Some(tz);
+        }
+    }
+
+    // On macOS/Linux, try to read from /etc/localtime symlink
+    #[cfg(unix)]
+    {
+        if let Ok(link) = std::fs::read_link("/etc/localtime") {
+            let path_str = link.to_string_lossy();
+            // Extract timezone from path like /var/db/timezone/zoneinfo/Asia/Tokyo
+            if let Some(pos) = path_str.find("zoneinfo/") {
+                let tz_name = &path_str[pos + 9..];
+                if let Ok(tz) = tz_name.parse::<Tz>() {
+                    return Some(tz);
+                }
+            }
+        }
+    }
+
+    None
 }
 
 pub fn difficulty_to_stars(difficulty: u8) -> String {
