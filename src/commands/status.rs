@@ -2,7 +2,7 @@ use crate::api::FplClient;
 use crate::config::Config;
 use crate::error::Result;
 use crate::utils::event_helpers::{find_current_event, find_next_event};
-use crate::utils::formatters::format_datetime;
+use crate::utils::formatters::format_datetime_local;
 
 pub async fn handle_status() -> Result<()> {
     let config = Config::load().unwrap_or_default();
@@ -27,11 +27,11 @@ pub async fn handle_status() -> Result<()> {
 
     if let (Some(current), Some(next)) = (current_event, next_event) {
         println!(
-            "{:<8} {:<8} {:<8} {:<8} {:<15}",
+            "{:<8} {:<8} {:<8} {:<8} {:<22}",
             "GW", "Average", "Points", "Highest", "Next Deadline"
         );
         println!(
-            "{:<8} {:<8} {:<8} {:<8} {:<15}",
+            "{:<8} {:<8} {:<8} {:<8} {:<22}",
             current.id,
             current
                 .average_entry_score
@@ -42,7 +42,7 @@ pub async fn handle_status() -> Result<()> {
                 .highest_score
                 .map(|s| s.to_string())
                 .unwrap_or("-".to_string()),
-            format_datetime(&next.deadline_time),
+            format_datetime_local(&next.deadline_time),
         );
     } else {
         println!("No current gameweek found.");

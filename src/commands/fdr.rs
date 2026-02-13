@@ -6,6 +6,8 @@ use crate::models::{Fixture, Team};
 use crate::utils::formatters::{colorize_text_by_difficulty, difficulty_to_stars, format_datetime};
 use crate::utils::team_helpers::create_team_ref_map;
 
+type TeamFdrData<'a> = (u64, &'a Team, Vec<Vec<(String, u8)>>);
+
 pub async fn handle_fixture_difficulty_rating(
     team_id: Option<u64>,
     limit: usize,
@@ -110,7 +112,7 @@ fn display_all_teams_fdr(fixtures: &[&Fixture], limit: usize, team_map: &HashMap
     let events_to_show: Vec<u64> = events.iter().take(limit).copied().collect();
 
     // Build FDR data for each team: (team_id, team, Vec<Vec<(display_text, difficulty)>>)
-    let mut team_fdr_data: Vec<(u64, &Team, Vec<Vec<(String, u8)>>)> = Vec::new();
+    let mut team_fdr_data: Vec<TeamFdrData> = Vec::new();
 
     for (team_id, team) in team_map.iter() {
         let mut fdr_values: Vec<Vec<(String, u8)>> = Vec::new();
@@ -148,10 +150,26 @@ fn display_all_teams_fdr(fixtures: &[&Fixture], limit: usize, team_map: &HashMap
     // Sort by team name
     team_fdr_data.sort_by(|a, b| a.1.name.cmp(&b.1.name));
 
-    // Print header
+    // Calculate dynamic column widths based on content
+    let mut column_widths: Vec<usize> = vec![6; events_to_show.len()]; // Minimum width for "GWxx"
+    for (_, _, fdr_values) in &team_fdr_data {
+        for (idx, gw_fixtures) in fdr_values.iter().enumerate() {
+            let cell_width = if gw_fixtures.is_empty() {
+                1 // "-"
+            } else {
+                // Calculate total width: sum of text lengths + spaces between fixtures
+                gw_fixtures.iter().map(|(t, _)| t.len()).sum::<usize>()
+                    + gw_fixtures.len().saturating_sub(1)
+            };
+            column_widths[idx] = column_widths[idx].max(cell_width);
+        }
+    }
+
+    // Print header with dynamic widths
     print!("{:<20}", "Team");
-    for event in &events_to_show {
-        print!(" {:<8}", format!("GW{}", event));
+    for (idx, event) in events_to_show.iter().enumerate() {
+        let width = column_widths[idx];
+        print!(" {:<width$}", format!("GW{}", event));
     }
     println!(" {:<5}", "Avg");
 
@@ -162,9 +180,10 @@ fn display_all_teams_fdr(fixtures: &[&Fixture], limit: usize, team_map: &HashMap
         let mut total = 0.0;
         let mut count = 0;
 
-        for gw_fixtures in &fdr_values {
+        for (idx, gw_fixtures) in fdr_values.iter().enumerate() {
+            let width = column_widths[idx];
             if gw_fixtures.is_empty() {
-                print!(" {:<8}", "-");
+                print!(" {:>width$}", "-");
             } else {
                 let mut display_parts = Vec::new();
                 let mut visual_length = 0;
@@ -174,18 +193,13 @@ fn display_all_teams_fdr(fixtures: &[&Fixture], limit: usize, team_map: &HashMap
                     total += *difficulty as f32;
                     count += 1;
                 }
-                visual_length += if gw_fixtures.len() > 1 {
-                    gw_fixtures.len() - 1
-                } else {
-                    0
-                };
-                let joined = display_parts.join(" ");
-                print!(" {}", joined);
+                // Add spaces between fixtures to visual length
+                visual_length += gw_fixtures.len().saturating_sub(1);
 
-                // Pad to match column width (8)
-                if visual_length < 8 {
-                    print!("{}", " ".repeat(8 - visual_length));
-                }
+                let joined = display_parts.join(" ");
+                // Right-pad to match dynamic column width
+                let padding = width.saturating_sub(visual_length);
+                print!(" {}{}", joined, " ".repeat(padding));
             }
         }
 

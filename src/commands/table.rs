@@ -52,65 +52,65 @@ pub async fn handle_table() -> Result<()> {
 
     // Calculate statistics from finished fixtures
     for fixture in &fixtures {
-        if fixture.finished {
-            if let (Some(h_score), Some(a_score)) = (fixture.team_h_score, fixture.team_a_score) {
-                let event = fixture.event.unwrap_or(0);
-                let kickoff = fixture.kickoff_time.clone().unwrap_or_default();
+        if fixture.finished
+            && let (Some(h_score), Some(a_score)) = (fixture.team_h_score, fixture.team_a_score)
+        {
+            let event = fixture.event.unwrap_or(0);
+            let kickoff = fixture.kickoff_time.clone().unwrap_or_default();
 
-                // Home team
-                if let Some(h_stats) = stats_map.get_mut(&fixture.team_h) {
-                    h_stats.played += 1;
-                    h_stats.goals_for += h_score;
-                    h_stats.goals_against += a_score;
+            // Home team
+            if let Some(h_stats) = stats_map.get_mut(&fixture.team_h) {
+                h_stats.played += 1;
+                h_stats.goals_for += h_score;
+                h_stats.goals_against += a_score;
 
-                    let result = if h_score > a_score {
-                        h_stats.won += 1;
-                        h_stats.points += 3;
-                        'W'
-                    } else if h_score == a_score {
-                        h_stats.drawn += 1;
-                        h_stats.points += 1;
-                        'D'
-                    } else {
-                        h_stats.lost += 1;
-                        'L'
-                    };
+                let result = if h_score > a_score {
+                    h_stats.won += 1;
+                    h_stats.points += 3;
+                    'W'
+                } else if h_score == a_score {
+                    h_stats.drawn += 1;
+                    h_stats.points += 1;
+                    'D'
+                } else {
+                    h_stats.lost += 1;
+                    'L'
+                };
 
-                    if let Some(fixtures_list) = team_fixtures.get_mut(&fixture.team_h) {
-                        fixtures_list.push(MatchResult {
-                            event,
-                            kickoff_time: kickoff.clone(),
-                            result,
-                        });
-                    }
+                if let Some(fixtures_list) = team_fixtures.get_mut(&fixture.team_h) {
+                    fixtures_list.push(MatchResult {
+                        event,
+                        kickoff_time: kickoff.clone(),
+                        result,
+                    });
                 }
+            }
 
-                // Away team
-                if let Some(a_stats) = stats_map.get_mut(&fixture.team_a) {
-                    a_stats.played += 1;
-                    a_stats.goals_for += a_score;
-                    a_stats.goals_against += h_score;
+            // Away team
+            if let Some(a_stats) = stats_map.get_mut(&fixture.team_a) {
+                a_stats.played += 1;
+                a_stats.goals_for += a_score;
+                a_stats.goals_against += h_score;
 
-                    let result = if a_score > h_score {
-                        a_stats.won += 1;
-                        a_stats.points += 3;
-                        'W'
-                    } else if a_score == h_score {
-                        a_stats.drawn += 1;
-                        a_stats.points += 1;
-                        'D'
-                    } else {
-                        a_stats.lost += 1;
-                        'L'
-                    };
+                let result = if a_score > h_score {
+                    a_stats.won += 1;
+                    a_stats.points += 3;
+                    'W'
+                } else if a_score == h_score {
+                    a_stats.drawn += 1;
+                    a_stats.points += 1;
+                    'D'
+                } else {
+                    a_stats.lost += 1;
+                    'L'
+                };
 
-                    if let Some(fixtures_list) = team_fixtures.get_mut(&fixture.team_a) {
-                        fixtures_list.push(MatchResult {
-                            event,
-                            kickoff_time: kickoff,
-                            result,
-                        });
-                    }
+                if let Some(fixtures_list) = team_fixtures.get_mut(&fixture.team_a) {
+                    fixtures_list.push(MatchResult {
+                        event,
+                        kickoff_time: kickoff,
+                        result,
+                    });
                 }
             }
         }

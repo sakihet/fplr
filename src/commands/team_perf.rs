@@ -6,6 +6,8 @@ use crate::models::Fixture;
 use crate::utils::event_helpers::get_current_event_id;
 use crate::utils::formatters::color_trend;
 
+type TeamStatsPerf<'a> = (u64, String, Vec<Option<i64>>, f64, i64, i64, f64, &'a str);
+
 pub async fn handle_team_perf(gw: Option<u32>, last: usize) -> Result<()> {
     let bootstrap_data = FplClient::fetch_bootstrap_static().await?;
     let all_fixtures = FplClient::fetch_fixtures().await?;
@@ -109,7 +111,7 @@ pub async fn handle_team_perf(gw: Option<u32>, last: usize) -> Result<()> {
 
     // Calculate average and trend for each team
     // (team_id, name, points_vec, avg, min, max, season_avg, trend)
-    let mut team_stats: Vec<(u64, String, Vec<Option<i64>>, f64, i64, i64, f64, &str)> = Vec::new();
+    let mut team_stats: Vec<TeamStatsPerf> = Vec::new();
 
     for team in &bootstrap_data.teams {
         if let Some(gw_points) = team_gw_points.get(&team.id) {

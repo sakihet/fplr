@@ -28,7 +28,7 @@ pub use history::{HistoryArgs, handle_history};
 pub use live::handle_live;
 pub use my_team::{MyTeamArgs, handle_my_team};
 pub use pick::handle_pick;
-pub use player::handle_player;
+pub use player::{PlayerFilterArgs, handle_player};
 pub use set_piece::handle_set_piece;
 pub use status::handle_status;
 pub use summary::handle_player_summary;

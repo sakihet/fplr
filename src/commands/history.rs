@@ -58,7 +58,7 @@ pub async fn handle_history(args: HistoryArgs) -> Result<()> {
     for gw in &history.current {
         let rank_str = gw
             .overall_rank
-            .map(|r| format_number(r))
+            .map(format_number)
             .unwrap_or_else(|| "-".to_string());
 
         let rank_change = match (prev_rank, gw.overall_rank) {
@@ -115,7 +115,7 @@ pub async fn handle_history(args: HistoryArgs) -> Result<()> {
         .current
         .last()
         .and_then(|g| g.overall_rank)
-        .map(|r| format_number(r))
+        .map(format_number)
         .unwrap_or_else(|| "N/A".to_string());
     let total_transfers: u64 = history.current.iter().map(|g| g.event_transfers).sum();
     let total_transfer_cost: i64 = history.current.iter().map(|g| g.event_transfers_cost).sum();

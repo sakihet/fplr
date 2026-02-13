@@ -1,7 +1,7 @@
 use crate::api::FplClient;
 use crate::error::{FplrError, Result};
 use crate::utils::event_helpers::find_next_event;
-use crate::utils::formatters::format_datetime;
+use crate::utils::formatters::format_datetime_local;
 use crate::utils::team_helpers::create_team_map;
 
 pub async fn handle_fixture() -> Result<()> {
@@ -38,7 +38,7 @@ pub async fn handle_fixture() -> Result<()> {
         println!(
             "{:<4} {:<20} {:<20} {:<20}",
             fixture.id,
-            format_datetime(kickoff),
+            format_datetime_local(kickoff),
             home_team,
             away_team
         );

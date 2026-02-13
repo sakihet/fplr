@@ -30,6 +30,10 @@ impl FplClient {
         Self::fetch("/fixtures/").await
     }
 
+    pub async fn fetch_fixtures_by_event(event_id: u32) -> Result<Vec<Fixture>> {
+        Self::fetch(&format!("/fixtures/?event={}", event_id)).await
+    }
+
     pub async fn fetch_live(event_id: u32) -> Result<LiveData> {
         Self::fetch(&format!("/event/{}/live/", event_id)).await
     }

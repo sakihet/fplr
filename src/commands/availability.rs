@@ -1,13 +1,14 @@
 use crate::api::FplClient;
 use crate::error::Result;
 use crate::models::{Element, Position};
-use crate::utils::team_helpers::{create_team_map, find_team_ids_by_name};
+use crate::utils::formatters::format_datetime_local;
+use crate::utils::team_helpers::{create_team_short_name_map, find_team_ids_by_name};
 use owo_colors::OwoColorize;
 
 pub async fn handle_availability(team: Option<String>, all: bool, limit: usize) -> Result<()> {
     let data = FplClient::fetch_bootstrap_static().await?;
 
-    let team_map = create_team_map(&data.teams);
+    let team_map = create_team_short_name_map(&data.teams);
     let target_team_ids = if let Some(ref team_name) = team {
         find_team_ids_by_name(&data.teams, team_name)
     } else {
@@ -51,7 +52,7 @@ pub async fn handle_availability(team: Option<String>, all: bool, limit: usize) 
     players.sort_by(|a, b| b.news_added.cmp(&a.news_added));
 
     println!(
-        "{:<4} {:<20} {:<16} {:<4} {:<10} {:<8} {:<18} {:<30}",
+        "{:<4} {:<20} {:<6} {:<4} {:<14} {:<8} {:<24} {:<30}",
         "ID", "Name", "Team", "Pos", "Status", "Chance", "News Added", "News"
     );
 
@@ -80,17 +81,11 @@ pub async fn handle_availability(team: Option<String>, all: bool, limit: usize) 
         let news_added = player
             .news_added
             .as_ref()
-            .map(|s| {
-                if s.len() >= 16 {
-                    s[..16].replace('T', " ")
-                } else {
-                    s.clone()
-                }
-            })
+            .map(|s| format_datetime_local(s))
             .unwrap_or_else(|| "N/A".to_string());
 
         println!(
-            "{:<4} {:<20} {:<16} {:<4} {:<10} {}{} {:<18} {:<30}",
+            "{:<4} {:<20} {:<6} {:<4} {:<14} {}{} {:<24} {:<30}",
             player.id,
             player.web_name,
             team_name,
@@ -98,8 +93,8 @@ pub async fn handle_availability(team: Option<String>, all: bool, limit: usize) 
                 .map(|p| p.display_name().to_string())
                 .unwrap_or_default(),
             status_desc,
-            chance_padding,
             colored_chance,
+            chance_padding,
             news_added,
             player.news
         );
