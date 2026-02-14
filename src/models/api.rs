@@ -284,3 +284,35 @@ pub struct SetPieceNotes {
     pub last_updated: String,
     pub teams: Vec<SetPieceTeam>,
 }
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct StandingResult {
+    pub id: u64,
+    pub event_total: i64,
+    pub player_name: String,
+    pub rank: u64,
+    pub last_rank: u64,
+    pub rank_sort: u64,
+    pub total: i64,
+    pub entry: u64,
+    pub entry_name: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Standings {
+    pub has_next: bool,
+    pub page: u64,
+    pub results: Vec<StandingResult>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct League {
+    pub id: u64,
+    pub name: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct LeagueStandingsResponse {
+    pub league: League,
+    pub standings: Standings,
+}

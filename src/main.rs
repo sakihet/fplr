@@ -104,6 +104,8 @@ enum Commands {
     Status {},
     /// Show league table
     Table {},
+    /// Show top teams in the overall league
+    Top {},
     /// Show teams
     Team {},
     /// Show team form based on total player form
@@ -176,6 +178,7 @@ async fn run() -> Result<()> {
         Commands::SetPiece { team } => commands::handle_set_piece(team).await?,
         Commands::Status {} => commands::handle_status().await?,
         Commands::Table {} => commands::handle_table().await?,
+        Commands::Top {} => commands::handle_top().await?,
         Commands::Team {} => commands::handle_team().await?,
         Commands::TeamForm {} => commands::handle_team_form().await?,
         Commands::TeamPerf { gw, last } => commands::handle_team_perf(gw, last).await?,
