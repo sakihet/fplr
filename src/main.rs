@@ -56,6 +56,14 @@ enum Commands {
         #[arg(short, long, default_value = "20")]
         limit: usize,
     },
+    /// Show a specific manager's team
+    Manager {
+        /// Manager ID
+        manager_id: u64,
+        /// Specific Gameweek (defaults to current)
+        #[arg(short, long)]
+        gw: Option<u32>,
+    },
     /// Show my team
     #[command(name = "my-team")]
     MyTeam(commands::MyTeamArgs),
@@ -145,6 +153,7 @@ async fn run() -> Result<()> {
         Commands::Gameweek {} => commands::handle_gameweek().await?,
         Commands::History(args) => commands::handle_history(args).await?,
         Commands::Live { event, limit } => commands::handle_live(event, limit).await?,
+        Commands::Manager { manager_id, gw } => commands::handle_manager(manager_id, gw).await?,
         Commands::MyTeam(args) => commands::handle_my_team(args).await?,
         Commands::Player {
             sort,
