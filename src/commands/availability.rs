@@ -1,9 +1,8 @@
 use crate::api::FplClient;
 use crate::error::Result;
 use crate::models::{Element, Position};
-use crate::utils::formatters::format_datetime_local;
+use crate::utils::formatters::{format_chance_of_playing, format_datetime_local};
 use crate::utils::team_helpers::{create_team_short_name_map, find_team_ids_by_name};
-use owo_colors::OwoColorize;
 
 pub async fn handle_availability(team: Option<String>, all: bool, limit: usize) -> Result<()> {
     let data = FplClient::fetch_bootstrap_static().await?;
@@ -52,8 +51,8 @@ pub async fn handle_availability(team: Option<String>, all: bool, limit: usize) 
     players.sort_by(|a, b| b.news_added.cmp(&a.news_added));
 
     println!(
-        "{:<4} {:<20} {:<6} {:<4} {:<14} {:<8} {:<24} {:<30}",
-        "ID", "Name", "Team", "Pos", "Status", "Chance", "News Added", "News"
+        "{:<4} {:<20} {:<6} {:<4} {:<14} {:<6} {:<24} {:<30}",
+        "ID", "Name", "Team", "Pos", "Status", "Avail", "News Added", "News"
     );
 
     for player in players.iter().take(limit) {
@@ -64,19 +63,8 @@ pub async fn handle_availability(team: Option<String>, all: bool, limit: usize) 
 
         let status_desc = player.status.display_name();
 
-        let chance_val = player.chance_of_playing_next_round;
-        let chance_str = chance_val
-            .map(|c| format!("{}%", c))
-            .unwrap_or_else(|| "N/A".to_string());
-
-        let chance_padding = " ".repeat(8usize.saturating_sub(chance_str.len()));
-
-        let colored_chance = match chance_val {
-            Some(75) => chance_str.yellow().to_string(),
-            Some(50) => chance_str.truecolor(255, 165, 0).to_string(),
-            Some(0) => chance_str.red().to_string(),
-            _ => chance_str,
-        };
+        let avail_display =
+            format_chance_of_playing(player.chance_of_playing_next_round, &player.news);
 
         let news_added = player
             .news_added
@@ -85,7 +73,7 @@ pub async fn handle_availability(team: Option<String>, all: bool, limit: usize) 
             .unwrap_or_else(|| "N/A".to_string());
 
         println!(
-            "{:<4} {:<20} {:<6} {:<4} {:<14} {}{} {:<24} {:<30}",
+            "{:<4} {:<20} {:<6} {:<4} {:<14} {} {:<24} {:<30}",
             player.id,
             player.web_name,
             team_name,
@@ -93,8 +81,7 @@ pub async fn handle_availability(team: Option<String>, all: bool, limit: usize) 
                 .map(|p| p.display_name().to_string())
                 .unwrap_or_default(),
             status_desc,
-            colored_chance,
-            chance_padding,
+            avail_display,
             news_added,
             player.news
         );
