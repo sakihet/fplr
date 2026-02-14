@@ -35,7 +35,7 @@ enum Commands {
     /// Show dream team
     DreamTeam { event_id: u32 },
     /// Show upcoming fixtures
-    Fixture {},
+    Fixture(commands::FixtureArgs),
     /// Show fixture difficulty rating
     #[command(visible_alias = "fdr")]
     FixtureDifficultyRating {
@@ -179,7 +179,7 @@ async fn run() -> Result<()> {
         Commands::Team {} => commands::handle_team().await?,
         Commands::TeamForm {} => commands::handle_team_form().await?,
         Commands::TeamPerf { gw, last } => commands::handle_team_perf(gw, last).await?,
-        Commands::Fixture {} => commands::handle_fixture().await?,
+        Commands::Fixture(args) => commands::handle_fixture(args).await?,
         Commands::FixtureDifficultyRating {
             team_id,
             limit,

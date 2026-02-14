@@ -22,7 +22,7 @@ pub use availability::handle_availability;
 pub use config::{ConfigArgs, handle_config};
 pub use dream_team::handle_dream_team;
 pub use fdr::handle_fixture_difficulty_rating;
-pub use fixture::handle_fixture;
+pub use fixture::{FixtureArgs, handle_fixture};
 pub use gameweek::handle_gameweek;
 pub use history::{HistoryArgs, handle_history};
 pub use live::handle_live;
