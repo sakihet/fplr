@@ -3,7 +3,8 @@ use crate::config::Config;
 use crate::error::Result;
 use crate::models::{Pick, Position};
 use crate::utils::event_helpers::get_effective_event_id;
-use crate::utils::team_helpers::create_team_map;
+use crate::utils::formatters::format_chance_of_playing;
+use crate::utils::team_helpers::create_team_short_name_map;
 use clap::Args;
 use std::collections::{HashMap, HashSet};
 
@@ -42,18 +43,39 @@ pub async fn handle_my_team(args: MyTeamArgs) -> Result<()> {
     // 4. Fetch Live Data for points
     let live_data = FplClient::fetch_live(event_id).await?;
 
-    // 5. Fetch Fixtures to check if matches have started
+    // 5. Fetch Fixtures to check if matches have started and get opponents
     let fixtures = FplClient::fetch_fixtures_by_event(event_id).await?;
     let mut started_teams = HashSet::new();
-    for fixture in fixtures {
+    let short_team_map = create_team_short_name_map(&bootstrap.teams);
+    let mut team_fixtures: HashMap<u64, Vec<String>> = HashMap::new();
+
+    for fixture in &fixtures {
         if fixture.started.unwrap_or(false) {
             started_teams.insert(fixture.team_h);
             started_teams.insert(fixture.team_a);
         }
+
+        let home_team_short = short_team_map
+            .get(&fixture.team_h)
+            .map(|s| s.as_str())
+            .unwrap_or("???");
+        let away_team_short = short_team_map
+            .get(&fixture.team_a)
+            .map(|s| s.as_str())
+            .unwrap_or("???");
+
+        team_fixtures
+            .entry(fixture.team_h)
+            .or_default()
+            .push(format!("{}(H)", away_team_short));
+        team_fixtures
+            .entry(fixture.team_a)
+            .or_default()
+            .push(format!("{}(A)", home_team_short));
     }
 
     // Helper maps
-    let team_map = create_team_map(&bootstrap.teams);
+    let team_map = create_team_short_name_map(&bootstrap.teams);
     let player_map: HashMap<u64, &crate::models::Element> =
         bootstrap.elements.iter().map(|p| (p.id, p)).collect();
 
@@ -106,8 +128,8 @@ pub async fn handle_my_team(args: MyTeamArgs) -> Result<()> {
     );
     println!();
     println!(
-        "{:<4} {:<4} {:<20} {:<15} {:<5} {:<6} {:<6} {:<32}",
-        "ID", "Pos", "Name", "Team", "Pts", "Cost", "Form", "Status"
+        "{:<4} {:<4} {:<20} {:<6} {:<15} {:>5}  {:<5} {:<6} {:<6} {:<32}",
+        "ID", "Pos", "Name", "Team", "Opp", "Avail", "Pts", "Cost", "Form", "Status"
     );
 
     // Function to print a player row
@@ -124,6 +146,14 @@ pub async fn handle_my_team(args: MyTeamArgs) -> Result<()> {
                 .get(&player.team)
                 .map(|s| s.as_str())
                 .unwrap_or("???");
+
+            let opponents = team_fixtures
+                .get(&player.team)
+                .map(|ops| ops.join(","))
+                .unwrap_or_else(|| "-".to_string());
+
+            let avail_display =
+                format_chance_of_playing(player.chance_of_playing_next_round, &player.news);
 
             let mut name_display = player.web_name.clone();
             if pick.is_captain {
@@ -146,11 +176,13 @@ pub async fn handle_my_team(args: MyTeamArgs) -> Result<()> {
             let cost = format!("{:.1}", player.now_cost as f64 / 10.0);
 
             println!(
-                "{:<4} {:<4} {:<20} {:<15} {:<5} {:<6} {:<6} {:<32}",
+                "{:<4} {:<4} {:<20} {:<6} {:<15} {}  {:<5} {:<6} {:<6} {:<32}",
                 player.id,
                 pos_name,
                 name_display,
                 team_name,
+                opponents,
+                avail_display,
                 points_display,
                 cost,
                 player.form,

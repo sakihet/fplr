@@ -49,6 +49,38 @@ pub struct Element {
     pub transfers_out: u64,
     pub transfers_in_event: u64,
     pub transfers_out_event: u64,
+    pub cost_change_event: i64,
+    pub cost_change_start: i64,
+    pub minutes: u64,
+    pub goals_scored: u64,
+    pub assists: u64,
+    pub clean_sheets: u64,
+    pub goals_conceded: u64,
+    pub own_goals: u64,
+    pub penalties_saved: u64,
+    pub penalties_missed: u64,
+    pub yellow_cards: u64,
+    pub red_cards: u64,
+    pub saves: u64,
+    pub bonus: u64,
+    pub bps: i64,
+    pub influence: String,
+    pub creativity: String,
+    pub threat: String,
+    pub ict_index: String,
+    pub dreamteam_count: u64,
+    pub value_form: String,
+    pub value_season: String,
+    pub points_per_game: String,
+    pub expected_goals: String,
+    pub expected_assists: String,
+    pub expected_goal_involvements: String,
+    pub expected_goals_conceded: String,
+    pub starts: u64,
+    pub tackles: u64,
+    pub clearances_blocks_interceptions: u64,
+    pub recoveries: u64,
+    pub defensive_contribution: u64,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -283,4 +315,36 @@ pub struct SetPieceTeam {
 pub struct SetPieceNotes {
     pub last_updated: String,
     pub teams: Vec<SetPieceTeam>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct StandingResult {
+    pub id: u64,
+    pub event_total: i64,
+    pub player_name: String,
+    pub rank: u64,
+    pub last_rank: u64,
+    pub rank_sort: u64,
+    pub total: i64,
+    pub entry: u64,
+    pub entry_name: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Standings {
+    pub has_next: bool,
+    pub page: u64,
+    pub results: Vec<StandingResult>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct League {
+    pub id: u64,
+    pub name: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct LeagueStandingsResponse {
+    pub league: League,
+    pub standings: Standings,
 }

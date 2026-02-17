@@ -35,7 +35,7 @@ enum Commands {
     /// Show dream team
     DreamTeam { event_id: u32 },
     /// Show upcoming fixtures
-    Fixture {},
+    Fixture(commands::FixtureArgs),
     /// Show fixture difficulty rating
     #[command(visible_alias = "fdr")]
     FixtureDifficultyRating {
@@ -55,6 +55,14 @@ enum Commands {
         event: u32,
         #[arg(short, long, default_value = "20")]
         limit: usize,
+    },
+    /// Show a specific manager's team
+    Manager {
+        /// Manager ID
+        manager_id: u64,
+        /// Specific Gameweek (defaults to current)
+        #[arg(short, long)]
+        gw: Option<u32>,
     },
     /// Show my team
     #[command(name = "my-team")]
@@ -104,6 +112,8 @@ enum Commands {
     Status {},
     /// Show league table
     Table {},
+    /// Show top teams in the overall league
+    Top {},
     /// Show teams
     Team {},
     /// Show team form based on total player form
@@ -143,6 +153,7 @@ async fn run() -> Result<()> {
         Commands::Gameweek {} => commands::handle_gameweek().await?,
         Commands::History(args) => commands::handle_history(args).await?,
         Commands::Live { event, limit } => commands::handle_live(event, limit).await?,
+        Commands::Manager { manager_id, gw } => commands::handle_manager(manager_id, gw).await?,
         Commands::MyTeam(args) => commands::handle_my_team(args).await?,
         Commands::Player {
             sort,
@@ -176,10 +187,11 @@ async fn run() -> Result<()> {
         Commands::SetPiece { team } => commands::handle_set_piece(team).await?,
         Commands::Status {} => commands::handle_status().await?,
         Commands::Table {} => commands::handle_table().await?,
+        Commands::Top {} => commands::handle_top().await?,
         Commands::Team {} => commands::handle_team().await?,
         Commands::TeamForm {} => commands::handle_team_form().await?,
         Commands::TeamPerf { gw, last } => commands::handle_team_perf(gw, last).await?,
-        Commands::Fixture {} => commands::handle_fixture().await?,
+        Commands::Fixture(args) => commands::handle_fixture(args).await?,
         Commands::FixtureDifficultyRating {
             team_id,
             limit,

@@ -36,6 +36,7 @@ Commands:
   gameweek                   Show gameweeks
   history                    Show manager's season history
   live                       Show live player stats for a specific event
+  manager                    Show a specific manager's team
   my-team                    Show my team
   player                     Show players
   pick                       Show a manager's team picks for a specific event
@@ -43,6 +44,7 @@ Commands:
   set-piece                  Show set piece takers (penalties, free kicks, corners)
   status                     Show status
   table                      Show league table
+  top                        Show top teams in the overall league
   team                       Show teams
   team-form                  Show team form based on total player form
   team-perf                  Show team performance based on player points per GW

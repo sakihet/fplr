@@ -118,3 +118,25 @@ pub fn format_signed_number(n: i64) -> String {
         n.to_string()
     }
 }
+
+/// Format and colorize chance of playing percentage
+pub fn format_chance_of_playing(chance: Option<u64>, news: &str) -> String {
+    let (chance_val, chance_str) = match chance {
+        Some(c) => (c, format!("{}%", c)),
+        None => {
+            if news.is_empty() {
+                (100, "100%".to_string())
+            } else {
+                (0, "0%".to_string())
+            }
+        }
+    };
+
+    let padded = format!("{:>5}", chance_str);
+    match chance_val {
+        100 => padded.default_color().to_string(),
+        75 => padded.yellow().to_string(),
+        50 => padded.bright_yellow().to_string(),
+        _ => padded.red().to_string(),
+    }
+}

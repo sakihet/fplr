@@ -6,8 +6,124 @@ pub enum SortBy {
     Cost,
     SelectedBy,
     Form,
+    #[value(alias = "minutes-played")]
+    Minutes,
+    #[value(alias = "goals")]
+    GoalsScored,
+    #[value(alias = "assists")]
+    Assists,
+    #[value(alias = "clean-sheets")]
+    CleanSheets,
+    #[value(alias = "goals-conceded")]
+    GoalsConceded,
+    #[value(alias = "own-goals")]
+    OwnGoals,
+    #[value(alias = "penalties-saved")]
+    PenaltiesSaved,
+    #[value(alias = "penalties-missed")]
+    PenaltiesMissed,
+    #[value(alias = "yellow-cards")]
+    YellowCards,
+    #[value(alias = "red-cards")]
+    RedCards,
+    #[value(alias = "saves")]
+    Saves,
+    #[value(alias = "bonus")]
+    Bonus,
+    #[value(alias = "bps")]
+    Bps,
+    #[value(alias = "influence")]
+    Influence,
+    #[value(alias = "creativity")]
+    Creativity,
+    #[value(alias = "threat")]
+    Threat,
+    #[value(alias = "ict-index")]
+    IctIndex,
+    #[value(alias = "dream-team")]
+    DreamTeamCount,
+    #[value(alias = "value-form")]
+    ValueForm,
+    #[value(alias = "value-season")]
+    ValueSeason,
+    #[value(alias = "points-per-game")]
+    PointsPerGame,
+    #[value(alias = "xg")]
+    ExpectedGoals,
+    #[value(alias = "xa")]
+    ExpectedAssists,
+    #[value(alias = "xgi")]
+    ExpectedGoalInvolvements,
+    #[value(alias = "xgc")]
+    ExpectedGoalsConceded,
+    #[value(alias = "starts")]
+    Starts,
+    #[value(alias = "tackles")]
+    Tackles,
+    #[value(alias = "cbi")]
+    ClearancesBlocksInterceptions,
+    #[value(alias = "recoveries")]
+    Recoveries,
+    #[value(alias = "defensive-contribution")]
+    DefensiveContribution,
+    #[value(alias = "ti")]
+    TransfersIn,
+    #[value(alias = "to")]
+    TransfersOut,
+    #[value(alias = "tie")]
+    TransfersInEvent,
+    #[value(alias = "toe")]
+    TransfersOutEvent,
+    #[value(alias = "pre", alias = "price-rise-event")]
+    PriceRiseEvent,
+    #[value(alias = "prs", alias = "price-rise-start")]
+    PriceRiseStart,
     #[default]
     Points,
+}
+
+impl SortBy {
+    pub fn stat_label(&self) -> Option<&'static str> {
+        match self {
+            SortBy::Minutes => Some("MP"),
+            SortBy::GoalsScored => Some("G"),
+            SortBy::Assists => Some("A"),
+            SortBy::CleanSheets => Some("CS"),
+            SortBy::GoalsConceded => Some("GC"),
+            SortBy::OwnGoals => Some("OG"),
+            SortBy::PenaltiesSaved => Some("PS"),
+            SortBy::PenaltiesMissed => Some("PM"),
+            SortBy::YellowCards => Some("YC"),
+            SortBy::RedCards => Some("RC"),
+            SortBy::Saves => Some("S"),
+            SortBy::Bonus => Some("B"),
+            SortBy::Bps => Some("BPS"),
+            SortBy::Influence => Some("INF"),
+            SortBy::Creativity => Some("CRE"),
+            SortBy::Threat => Some("THR"),
+            SortBy::IctIndex => Some("ICT"),
+            SortBy::DreamTeamCount => Some("DT"),
+            SortBy::ValueForm => Some("V-F"),
+            SortBy::ValueSeason => Some("V-S"),
+            SortBy::PointsPerGame => Some("PPG"),
+            SortBy::ExpectedGoals => Some("xG"),
+            SortBy::ExpectedAssists => Some("xA"),
+            SortBy::ExpectedGoalInvolvements => Some("xGI"),
+            SortBy::ExpectedGoalsConceded => Some("xGC"),
+            SortBy::Starts => Some("STR"),
+            SortBy::Tackles => Some("TCK"),
+            SortBy::ClearancesBlocksInterceptions => Some("CBI"),
+            SortBy::Recoveries => Some("REC"),
+            SortBy::DefensiveContribution => Some("DEF"),
+            SortBy::TransfersIn => Some("TI"),
+            SortBy::TransfersOut => Some("TO"),
+            SortBy::TransfersInEvent => Some("TIE"),
+            SortBy::TransfersOutEvent => Some("TOE"),
+            SortBy::PriceRiseEvent => Some("CCE"),
+            SortBy::PriceRiseStart => Some("CCS"),
+            _ => None,
+        }
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
