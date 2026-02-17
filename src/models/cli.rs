@@ -66,6 +66,18 @@ pub enum SortBy {
     Recoveries,
     #[value(alias = "defensive-contribution")]
     DefensiveContribution,
+    #[value(alias = "ti")]
+    TransfersIn,
+    #[value(alias = "to")]
+    TransfersOut,
+    #[value(alias = "tie")]
+    TransfersInEvent,
+    #[value(alias = "toe")]
+    TransfersOutEvent,
+    #[value(alias = "pre", alias = "price-rise-event")]
+    PriceRiseEvent,
+    #[value(alias = "prs", alias = "price-rise-start")]
+    PriceRiseStart,
     #[default]
     Points,
 }
@@ -103,6 +115,12 @@ impl SortBy {
             SortBy::ClearancesBlocksInterceptions => Some("CBI"),
             SortBy::Recoveries => Some("REC"),
             SortBy::DefensiveContribution => Some("DEF"),
+            SortBy::TransfersIn => Some("TI"),
+            SortBy::TransfersOut => Some("TO"),
+            SortBy::TransfersInEvent => Some("TIE"),
+            SortBy::TransfersOutEvent => Some("TOE"),
+            SortBy::PriceRiseEvent => Some("CCE"),
+            SortBy::PriceRiseStart => Some("CCS"),
             _ => None,
         }
     }

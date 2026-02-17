@@ -174,6 +174,20 @@ fn sort_players(players: &mut [Element], sort_by: &SortBy) {
         SortBy::DefensiveContribution => {
             players.sort_by(|a, b| b.defensive_contribution.cmp(&a.defensive_contribution))
         }
+        SortBy::TransfersIn => players.sort_by(|a, b| b.transfers_in.cmp(&a.transfers_in)),
+        SortBy::TransfersOut => players.sort_by(|a, b| b.transfers_out.cmp(&a.transfers_out)),
+        SortBy::TransfersInEvent => {
+            players.sort_by(|a, b| b.transfers_in_event.cmp(&a.transfers_in_event))
+        }
+        SortBy::TransfersOutEvent => {
+            players.sort_by(|a, b| b.transfers_out_event.cmp(&a.transfers_out_event))
+        }
+        SortBy::PriceRiseEvent => {
+            players.sort_by(|a, b| b.cost_change_event.cmp(&a.cost_change_event))
+        }
+        SortBy::PriceRiseStart => {
+            players.sort_by(|a, b| b.cost_change_start.cmp(&a.cost_change_start))
+        }
         SortBy::Points => players.sort_by(|a, b| b.total_points.cmp(&a.total_points)),
         SortBy::SelectedBy => players.sort_by(|a, b| {
             parse_f64(&b.selected_by_percent)
@@ -277,6 +291,12 @@ fn get_stat_value(player: &Element, sort_by: &SortBy) -> String {
         SortBy::ClearancesBlocksInterceptions => player.clearances_blocks_interceptions.to_string(),
         SortBy::Recoveries => player.recoveries.to_string(),
         SortBy::DefensiveContribution => player.defensive_contribution.to_string(),
+        SortBy::TransfersIn => player.transfers_in.to_string(),
+        SortBy::TransfersOut => player.transfers_out.to_string(),
+        SortBy::TransfersInEvent => player.transfers_in_event.to_string(),
+        SortBy::TransfersOutEvent => player.transfers_out_event.to_string(),
+        SortBy::PriceRiseEvent => format!("{:.1}", player.cost_change_event as f64 / 10.0),
+        SortBy::PriceRiseStart => format!("{:.1}", player.cost_change_start as f64 / 10.0),
         _ => "".to_string(),
     }
 }

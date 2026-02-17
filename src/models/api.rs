@@ -49,6 +49,8 @@ pub struct Element {
     pub transfers_out: u64,
     pub transfers_in_event: u64,
     pub transfers_out_event: u64,
+    pub cost_change_event: i64,
+    pub cost_change_start: i64,
     pub minutes: u64,
     pub goals_scored: u64,
     pub assists: u64,
