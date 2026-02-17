@@ -6,6 +6,66 @@ pub enum SortBy {
     Cost,
     SelectedBy,
     Form,
+    #[value(alias = "minutes-played")]
+    Minutes,
+    #[value(alias = "goals")]
+    GoalsScored,
+    #[value(alias = "assists")]
+    Assists,
+    #[value(alias = "clean-sheets")]
+    CleanSheets,
+    #[value(alias = "goals-conceded")]
+    GoalsConceded,
+    #[value(alias = "own-goals")]
+    OwnGoals,
+    #[value(alias = "penalties-saved")]
+    PenaltiesSaved,
+    #[value(alias = "penalties-missed")]
+    PenaltiesMissed,
+    #[value(alias = "yellow-cards")]
+    YellowCards,
+    #[value(alias = "red-cards")]
+    RedCards,
+    #[value(alias = "saves")]
+    Saves,
+    #[value(alias = "bonus")]
+    Bonus,
+    #[value(alias = "bps")]
+    Bps,
+    #[value(alias = "influence")]
+    Influence,
+    #[value(alias = "creativity")]
+    Creativity,
+    #[value(alias = "threat")]
+    Threat,
+    #[value(alias = "ict-index")]
+    IctIndex,
+    #[value(alias = "dream-team")]
+    DreamTeamCount,
+    #[value(alias = "value-form")]
+    ValueForm,
+    #[value(alias = "value-season")]
+    ValueSeason,
+    #[value(alias = "points-per-game")]
+    PointsPerGame,
+    #[value(alias = "xg")]
+    ExpectedGoals,
+    #[value(alias = "xa")]
+    ExpectedAssists,
+    #[value(alias = "xgi")]
+    ExpectedGoalInvolvements,
+    #[value(alias = "xgc")]
+    ExpectedGoalsConceded,
+    #[value(alias = "starts")]
+    Starts,
+    #[value(alias = "tackles")]
+    Tackles,
+    #[value(alias = "cbi")]
+    ClearancesBlocksInterceptions,
+    #[value(alias = "recoveries")]
+    Recoveries,
+    #[value(alias = "defensive-contribution")]
+    DefensiveContribution,
     #[default]
     Points,
 }
