@@ -70,6 +70,44 @@ pub enum SortBy {
     Points,
 }
 
+impl SortBy {
+    pub fn stat_label(&self) -> Option<&'static str> {
+        match self {
+            SortBy::Minutes => Some("MP"),
+            SortBy::GoalsScored => Some("G"),
+            SortBy::Assists => Some("A"),
+            SortBy::CleanSheets => Some("CS"),
+            SortBy::GoalsConceded => Some("GC"),
+            SortBy::OwnGoals => Some("OG"),
+            SortBy::PenaltiesSaved => Some("PS"),
+            SortBy::PenaltiesMissed => Some("PM"),
+            SortBy::YellowCards => Some("YC"),
+            SortBy::RedCards => Some("RC"),
+            SortBy::Saves => Some("S"),
+            SortBy::Bonus => Some("B"),
+            SortBy::Bps => Some("BPS"),
+            SortBy::Influence => Some("INF"),
+            SortBy::Creativity => Some("CRE"),
+            SortBy::Threat => Some("THR"),
+            SortBy::IctIndex => Some("ICT"),
+            SortBy::DreamTeamCount => Some("DT"),
+            SortBy::ValueForm => Some("V-F"),
+            SortBy::ValueSeason => Some("V-S"),
+            SortBy::PointsPerGame => Some("PPG"),
+            SortBy::ExpectedGoals => Some("xG"),
+            SortBy::ExpectedAssists => Some("xA"),
+            SortBy::ExpectedGoalInvolvements => Some("xGI"),
+            SortBy::ExpectedGoalsConceded => Some("xGC"),
+            SortBy::Starts => Some("STR"),
+            SortBy::Tackles => Some("TCK"),
+            SortBy::ClearancesBlocksInterceptions => Some("CBI"),
+            SortBy::Recoveries => Some("REC"),
+            SortBy::DefensiveContribution => Some("DEF"),
+            _ => None,
+        }
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum PlayerStatus {
     #[serde(rename = "a")]
