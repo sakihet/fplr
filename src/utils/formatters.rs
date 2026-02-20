@@ -148,7 +148,7 @@ pub fn to_sparkline(values: &[i64], max_val: i64) -> String {
         return "".to_string();
     }
 
-    let ticks = [" ", " ", "▂", "▃", "▄", "▅", "▆", "▇", "█"];
+    let ticks = [" ", "▁", "▂", "▃", "▄", "▅", "▆", "▇", "█"];
     let max = max_val.max(1) as f64;
 
     values
@@ -161,4 +161,66 @@ pub fn to_sparkline(values: &[i64], max_val: i64) -> String {
             ticks[idx.min(8)]
         })
         .collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_to_sparkline_empty() {
+        let values: Vec<i64> = vec![];
+        assert_eq!(to_sparkline(&values, 100), "");
+    }
+
+    #[test]
+    fn test_to_sparkline_zeros() {
+        let values = vec![0, 0, 0];
+        // 0 maps to ticks[0] which is " "
+        assert_eq!(to_sparkline(&values, 10), "   ");
+    }
+
+    #[test]
+    fn test_to_sparkline_simple_scale() {
+        let values = vec![1, 2, 3, 4, 5, 6, 7, 8];
+        let max = 8;
+        // 1/8 -> 0.125 * 8 = 1 -> ticks[1]
+        // 8/8 -> 1.0 * 8 = 8 -> ticks[8]
+        let result = to_sparkline(&values, max);
+        // Expecting a gradient from lowest non-zero block to full block
+        // Note: The exact characters depend on what's in 'ticks' in the implementation.
+        // Based on current file content: ticks[1] is "▁" (or similar), ticks[8] is "█"
+        assert_eq!(result.chars().count(), 8);
+        assert!(result.ends_with("█"));
+    }
+
+    #[test]
+    fn test_to_sparkline_clamping() {
+        let values = vec![10, 20];
+        let max = 10;
+        // 20 > 10, should be clamped to max block
+        let result = to_sparkline(&values, max);
+        assert!(result.ends_with("█"));
+    }
+
+    #[test]
+    fn test_to_sparkline_negative() {
+        let values = vec![-5, -1];
+        // Negatives are treated as 0 -> " "
+        assert_eq!(to_sparkline(&values, 10), "  ");
+    }
+
+    #[test]
+    fn test_to_sparkline_mixed() {
+        // 0, 50, 100 with max 100
+        // 0 -> " "
+        // 50 -> 4 -> "▄" (index 4)
+        // 100 -> 8 -> "█"
+        let values = vec![0, 50, 100];
+        let result = to_sparkline(&values, 100);
+
+        let chars: Vec<char> = result.chars().collect();
+        assert_eq!(chars[0], ' '); // 0
+        assert_eq!(chars[2], '█'); // 100
+    }
 }
