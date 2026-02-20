@@ -1,11 +1,12 @@
 use crate::api::FplClient;
 use crate::config::Config;
 use crate::error::Result;
-use crate::models::{Pick, Position};
+use crate::models::{LiveData, Pick, Position};
 use crate::utils::event_helpers::get_effective_event_id;
-use crate::utils::formatters::format_chance_of_playing;
+use crate::utils::formatters::{format_chance_of_playing, to_sparkline};
 use crate::utils::team_helpers::create_team_short_name_map;
 use clap::Args;
+use futures::future::join_all;
 use std::collections::{HashMap, HashSet};
 
 #[derive(Debug, Args)]
@@ -40,8 +41,21 @@ pub async fn handle_my_team(args: MyTeamArgs) -> Result<()> {
     // 3. Fetch Manager Picks
     let picks_data = FplClient::fetch_manager_picks(manager_id, event_id).await?;
 
-    // 4. Fetch Live Data for points
-    let live_data = FplClient::fetch_live(event_id).await?;
+    // 4. Fetch Live Data for points (current + last 5 GWs for sparkline)
+    let history_count = 5;
+    let start_gw = event_id.saturating_sub(history_count - 1).max(1);
+    let gw_range: Vec<u32> = (start_gw..=event_id).collect();
+
+    let live_data_futures: Vec<_> = gw_range
+        .iter()
+        .map(|&gw| FplClient::fetch_live(gw))
+        .collect();
+    let live_data_results = join_all(live_data_futures).await;
+
+    let mut live_histories: Vec<LiveData> = Vec::new();
+    for res in live_data_results {
+        live_histories.push(res?);
+    }
 
     // 5. Fetch Fixtures to check if matches have started and get opponents
     let fixtures = FplClient::fetch_fixtures_by_event(event_id).await?;
@@ -79,16 +93,34 @@ pub async fn handle_my_team(args: MyTeamArgs) -> Result<()> {
     let player_map: HashMap<u64, &crate::models::Element> =
         bootstrap.elements.iter().map(|p| (p.id, p)).collect();
 
-    let live_map: HashMap<u64, &crate::models::LiveStats> = live_data
+    // Latest live data for current points
+    let current_live = live_histories.last().unwrap();
+    let live_map: HashMap<u64, &crate::models::LiveStats> = current_live
         .elements
         .iter()
         .map(|e| (e.id, &e.stats))
         .collect();
 
-    // 6. Display
-    // Sort picks by position: GKP(1), DEF(2), MID(3), FWD(4), then Sub
-    // Picks 1-11 are starters, 12-15 are bench.
+    // Map for historical points: element_id -> Vec<points>
+    let mut player_history_map: HashMap<u64, Vec<i64>> = HashMap::new();
+    for live in &live_histories {
+        for element in &live.elements {
+            player_history_map
+                .entry(element.id)
+                .or_default()
+                .push(element.stats.total_points);
+        }
+    }
 
+    // Calculate global max for sparkline scaling to allow comparison between players
+    let global_max = player_history_map
+        .values()
+        .flatten()
+        .max()
+        .copied()
+        .unwrap_or(1);
+
+    // 6. Display
     let mut starters: Vec<&Pick> = picks_data
         .picks
         .iter()
@@ -100,12 +132,11 @@ pub async fn handle_my_team(args: MyTeamArgs) -> Result<()> {
         .filter(|p| p.position > 11)
         .collect();
 
-    // Sort starters by position type
     starters.sort_by_key(|p| {
         if let Some(player) = player_map.get(&p.element) {
             player.element_type
         } else {
-            99 // unknown
+            99
         }
     });
 
@@ -128,8 +159,8 @@ pub async fn handle_my_team(args: MyTeamArgs) -> Result<()> {
     );
     println!();
     println!(
-        "{:<4} {:<4} {:<20} {:<6} {:<15} {:>5}  {:<5} {:<6} {:<6} {:<32}",
-        "ID", "Pos", "Name", "Team", "Opp", "Avail", "Pts", "Cost", "Form", "Status"
+        "{:<4} {:<4} {:<20} {:<6} {:<15} {:>5}  {:<5} {:<6} {:<6} {:<8} {:<32}",
+        "ID", "Pos", "Name", "Team", "Opp", "Avail", "Pts", "Cost", "Form", "Last 5", "Status"
     );
 
     // Function to print a player row
@@ -164,7 +195,6 @@ pub async fn handle_my_team(args: MyTeamArgs) -> Result<()> {
             }
 
             let points = live_opt.map(|l| l.total_points).unwrap_or(0);
-            // Apply multiplier for display (e.g. Captain points doubled)
             let final_points = points * (pick.multiplier as i64);
 
             let points_display = if !started_teams.contains(&player.team) && points == 0 {
@@ -173,10 +203,16 @@ pub async fn handle_my_team(args: MyTeamArgs) -> Result<()> {
                 final_points.to_string()
             };
 
+            let history = player_history_map
+                .get(&pick.element)
+                .cloned()
+                .unwrap_or_default();
+            let sparkline = to_sparkline(&history, global_max);
+
             let cost = format!("{:.1}", player.now_cost as f64 / 10.0);
 
             println!(
-                "{:<4} {:<4} {:<20} {:<6} {:<15} {}  {:<5} {:<6} {:<6} {:<32}",
+                "{:<4} {:<4} {:<20} {:<6} {:<15} {}  {:<5} {:<6} {:<6} {:<8} {:<32}",
                 player.id,
                 pos_name,
                 name_display,
@@ -186,6 +222,7 @@ pub async fn handle_my_team(args: MyTeamArgs) -> Result<()> {
                 points_display,
                 cost,
                 player.form,
+                sparkline,
                 player.news.chars().take(32).collect::<String>()
             );
         } else {

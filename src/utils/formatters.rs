@@ -140,3 +140,25 @@ pub fn format_chance_of_playing(chance: Option<u64>, news: &str) -> String {
         _ => padded.red().to_string(),
     }
 }
+
+/// Convert a list of values to a sparkline string using Unicode lower blocks
+/// max_val is used as the scale to allow comparison across different sparklines
+pub fn to_sparkline(values: &[i64], max_val: i64) -> String {
+    if values.is_empty() {
+        return "".to_string();
+    }
+
+    let ticks = [" ", " ", "▂", "▃", "▄", "▅", "▆", "▇", "█"];
+    let max = max_val.max(1) as f64;
+
+    values
+        .iter()
+        .map(|&v| {
+            if v <= 0 {
+                return ticks[0];
+            }
+            let idx = ((v as f64 / max) * 8.0).round() as usize;
+            ticks[idx.min(8)]
+        })
+        .collect()
+}
