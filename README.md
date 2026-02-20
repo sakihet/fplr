@@ -49,5 +49,6 @@ Commands:
   team-form                  Show team form based on total player form
   team-perf                  Show team performance based on player points per GW
   transfer                   Show popular transfers
+  trend                      Show player performance trends with sparklines
   help                       Print this message or the help of the given subcommand(s)
 ```
