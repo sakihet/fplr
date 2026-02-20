@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use crate::api::FplClient;
 use crate::error::{FplrError, Result};
+use crate::models::Position;
 use crate::utils::event_helpers::get_effective_event_id;
 use crate::utils::player_helpers::create_player_map;
 use crate::utils::team_helpers::create_team_short_name_map;
@@ -18,6 +19,11 @@ pub async fn handle_manager(manager_id: u64, gw: Option<u32>) -> Result<()> {
         .elements
         .iter()
         .map(|e| (e.id, e.team))
+        .collect();
+    let player_pos_map: HashMap<u64, u64> = bootstrap_data
+        .elements
+        .iter()
+        .map(|e| (e.id, e.element_type))
         .collect();
 
     let live_data = FplClient::fetch_live(event_id).await?;
@@ -56,6 +62,12 @@ pub async fn handle_manager(manager_id: u64, gw: Option<u32>) -> Result<()> {
             .map(|s| s.as_str())
             .unwrap_or("???");
 
+        let pos_str = player_pos_map
+            .get(&pick.element)
+            .and_then(|&etid| Position::from_element_type_id(etid))
+            .map(|p| p.display_name())
+            .unwrap_or("???");
+
         let points = points_map.get(&pick.element).copied().unwrap_or(0);
 
         println!(
@@ -63,7 +75,7 @@ pub async fn handle_manager(manager_id: u64, gw: Option<u32>) -> Result<()> {
             pick.element,
             name,
             team_short,
-            format_position(pick.position),
+            pos_str,
             if pick.is_captain { "Y" } else { "" },
             if pick.is_vice_captain { "Y" } else { "" },
             points,
@@ -71,14 +83,4 @@ pub async fn handle_manager(manager_id: u64, gw: Option<u32>) -> Result<()> {
     }
 
     Ok(())
-}
-
-fn format_position(pos: u32) -> &'static str {
-    match pos {
-        1 => "GK",
-        2..=5 => "DEF",
-        6..=10 => "MID",
-        11..=15 => "FWD",
-        _ => "SUB",
-    }
 }

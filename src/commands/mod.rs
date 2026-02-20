@@ -19,6 +19,7 @@ pub mod team_form;
 pub mod team_perf;
 pub mod top;
 pub mod transfer;
+pub mod trend;
 
 pub use availability::handle_availability;
 pub use config::{ConfigArgs, handle_config};
@@ -41,3 +42,4 @@ pub use team_form::handle_team_form;
 pub use team_perf::handle_team_perf;
 pub use top::handle_top;
 pub use transfer::{TransferArgs, handle_transfer};
+pub use trend::handle_trend;

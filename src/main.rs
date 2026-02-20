@@ -131,6 +131,21 @@ enum Commands {
     },
     /// Show popular transfers
     Transfer(commands::TransferArgs),
+    /// Show player performance trends with sparklines
+    Trend {
+        /// Filter by team name
+        #[arg(short, long)]
+        team: Option<String>,
+        /// Filter by position
+        #[arg(short, long)]
+        position: Option<Position>,
+        /// Number of players to show
+        #[arg(short, long, default_value = "20")]
+        limit: usize,
+        /// Number of recent gameweeks to show
+        #[arg(short, long, default_value = "5")]
+        weeks: usize,
+    },
 }
 
 #[tokio::main]
@@ -198,6 +213,12 @@ async fn run() -> Result<()> {
             all,
         } => commands::handle_fixture_difficulty_rating(team_id, limit, all).await?,
         Commands::Transfer(args) => commands::handle_transfer(args).await?,
+        Commands::Trend {
+            team,
+            position,
+            limit,
+            weeks,
+        } => commands::handle_trend(team, position, limit, weeks).await?,
     }
     Ok(())
 }

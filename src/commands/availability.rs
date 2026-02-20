@@ -51,7 +51,7 @@ pub async fn handle_availability(team: Option<String>, all: bool, limit: usize) 
     players.sort_by(|a, b| b.news_added.cmp(&a.news_added));
 
     println!(
-        "{:<4} {:<20} {:<6} {:<4} {:<14} {:<6} {:<24} {:<30}",
+        "{:<4} {:<20} {:<6} {:<4} {:<14} {:<5} {:<24} {:<30}",
         "ID", "Name", "Team", "Pos", "Status", "Avail", "News Added", "News"
     );
 
