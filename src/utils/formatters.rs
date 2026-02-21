@@ -224,3 +224,17 @@ mod tests {
         assert_eq!(chars[2], '█'); // 100
     }
 }
+
+// ============================================
+// Column width constants for consistent layout
+// ============================================
+
+pub const WIDTH_ID: usize = 4;
+pub const WIDTH_NAME: usize = 16;
+pub const WIDTH_POS: usize = 3;
+pub const WIDTH_TEAM: usize = 4;
+pub const WIDTH_COST: usize = 4;
+pub const WIDTH_SEL: usize = 4;
+pub const WIDTH_FORM: usize = 4;
+pub const WIDTH_PTS: usize = 3;
+pub const WIDTH_STAT: usize = 6;

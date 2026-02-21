@@ -3,7 +3,7 @@ use crate::config::Config;
 use crate::error::Result;
 use crate::models::{LiveData, Pick, Position};
 use crate::utils::event_helpers::get_effective_event_id;
-use crate::utils::formatters::{format_chance_of_playing, to_sparkline};
+use crate::utils::formatters::*;
 use crate::utils::team_helpers::create_team_short_name_map;
 use clap::Args;
 use futures::future::join_all;
@@ -159,8 +159,29 @@ pub async fn handle_my_team(args: MyTeamArgs) -> Result<()> {
     );
     println!();
     println!(
-        "{:<4} {:<4} {:<20} {:<6} {:<15} {:>5}  {:<5} {:<6} {:<6} {:<8} {:<32}",
-        "ID", "Pos", "Name", "Team", "Opp", "Avail", "Pts", "Cost", "Form", "Last 5", "Status"
+        "{:>id_w$}  {:<pos_w$}  {:<name_w$}  {:<team_w$}  {:<opp_w$}  {:>avail_w$}  {:>pts_w$}  {:>cost_w$}  {:>form_w$}  {:<last5_w$}  {:<status_w$}",
+        "ID",
+        "Pos",
+        "Name",
+        "Team",
+        "Opp",
+        "Avail",
+        "Pts",
+        "Cost",
+        "Form",
+        "Last 5",
+        "Status",
+        id_w = WIDTH_ID,
+        pos_w = WIDTH_POS,
+        name_w = WIDTH_NAME,
+        team_w = WIDTH_TEAM,
+        opp_w = 15,
+        avail_w = 5,
+        pts_w = WIDTH_PTS,
+        cost_w = WIDTH_COST,
+        form_w = WIDTH_FORM,
+        last5_w = 8,
+        status_w = 32,
     );
 
     // Function to print a player row
@@ -212,7 +233,7 @@ pub async fn handle_my_team(args: MyTeamArgs) -> Result<()> {
             let cost = format!("{:.1}", player.now_cost as f64 / 10.0);
 
             println!(
-                "{:<4} {:<4} {:<20} {:<6} {:<15} {}  {:<5} {:<6} {:<6} {:<8} {:<32}",
+                "{:>id_w$}  {:<pos_w$}  {:<name_w$}  {:<team_w$}  {:<opp_w$}  {:>avail_w$}  {:>pts_w$}  {:>cost_w$}  {:>form_w$}  {:<last5_w$}  {:<status_w$}",
                 player.id,
                 pos_name,
                 name_display,
@@ -223,7 +244,18 @@ pub async fn handle_my_team(args: MyTeamArgs) -> Result<()> {
                 cost,
                 player.form,
                 sparkline,
-                player.news.chars().take(32).collect::<String>()
+                player.news.chars().take(32).collect::<String>(),
+                id_w = WIDTH_ID,
+                pos_w = WIDTH_POS,
+                name_w = WIDTH_NAME,
+                team_w = WIDTH_TEAM,
+                opp_w = 15,
+                avail_w = 5,
+                pts_w = WIDTH_PTS,
+                cost_w = WIDTH_COST,
+                form_w = WIDTH_FORM,
+                last5_w = 8,
+                status_w = 32,
             );
         } else {
             println!("Unknown Player ID: {}", pick.element);

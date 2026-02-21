@@ -3,6 +3,7 @@ use deunicode::deunicode;
 use crate::api::FplClient;
 use crate::error::Result;
 use crate::models::{Element, Position, SortBy};
+use crate::utils::formatters::*;
 use crate::utils::team_helpers::{create_team_short_name_map, find_team_ids_by_name};
 use std::collections::HashMap;
 
@@ -206,13 +207,47 @@ fn print_players(players: &[Element], args: &PlayerFilterArgs, team_map: &HashMa
 
     if let Some(label) = stat_label {
         println!(
-            "{:<4} {:<20} {:<4} {:<6} {:<6} {:<8} {:<6} {:<8} {:<6}",
-            "ID", "Name", "Pos", "Team", "Cost", "Selected", "Form", "Points", label
+            "{:>id_w$}  {:<name_w$}  {:<pos_w$}  {:<team_w$}  {:>cost_w$}  {:>sel_w$}  {:>form_w$}  {:>pts_w$}  {:>stat_w$}",
+            "ID",
+            "Name",
+            "Pos",
+            "Team",
+            "Cost",
+            "Sel%",
+            "Form",
+            "Pts",
+            label,
+            id_w = WIDTH_ID,
+            name_w = WIDTH_NAME,
+            pos_w = WIDTH_POS,
+            team_w = WIDTH_TEAM,
+            cost_w = WIDTH_COST,
+            sel_w = WIDTH_SEL,
+            form_w = WIDTH_FORM,
+            pts_w = WIDTH_PTS,
+            stat_w = WIDTH_STAT,
         );
     } else {
         println!(
-            "{:<4} {:<20} {:<4} {:<6} {:<6} {:<8} {:<6} {:<8} {:<30}",
-            "ID", "Name", "Pos", "Team", "Cost", "Selected", "Form", "Points", "News"
+            "{:>id_w$}  {:<name_w$}  {:<pos_w$}  {:<team_w$}  {:>cost_w$}  {:>sel_w$}  {:>form_w$}  {:>pts_w$}  {:<news_w$}",
+            "ID",
+            "Name",
+            "Pos",
+            "Team",
+            "Cost",
+            "Sel%",
+            "Form",
+            "Pts",
+            "News",
+            id_w = WIDTH_ID,
+            name_w = WIDTH_NAME,
+            pos_w = WIDTH_POS,
+            team_w = WIDTH_TEAM,
+            cost_w = WIDTH_COST,
+            sel_w = WIDTH_SEL,
+            form_w = WIDTH_FORM,
+            pts_w = WIDTH_PTS,
+            news_w = 20,
         );
     }
 
@@ -231,7 +266,7 @@ fn print_players(players: &[Element], args: &PlayerFilterArgs, team_map: &HashMa
         if stat_label.is_some() {
             let stat_value = get_stat_value(player, &args.sort);
             println!(
-                "{:<4} {:<20} {:<4} {:<6} {:<6} {:<8} {:<6} {:<8} {:<6}",
+                "{:>id_w$}  {:<name_w$}  {:<pos_w$}  {:<team_w$}  {:>cost_w$}  {:>sel_w$}  {:>form_w$}  {:>pts_w$}  {:>stat_w$}",
                 player.id,
                 player.web_name,
                 pos_name,
@@ -241,10 +276,19 @@ fn print_players(players: &[Element], args: &PlayerFilterArgs, team_map: &HashMa
                 player.form,
                 player.total_points,
                 stat_value,
+                id_w = WIDTH_ID,
+                name_w = WIDTH_NAME,
+                pos_w = WIDTH_POS,
+                team_w = WIDTH_TEAM,
+                cost_w = WIDTH_COST,
+                sel_w = WIDTH_SEL,
+                form_w = WIDTH_FORM,
+                pts_w = WIDTH_PTS,
+                stat_w = WIDTH_STAT,
             );
         } else {
             println!(
-                "{:<4} {:<20} {:<4} {:<6} {:<6} {:<8} {:<6} {:<8} {:<30}",
+                "{:>id_w$}  {:<name_w$}  {:<pos_w$}  {:<team_w$}  {:>cost_w$}  {:>sel_w$}  {:>form_w$}  {:>pts_w$}  {:<news_w$}",
                 player.id,
                 player.web_name,
                 pos_name,
@@ -254,6 +298,15 @@ fn print_players(players: &[Element], args: &PlayerFilterArgs, team_map: &HashMa
                 player.form,
                 player.total_points,
                 player.news,
+                id_w = WIDTH_ID,
+                name_w = WIDTH_NAME,
+                pos_w = WIDTH_POS,
+                team_w = WIDTH_TEAM,
+                cost_w = WIDTH_COST,
+                sel_w = WIDTH_SEL,
+                form_w = WIDTH_FORM,
+                pts_w = WIDTH_PTS,
+                news_w = 20,
             );
         }
     }

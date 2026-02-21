@@ -2,6 +2,7 @@ use crate::api::FplClient;
 use crate::error::Result;
 use crate::models::Position;
 use crate::utils::event_helpers::get_current_event_id;
+use crate::utils::formatters::*;
 use crate::utils::team_helpers::create_team_short_name_map;
 use clap::Args;
 use owo_colors::OwoColorize;
@@ -62,8 +63,19 @@ pub async fn handle_transfer(args: TransferArgs) -> Result<()> {
     println!("\n=== Top Transfers {} ({}) ===\n", direction_str, time_str);
 
     println!(
-        "{:<4} {:<15} {:<4} {:<4} {:>6} {:>10} {:>10} {:>10}",
-        "Rank", "Player", "Team", "Pos", "Price", "IN", "OUT", "Net"
+        "{:>id_w$}  {:<name_w$}  {:<team_w$}  {:<pos_w$}  {:>6}  {:>10}  {:>10}  {:>10}",
+        "Rank",
+        "Player",
+        "Team",
+        "Pos",
+        "Price",
+        "IN",
+        "OUT",
+        "Net",
+        id_w = WIDTH_ID,
+        name_w = WIDTH_NAME,
+        team_w = WIDTH_TEAM,
+        pos_w = WIDTH_POS,
     );
 
     for (i, player) in players.iter().take(args.limit).enumerate() {
@@ -105,15 +117,19 @@ pub async fn handle_transfer(args: TransferArgs) -> Result<()> {
         };
 
         println!(
-            "{:<4} {:<15} {:<4} {:<4} {:>6} {:>10} {:>10} {}",
+            "{:>id_w$}  {:<name_w$}  {:<team_w$}  {:<pos_w$}  {:>6}  {:>10}  {:>10}  {}",
             i + 1,
-            truncate_name(&player.web_name, 15),
+            truncate_name(&player.web_name, WIDTH_NAME),
             team_name,
             position,
             price,
             in_str,
             out_str,
-            net_colored
+            net_colored,
+            id_w = WIDTH_ID,
+            name_w = WIDTH_NAME,
+            team_w = WIDTH_TEAM,
+            pos_w = WIDTH_POS,
         );
     }
 
