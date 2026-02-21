@@ -1,13 +1,13 @@
 use crate::api::FplClient;
 use crate::error::{FplrError, Result};
-use crate::utils::event_helpers::find_next_event;
+use crate::utils::event_helpers::get_effective_event_id;
 use crate::utils::formatters::*;
 use crate::utils::team_helpers::create_team_map;
 use clap::Args;
 
 #[derive(Debug, Args)]
 pub struct FixtureArgs {
-    /// Specific Gameweek (defaults to next)
+    /// Specific Gameweek (defaults to current)
     #[arg(short, long)]
     pub gw: Option<u32>,
 }
@@ -16,14 +16,8 @@ pub async fn handle_fixture(args: FixtureArgs) -> Result<()> {
     let bootstrap_data = FplClient::fetch_bootstrap_static().await?;
     let team_map = create_team_map(&bootstrap_data.teams);
 
-    let event_id = match args.gw {
-        Some(gw) => gw as u64,
-        None => {
-            let next_event =
-                find_next_event(&bootstrap_data.events).ok_or(FplrError::NoNextEvent)?;
-            next_event.id
-        }
-    };
+    let event_id = get_effective_event_id(&bootstrap_data.events, args.gw)
+        .ok_or(FplrError::NoNextEvent)? as u64;
 
     let fixtures = FplClient::fetch_fixtures().await?;
 
