@@ -1,7 +1,7 @@
 use crate::api::FplClient;
 use crate::error::{FplrError, Result};
 use crate::utils::event_helpers::find_next_event;
-use crate::utils::formatters::format_datetime_local;
+use crate::utils::formatters::*;
 use crate::utils::team_helpers::create_team_map;
 use clap::Args;
 
@@ -41,8 +41,17 @@ pub async fn handle_fixture(args: FixtureArgs) -> Result<()> {
 
     println!("Fixtures for Gameweek {}:", event_id);
     println!(
-        "{:<4} {:<20} {:<20} {:<20} {:<10}",
-        "ID", "Kickoff Time", "Home", "Away", "Score"
+        "{:>id_w$}  {:<time_w$}  {:<home_w$}  {:<away_w$}  {:<score_w$}",
+        "ID",
+        "Kickoff Time",
+        "Home",
+        "Away",
+        "Score",
+        id_w = WIDTH_ID,
+        time_w = WIDTH_TIME,
+        home_w = WIDTH_NAME,
+        away_w = WIDTH_NAME,
+        score_w = WIDTH_SCORE,
     );
 
     for fixture in target_fixtures {
@@ -67,12 +76,17 @@ pub async fn handle_fixture(args: FixtureArgs) -> Result<()> {
         };
 
         println!(
-            "{:<4} {:<20} {:<20} {:<20} {:<10}",
+            "{:>id_w$}  {:<time_w$}  {:<home_w$}  {:<away_w$}  {:<score_w$}",
             fixture.id,
             format_datetime_local(kickoff),
-            home_team,
-            away_team,
-            score
+            truncate(home_team, WIDTH_NAME),
+            truncate(away_team, WIDTH_NAME),
+            score,
+            id_w = WIDTH_ID,
+            time_w = WIDTH_TIME,
+            home_w = WIDTH_NAME,
+            away_w = WIDTH_NAME,
+            score_w = WIDTH_SCORE,
         );
     }
 
