@@ -63,19 +63,21 @@ pub async fn handle_transfer(args: TransferArgs) -> Result<()> {
     println!("\n=== Top Transfers {} ({}) ===\n", direction_str, time_str);
 
     println!(
-        "{:>id_w$}  {:<name_w$}  {:<team_w$}  {:<pos_w$}  {:>6}  {:>10}  {:>10}  {:>10}",
+        "{:>id_w$}  {:<name_w$}  {:<pos_w$}  {:<team_w$}  {:>cost_w$}  {:>trans_w$}  {:>trans_w$}  {:>trans_w$}",
         "Rank",
-        "Player",
-        "Team",
+        "Name",
         "Pos",
-        "Price",
+        "Team",
+        "Cost",
         "IN",
         "OUT",
         "Net",
         id_w = WIDTH_ID,
         name_w = WIDTH_NAME,
-        team_w = WIDTH_TEAM,
         pos_w = WIDTH_POS,
+        team_w = WIDTH_TEAM,
+        cost_w = WIDTH_COST,
+        trans_w = WIDTH_TRANS,
     );
 
     for (i, player) in players.iter().take(args.limit).enumerate() {
@@ -88,7 +90,7 @@ pub async fn handle_transfer(args: TransferArgs) -> Result<()> {
             .map(|p| p.display_name())
             .unwrap_or("???");
 
-        let price = format!("£{:.1}", player.now_cost as f64 / 10.0);
+        let cost = format!("{:.1}", player.now_cost as f64 / 10.0);
 
         let (transfers_in, transfers_out) = if args.all_time {
             (player.transfers_in, player.transfers_out)
@@ -107,7 +109,7 @@ pub async fn handle_transfer(args: TransferArgs) -> Result<()> {
         };
 
         // Apply padding first, then color
-        let net_padded = format!("{:>10}", net_str);
+        let net_padded = format!("{:>width$}", net_str, width = WIDTH_TRANS);
         let net_colored = if net > 0 {
             net_padded.green().to_string()
         } else if net < 0 {
@@ -117,19 +119,21 @@ pub async fn handle_transfer(args: TransferArgs) -> Result<()> {
         };
 
         println!(
-            "{:>id_w$}  {:<name_w$}  {:<team_w$}  {:<pos_w$}  {:>6}  {:>10}  {:>10}  {}",
+            "{:>id_w$}  {:<name_w$}  {:<pos_w$}  {:<team_w$}  {:>cost_w$}  {:>trans_w$}  {:>trans_w$}  {}",
             i + 1,
-            truncate_name(&player.web_name, WIDTH_NAME),
-            team_name,
+            player.web_name,
             position,
-            price,
+            team_name,
+            cost,
             in_str,
             out_str,
             net_colored,
             id_w = WIDTH_ID,
             name_w = WIDTH_NAME,
-            team_w = WIDTH_TEAM,
             pos_w = WIDTH_POS,
+            team_w = WIDTH_TEAM,
+            cost_w = WIDTH_COST,
+            trans_w = WIDTH_TRANS,
         );
     }
 
@@ -144,13 +148,5 @@ fn format_number(n: u64) -> String {
         format!("{:.1}K", n as f64 / 1_000.0)
     } else {
         n.to_string()
-    }
-}
-
-fn truncate_name(name: &str, max_len: usize) -> String {
-    if name.chars().count() > max_len {
-        name.chars().take(max_len - 1).collect::<String>() + "…"
-    } else {
-        name.to_string()
     }
 }

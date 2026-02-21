@@ -238,3 +238,4 @@ pub const WIDTH_SEL: usize = 4;
 pub const WIDTH_FORM: usize = 4;
 pub const WIDTH_PTS: usize = 3;
 pub const WIDTH_STAT: usize = 6;
+pub const WIDTH_TRANS: usize = 7;
