@@ -256,3 +256,4 @@ pub const WIDTH_PTS: usize = 3;
 pub const WIDTH_AVAIL: usize = 5;
 pub const WIDTH_STAT: usize = 6;
 pub const WIDTH_TRANS: usize = 7;
+pub const WIDTH_STR: usize = 3;
