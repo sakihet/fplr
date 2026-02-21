@@ -33,7 +33,11 @@ enum Commands {
     /// Manage configuration
     Config(commands::ConfigArgs),
     /// Show dream team
-    DreamTeam { event_id: u32 },
+    DreamTeam {
+        /// Specific Gameweek (defaults to current)
+        #[arg(short, long)]
+        gw: Option<u32>,
+    },
     /// Show upcoming fixtures
     Fixture(commands::FixtureArgs),
     /// Show fixture difficulty rating
@@ -52,7 +56,9 @@ enum Commands {
     History(commands::HistoryArgs),
     /// Show live player stats for a specific event
     Live {
-        event: u32,
+        /// Specific Gameweek (defaults to current)
+        #[arg(short, long)]
+        gw: Option<u32>,
         #[arg(short, long, default_value = "20")]
         limit: usize,
     },
@@ -164,10 +170,10 @@ async fn run() -> Result<()> {
             commands::handle_availability(team, all, limit).await?
         }
         Commands::Config(args) => commands::handle_config(args)?,
-        Commands::DreamTeam { event_id } => commands::handle_dream_team(event_id).await?,
+        Commands::DreamTeam { gw } => commands::handle_dream_team(gw).await?,
         Commands::Gameweek {} => commands::handle_gameweek().await?,
         Commands::History(args) => commands::handle_history(args).await?,
-        Commands::Live { event, limit } => commands::handle_live(event, limit).await?,
+        Commands::Live { gw, limit } => commands::handle_live(gw, limit).await?,
         Commands::Manager { manager_id, gw } => commands::handle_manager(manager_id, gw).await?,
         Commands::MyTeam(args) => commands::handle_my_team(args).await?,
         Commands::Player {

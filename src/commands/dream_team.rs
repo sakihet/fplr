@@ -1,11 +1,20 @@
 use crate::api::FplClient;
 use crate::error::Result;
+use crate::utils::event_helpers::get_effective_event_id;
 use crate::utils::formatters::*;
 use crate::utils::player_helpers::create_player_map;
 
-pub async fn handle_dream_team(event_id: u32) -> Result<()> {
+pub async fn handle_dream_team(gw: Option<u32>) -> Result<()> {
     let bootstrap_data = FplClient::fetch_bootstrap_static().await?;
     let player_map = create_player_map(&bootstrap_data.elements);
+
+    let event_id = match get_effective_event_id(&bootstrap_data.events, gw) {
+        Some(id) => id,
+        None => {
+            println!("Could not determine current Gameweek.");
+            return Ok(());
+        }
+    };
 
     let data = FplClient::fetch_dream_team(event_id).await?;
     let mut team = data.team;

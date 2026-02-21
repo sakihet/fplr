@@ -1,17 +1,27 @@
 use crate::api::FplClient;
 use crate::error::Result;
 use crate::models::StatsPoints;
+use crate::utils::event_helpers::get_effective_event_id;
 use crate::utils::formatters::*;
 use crate::utils::player_helpers::create_player_map;
 
-pub async fn handle_live(event: u32, limit: usize) -> Result<()> {
+pub async fn handle_live(gw: Option<u32>, limit: usize) -> Result<()> {
     let bootstrap_data = FplClient::fetch_bootstrap_static().await?;
     let player_map = create_player_map(&bootstrap_data.elements);
 
-    let data = FplClient::fetch_live(event).await?;
+    let event_id = match get_effective_event_id(&bootstrap_data.events, gw) {
+        Some(id) => id,
+        None => {
+            println!("Could not determine current Gameweek.");
+            return Ok(());
+        }
+    };
+
+    let data = FplClient::fetch_live(event_id).await?;
     let mut elements = data.elements;
     elements.sort_by(|a, b| b.stats.total_points.cmp(&a.stats.total_points));
 
+    println!("Live Stats for GW{}", event_id);
     println!(
         "{:>id_w$}  {:<name_w$}  {:>pts_w$}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}",
         "ID",
