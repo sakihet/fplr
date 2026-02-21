@@ -1,7 +1,7 @@
 use crate::api::FplClient;
 use crate::error::Result;
 use crate::models::{LiveData, Position};
-use crate::utils::formatters::{format_chance_of_playing, to_sparkline};
+use crate::utils::formatters::*;
 use crate::utils::team_helpers::{create_team_short_name_map, find_team_ids_by_name};
 use futures::future::join_all;
 use std::collections::HashMap;
@@ -99,17 +99,25 @@ pub async fn handle_trend(
 
     // 4. Print table
     println!(
-        "{:<4} {:<20} {:<4} {:<6} {:<6} {:<8} {:<6} {:<5} {:<width$}",
+        "{:>id_w$}  {:<name_w$}  {:<pos_w$}  {:<team_w$}  {:>cost_w$}  {:>pts_w$}  {:>form_w$}  {:>avail_w$}  {:<trend_w$}",
         "ID",
         "Name",
         "Pos",
         "Team",
         "Cost",
-        "Points",
+        "Pts",
         "Form",
         "Avail",
         "Trend",
-        width = weeks.max(5)
+        id_w = WIDTH_ID,
+        name_w = WIDTH_NAME,
+        pos_w = WIDTH_POS,
+        team_w = WIDTH_TEAM,
+        cost_w = WIDTH_COST,
+        pts_w = WIDTH_PTS,
+        form_w = WIDTH_FORM,
+        avail_w = 5,
+        trend_w = weeks.max(5)
     );
 
     for player in top_players {
@@ -131,7 +139,7 @@ pub async fn handle_trend(
             format_chance_of_playing(player.chance_of_playing_next_round, &player.news);
 
         println!(
-            "{:<4} {:<20} {:<4} {:<6} {:<6} {:<8} {:<6} {:<5} {:<width$}",
+            "{:>id_w$}  {:<name_w$}  {:<pos_w$}  {:<team_w$}  {:>cost_w$}  {:>pts_w$}  {:>form_w$}  {:>avail_w$}  {:<trend_w$}",
             player.id,
             player.web_name,
             pos_name,
@@ -141,7 +149,15 @@ pub async fn handle_trend(
             player.form,
             availability,
             sparkline,
-            width = weeks.max(5)
+            id_w = WIDTH_ID,
+            name_w = WIDTH_NAME,
+            pos_w = WIDTH_POS,
+            team_w = WIDTH_TEAM,
+            cost_w = WIDTH_COST,
+            pts_w = WIDTH_PTS,
+            form_w = WIDTH_FORM,
+            avail_w = 5,
+            trend_w = weeks.max(5)
         );
     }
 
