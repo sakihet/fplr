@@ -1,7 +1,7 @@
 use crate::api::FplClient;
 use crate::error::Result;
 use crate::models::{LiveData, Position};
-use crate::utils::formatters::to_sparkline;
+use crate::utils::formatters::{format_chance_of_playing, to_sparkline};
 use crate::utils::team_helpers::{create_team_short_name_map, find_team_ids_by_name};
 use futures::future::join_all;
 use std::collections::HashMap;
@@ -99,7 +99,7 @@ pub async fn handle_trend(
 
     // 4. Print table
     println!(
-        "{:<4} {:<20} {:<4} {:<6} {:<6} {:<8} {:<6} {:<width$}",
+        "{:<4} {:<20} {:<4} {:<6} {:<6} {:<8} {:<6} {:<5} {:<width$}",
         "ID",
         "Name",
         "Pos",
@@ -107,6 +107,7 @@ pub async fn handle_trend(
         "Cost",
         "Points",
         "Form",
+        "Avail",
         "Trend",
         width = weeks.max(5)
     );
@@ -126,9 +127,11 @@ pub async fn handle_trend(
             .unwrap_or_default();
         let sparkline = to_sparkline(&history, global_max);
         let cost = format!("{:.1}", player.now_cost as f64 / 10.0);
+        let availability =
+            format_chance_of_playing(player.chance_of_playing_next_round, &player.news);
 
         println!(
-            "{:<4} {:<20} {:<4} {:<6} {:<6} {:<8} {:<6} {:<width$}",
+            "{:<4} {:<20} {:<4} {:<6} {:<6} {:<8} {:<6} {:<5} {:<width$}",
             player.id,
             player.web_name,
             pos_name,
@@ -136,6 +139,7 @@ pub async fn handle_trend(
             cost,
             player.total_points,
             player.form,
+            availability,
             sparkline,
             width = weeks.max(5)
         );
