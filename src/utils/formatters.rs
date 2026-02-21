@@ -119,6 +119,15 @@ pub fn format_signed_number(n: i64) -> String {
     }
 }
 
+/// Truncate a string to a maximum length and add an ellipsis if it exceeds it.
+pub fn truncate(s: &str, max_len: usize) -> String {
+    if s.chars().count() > max_len {
+        s.chars().take(max_len - 1).collect::<String>() + "…"
+    } else {
+        s.to_string()
+    }
+}
+
 /// Format and colorize chance of playing percentage
 pub fn format_chance_of_playing(chance: Option<u64>, news: &str) -> String {
     let (chance_val, chance_str) = match chance {
@@ -223,6 +232,13 @@ mod tests {
         assert_eq!(chars[0], ' '); // 0
         assert_eq!(chars[2], '█'); // 100
     }
+
+    #[test]
+    fn test_truncate() {
+        assert_eq!(truncate("Hello", 10), "Hello");
+        assert_eq!(truncate("Hello World", 5), "Hell…");
+        assert_eq!(truncate("Manchester City", 10), "Mancheste…");
+    }
 }
 
 // ============================================
@@ -237,5 +253,6 @@ pub const WIDTH_COST: usize = 4;
 pub const WIDTH_SEL: usize = 4;
 pub const WIDTH_FORM: usize = 4;
 pub const WIDTH_PTS: usize = 3;
+pub const WIDTH_AVAIL: usize = 5;
 pub const WIDTH_STAT: usize = 6;
 pub const WIDTH_TRANS: usize = 7;

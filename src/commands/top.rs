@@ -1,5 +1,6 @@
 use crate::api::FplClient;
 use crate::error::Result;
+use crate::utils::formatters::truncate;
 
 pub async fn handle_top() -> Result<()> {
     // League 314 is the Overall league
@@ -31,12 +32,4 @@ pub async fn handle_top() -> Result<()> {
     }
 
     Ok(())
-}
-
-fn truncate(s: &str, max_chars: usize) -> String {
-    if s.chars().count() > max_chars {
-        format!("{}...", s.chars().take(max_chars - 3).collect::<String>())
-    } else {
-        s.to_string()
-    }
 }
