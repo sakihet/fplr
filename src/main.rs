@@ -151,6 +151,10 @@ enum Commands {
         /// Number of recent gameweeks to show
         #[arg(short, long, default_value = "5")]
         weeks: usize,
+        #[arg(long)]
+        min_cost: Option<f64>,
+        #[arg(long)]
+        max_cost: Option<f64>,
     },
 }
 
@@ -224,7 +228,9 @@ async fn run() -> Result<()> {
             position,
             limit,
             weeks,
-        } => commands::handle_trend(team, position, limit, weeks).await?,
+            min_cost,
+            max_cost,
+        } => commands::handle_trend(team, position, limit, weeks, min_cost, max_cost).await?,
     }
     Ok(())
 }

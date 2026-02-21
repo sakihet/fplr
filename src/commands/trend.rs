@@ -11,6 +11,8 @@ pub async fn handle_trend(
     position: Option<Position>,
     limit: usize,
     weeks: usize,
+    min_cost: Option<f64>,
+    max_cost: Option<f64>,
 ) -> Result<()> {
     let bootstrap_data = FplClient::fetch_bootstrap_static().await?;
     let team_map = create_team_short_name_map(&bootstrap_data.teams);
@@ -36,7 +38,21 @@ pub async fn handle_trend(
             } else {
                 true
             };
-            team_match && pos_match
+            let cost_match = {
+                let p_cost = p.now_cost as f64;
+                let min_match = if let Some(min) = min_cost {
+                    p_cost >= min * 10.0
+                } else {
+                    true
+                };
+                let max_match = if let Some(max) = max_cost {
+                    p_cost <= max * 10.0
+                } else {
+                    true
+                };
+                min_match && max_match
+            };
+            team_match && pos_match && cost_match
         })
         .collect();
 
