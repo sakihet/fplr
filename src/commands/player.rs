@@ -207,7 +207,7 @@ fn print_players(players: &[Element], args: &PlayerFilterArgs, team_map: &HashMa
 
     if let Some(label) = stat_label {
         println!(
-            "{:>id_w$}  {:<name_w$}  {:<pos_w$}  {:<team_w$}  {:>cost_w$}  {:>sel_w$}  {:>form_w$}  {:>pts_w$}  {:>stat_w$}",
+            "{:>id_w$}  {:<name_w$}  {:<pos_w$}  {:<team_w$}  {:>cost_w$}  {:>sel_w$}  {:>form_w$}  {:>pts_w$}  {:>avail_w$}  {:>stat_w$}",
             "ID",
             "Name",
             "Pos",
@@ -216,6 +216,7 @@ fn print_players(players: &[Element], args: &PlayerFilterArgs, team_map: &HashMa
             "Sel%",
             "Form",
             "Pts",
+            "Avail",
             label,
             id_w = WIDTH_ID,
             name_w = WIDTH_NAME,
@@ -225,11 +226,12 @@ fn print_players(players: &[Element], args: &PlayerFilterArgs, team_map: &HashMa
             sel_w = WIDTH_SEL,
             form_w = WIDTH_FORM,
             pts_w = WIDTH_PTS,
+            avail_w = WIDTH_AVAIL,
             stat_w = WIDTH_STAT,
         );
     } else {
         println!(
-            "{:>id_w$}  {:<name_w$}  {:<pos_w$}  {:<team_w$}  {:>cost_w$}  {:>sel_w$}  {:>form_w$}  {:>pts_w$}  {:<news_w$}",
+            "{:>id_w$}  {:<name_w$}  {:<pos_w$}  {:<team_w$}  {:>cost_w$}  {:>sel_w$}  {:>form_w$}  {:>pts_w$}  {:>avail_w$}  {:<news_w$}",
             "ID",
             "Name",
             "Pos",
@@ -238,6 +240,7 @@ fn print_players(players: &[Element], args: &PlayerFilterArgs, team_map: &HashMa
             "Sel%",
             "Form",
             "Pts",
+            "Avail",
             "News",
             id_w = WIDTH_ID,
             name_w = WIDTH_NAME,
@@ -247,6 +250,7 @@ fn print_players(players: &[Element], args: &PlayerFilterArgs, team_map: &HashMa
             sel_w = WIDTH_SEL,
             form_w = WIDTH_FORM,
             pts_w = WIDTH_PTS,
+            avail_w = WIDTH_AVAIL,
             news_w = 20,
         );
     }
@@ -262,19 +266,21 @@ fn print_players(players: &[Element], args: &PlayerFilterArgs, team_map: &HashMa
             .unwrap_or("N/A");
 
         let cost = format!("{:.1}", player.now_cost as f64 / 10.0);
+        let avail = format_chance_of_playing(player.chance_of_playing_next_round, &player.news);
 
         if stat_label.is_some() {
             let stat_value = get_stat_value(player, &args.sort);
             println!(
-                "{:>id_w$}  {:<name_w$}  {:<pos_w$}  {:<team_w$}  {:>cost_w$}  {:>sel_w$}  {:>form_w$}  {:>pts_w$}  {:>stat_w$}",
+                "{:>id_w$}  {:<name_w$}  {:<pos_w$}  {:<team_w$}  {:>cost_w$}  {:>sel_w$}  {:>form_w$}  {:>pts_w$}  {}  {:>stat_w$}",
                 player.id,
-                player.web_name,
+                truncate(&player.web_name, WIDTH_NAME),
                 pos_name,
-                team_name,
+                truncate(team_name, WIDTH_TEAM),
                 cost,
                 player.selected_by_percent,
                 player.form,
                 player.total_points,
+                avail,
                 stat_value,
                 id_w = WIDTH_ID,
                 name_w = WIDTH_NAME,
@@ -288,15 +294,16 @@ fn print_players(players: &[Element], args: &PlayerFilterArgs, team_map: &HashMa
             );
         } else {
             println!(
-                "{:>id_w$}  {:<name_w$}  {:<pos_w$}  {:<team_w$}  {:>cost_w$}  {:>sel_w$}  {:>form_w$}  {:>pts_w$}  {:<news_w$}",
+                "{:>id_w$}  {:<name_w$}  {:<pos_w$}  {:<team_w$}  {:>cost_w$}  {:>sel_w$}  {:>form_w$}  {:>pts_w$}  {}  {:<news_w$}",
                 player.id,
-                player.web_name,
+                truncate(&player.web_name, WIDTH_NAME),
                 pos_name,
-                team_name,
+                truncate(team_name, WIDTH_TEAM),
                 cost,
                 player.selected_by_percent,
                 player.form,
                 player.total_points,
+                avail,
                 player.news,
                 id_w = WIDTH_ID,
                 name_w = WIDTH_NAME,
