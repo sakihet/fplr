@@ -251,7 +251,7 @@ fn print_players(players: &[Element], args: &PlayerFilterArgs, team_map: &HashMa
             form_w = WIDTH_FORM,
             pts_w = WIDTH_PTS,
             avail_w = WIDTH_AVAIL,
-            news_w = 20,
+            news_w = WIDTH_NEWS,
         );
     }
 
@@ -313,7 +313,7 @@ fn print_players(players: &[Element], args: &PlayerFilterArgs, team_map: &HashMa
                 sel_w = WIDTH_SEL,
                 form_w = WIDTH_FORM,
                 pts_w = WIDTH_PTS,
-                news_w = 20,
+                news_w = WIDTH_NEWS,
             );
         }
     }

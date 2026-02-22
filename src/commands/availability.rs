@@ -64,10 +64,10 @@ pub async fn handle_availability(team: Option<String>, all: bool, limit: usize) 
         name_w = WIDTH_NAME,
         team_w = WIDTH_TEAM_SHORT_NAME,
         pos_w = WIDTH_POS,
-        status_w = 14,
-        avail_w = 5,
-        news_added_w = 24,
-        news_w = 30,
+        status_w = WIDTH_STATUS,
+        avail_w = WIDTH_AVAIL,
+        news_added_w = WIDTH_TIME,
+        news_w = WIDTH_NEWS,
     );
 
     for player in players.iter().take(limit) {
@@ -103,10 +103,10 @@ pub async fn handle_availability(team: Option<String>, all: bool, limit: usize) 
             name_w = WIDTH_NAME,
             team_w = WIDTH_TEAM_SHORT_NAME,
             pos_w = WIDTH_POS,
-            status_w = 14,
-            avail_w = 5,
-            news_added_w = 24,
-            news_w = 30,
+            status_w = WIDTH_STATUS,
+            avail_w = WIDTH_AVAIL,
+            news_added_w = WIDTH_TIME,
+            news_w = WIDTH_NEWS,
         );
     }
 

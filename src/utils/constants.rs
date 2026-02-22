@@ -13,3 +13,5 @@ pub const WIDTH_TRANS: usize = 7;
 pub const WIDTH_STR: usize = 3;
 pub const WIDTH_TIME: usize = 20;
 pub const WIDTH_SCORE: usize = 7;
+pub const WIDTH_NEWS: usize = 30;
+pub const WIDTH_STATUS: usize = 13;

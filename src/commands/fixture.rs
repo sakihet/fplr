@@ -43,8 +43,8 @@ pub async fn handle_fixture(args: FixtureArgs) -> Result<()> {
         "Score",
         id_w = WIDTH_ID,
         time_w = WIDTH_TIME,
-        home_w = WIDTH_NAME,
-        away_w = WIDTH_NAME,
+        home_w = WIDTH_TEAM_NAME,
+        away_w = WIDTH_TEAM_NAME,
         score_w = WIDTH_SCORE,
     );
 
@@ -73,13 +73,13 @@ pub async fn handle_fixture(args: FixtureArgs) -> Result<()> {
             "{:>id_w$}  {:<time_w$}  {:<home_w$}  {:<away_w$}  {:<score_w$}",
             fixture.id,
             format_datetime_local(kickoff),
-            truncate(home_team, WIDTH_NAME),
-            truncate(away_team, WIDTH_NAME),
+            home_team,
+            away_team,
             score,
             id_w = WIDTH_ID,
             time_w = WIDTH_TIME,
-            home_w = WIDTH_NAME,
-            away_w = WIDTH_NAME,
+            home_w = WIDTH_TEAM_NAME,
+            away_w = WIDTH_TEAM_NAME,
             score_w = WIDTH_SCORE,
         );
     }
