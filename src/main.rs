@@ -125,6 +125,12 @@ enum Commands {
         #[arg(short, long, default_value = "pos")]
         sort: TeamSortBy,
     },
+    /// Show talisman players
+    Talisman {
+        /// Filter by team name
+        #[arg(short, long)]
+        team: Option<String>,
+    },
     /// Show team form based on total player form
     #[command(name = "team-form")]
     TeamForm {
@@ -218,6 +224,7 @@ async fn run() -> Result<()> {
         Commands::SetPiece { team } => commands::handle_set_piece(team).await?,
         Commands::Status {} => commands::handle_status().await?,
         Commands::Table {} => commands::handle_table().await?,
+        Commands::Talisman { team } => commands::handle_talisman(team).await?,
         Commands::Top {} => commands::handle_top().await?,
         Commands::Team { sort } => commands::handle_team(&sort).await?,
         Commands::TeamForm { sort } => commands::handle_team_form(&sort).await?,
