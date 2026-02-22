@@ -1,8 +1,8 @@
 use crate::api::FplClient;
 use crate::error::Result;
 use crate::models::{LiveData, Position};
-use crate::utils::formatters::to_sparkline;
 use crate::utils::team_helpers::{create_team_short_name_map, find_team_ids_by_name};
+use crate::utils::{constants::*, formatters::*};
 use futures::future::join_all;
 use std::collections::HashMap;
 
@@ -11,6 +11,8 @@ pub async fn handle_trend(
     position: Option<Position>,
     limit: usize,
     weeks: usize,
+    min_cost: Option<f64>,
+    max_cost: Option<f64>,
 ) -> Result<()> {
     let bootstrap_data = FplClient::fetch_bootstrap_static().await?;
     let team_map = create_team_short_name_map(&bootstrap_data.teams);
@@ -36,7 +38,21 @@ pub async fn handle_trend(
             } else {
                 true
             };
-            team_match && pos_match
+            let cost_match = {
+                let p_cost = p.now_cost as f64;
+                let min_match = if let Some(min) = min_cost {
+                    p_cost >= min * 10.0
+                } else {
+                    true
+                };
+                let max_match = if let Some(max) = max_cost {
+                    p_cost <= max * 10.0
+                } else {
+                    true
+                };
+                min_match && max_match
+            };
+            team_match && pos_match && cost_match
         })
         .collect();
 
@@ -99,16 +115,25 @@ pub async fn handle_trend(
 
     // 4. Print table
     println!(
-        "{:<4} {:<20} {:<4} {:<6} {:<6} {:<8} {:<6} {:<width$}",
+        "{:>id_w$}  {:<name_w$}  {:<pos_w$}  {:<team_w$}  {:>cost_w$}  {:>pts_w$}  {:>form_w$}  {:>avail_w$}  {:<trend_w$}",
         "ID",
         "Name",
         "Pos",
         "Team",
         "Cost",
-        "Points",
+        "Pts",
         "Form",
+        "Avail",
         "Trend",
-        width = weeks.max(5)
+        id_w = WIDTH_ID,
+        name_w = WIDTH_NAME,
+        pos_w = WIDTH_POS,
+        team_w = WIDTH_TEAM_SHORT_NAME,
+        cost_w = WIDTH_COST,
+        pts_w = WIDTH_PTS,
+        form_w = WIDTH_FORM,
+        avail_w = 5,
+        trend_w = weeks.max(5)
     );
 
     for player in top_players {
@@ -126,9 +151,11 @@ pub async fn handle_trend(
             .unwrap_or_default();
         let sparkline = to_sparkline(&history, global_max);
         let cost = format!("{:.1}", player.now_cost as f64 / 10.0);
+        let availability =
+            format_chance_of_playing(player.chance_of_playing_next_round, &player.news);
 
         println!(
-            "{:<4} {:<20} {:<4} {:<6} {:<6} {:<8} {:<6} {:<width$}",
+            "{:>id_w$}  {:<name_w$}  {:<pos_w$}  {:<team_w$}  {:>cost_w$}  {:>pts_w$}  {:>form_w$}  {:>avail_w$}  {:<trend_w$}",
             player.id,
             player.web_name,
             pos_name,
@@ -136,8 +163,17 @@ pub async fn handle_trend(
             cost,
             player.total_points,
             player.form,
+            availability,
             sparkline,
-            width = weeks.max(5)
+            id_w = WIDTH_ID,
+            name_w = WIDTH_NAME,
+            pos_w = WIDTH_POS,
+            team_w = WIDTH_TEAM_SHORT_NAME,
+            cost_w = WIDTH_COST,
+            pts_w = WIDTH_PTS,
+            form_w = WIDTH_FORM,
+            avail_w = 5,
+            trend_w = weeks.max(5)
         );
     }
 

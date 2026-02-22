@@ -1,13 +1,13 @@
 use crate::api::FplClient;
 use crate::error::{FplrError, Result};
-use crate::utils::event_helpers::find_next_event;
-use crate::utils::formatters::format_datetime_local;
+use crate::utils::event_helpers::get_effective_event_id;
 use crate::utils::team_helpers::create_team_map;
+use crate::utils::{constants::*, formatters::*};
 use clap::Args;
 
 #[derive(Debug, Args)]
 pub struct FixtureArgs {
-    /// Specific Gameweek (defaults to next)
+    /// Specific Gameweek (defaults to current)
     #[arg(short, long)]
     pub gw: Option<u32>,
 }
@@ -16,14 +16,8 @@ pub async fn handle_fixture(args: FixtureArgs) -> Result<()> {
     let bootstrap_data = FplClient::fetch_bootstrap_static().await?;
     let team_map = create_team_map(&bootstrap_data.teams);
 
-    let event_id = match args.gw {
-        Some(gw) => gw as u64,
-        None => {
-            let next_event =
-                find_next_event(&bootstrap_data.events).ok_or(FplrError::NoNextEvent)?;
-            next_event.id
-        }
-    };
+    let event_id = get_effective_event_id(&bootstrap_data.events, args.gw)
+        .ok_or(FplrError::NoNextEvent)? as u64;
 
     let fixtures = FplClient::fetch_fixtures().await?;
 
@@ -41,8 +35,17 @@ pub async fn handle_fixture(args: FixtureArgs) -> Result<()> {
 
     println!("Fixtures for Gameweek {}:", event_id);
     println!(
-        "{:<4} {:<20} {:<20} {:<20} {:<10}",
-        "ID", "Kickoff Time", "Home", "Away", "Score"
+        "{:>id_w$}  {:<time_w$}  {:<home_w$}  {:<away_w$}  {:<score_w$}",
+        "ID",
+        "Kickoff Time",
+        "Home",
+        "Away",
+        "Score",
+        id_w = WIDTH_ID,
+        time_w = WIDTH_TIME,
+        home_w = WIDTH_TEAM_NAME,
+        away_w = WIDTH_TEAM_NAME,
+        score_w = WIDTH_SCORE,
     );
 
     for fixture in target_fixtures {
@@ -67,12 +70,17 @@ pub async fn handle_fixture(args: FixtureArgs) -> Result<()> {
         };
 
         println!(
-            "{:<4} {:<20} {:<20} {:<20} {:<10}",
+            "{:>id_w$}  {:<time_w$}  {:<home_w$}  {:<away_w$}  {:<score_w$}",
             fixture.id,
             format_datetime_local(kickoff),
             home_team,
             away_team,
-            score
+            score,
+            id_w = WIDTH_ID,
+            time_w = WIDTH_TIME,
+            home_w = WIDTH_TEAM_NAME,
+            away_w = WIDTH_TEAM_NAME,
+            score_w = WIDTH_SCORE,
         );
     }
 

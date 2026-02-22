@@ -1,8 +1,8 @@
 use crate::api::FplClient;
 use crate::error::Result;
 use crate::models::{Element, Position};
-use crate::utils::formatters::{format_chance_of_playing, format_datetime_local};
 use crate::utils::team_helpers::{create_team_short_name_map, find_team_ids_by_name};
+use crate::utils::{constants::*, formatters::*};
 
 pub async fn handle_availability(team: Option<String>, all: bool, limit: usize) -> Result<()> {
     let data = FplClient::fetch_bootstrap_static().await?;
@@ -51,8 +51,23 @@ pub async fn handle_availability(team: Option<String>, all: bool, limit: usize) 
     players.sort_by(|a, b| b.news_added.cmp(&a.news_added));
 
     println!(
-        "{:<4} {:<20} {:<6} {:<4} {:<14} {:<5} {:<24} {:<30}",
-        "ID", "Name", "Team", "Pos", "Status", "Avail", "News Added", "News"
+        "{:>id_w$}  {:<name_w$}  {:<team_w$}  {:<pos_w$}  {:<status_w$}  {:>avail_w$}  {:<news_added_w$}  {:<news_w$}",
+        "ID",
+        "Name",
+        "Team",
+        "Pos",
+        "Status",
+        "Avail",
+        "News Added",
+        "News",
+        id_w = WIDTH_ID,
+        name_w = WIDTH_NAME,
+        team_w = WIDTH_TEAM_SHORT_NAME,
+        pos_w = WIDTH_POS,
+        status_w = WIDTH_STATUS,
+        avail_w = WIDTH_AVAIL,
+        news_added_w = WIDTH_TIME,
+        news_w = WIDTH_NEWS,
     );
 
     for player in players.iter().take(limit) {
@@ -73,7 +88,7 @@ pub async fn handle_availability(team: Option<String>, all: bool, limit: usize) 
             .unwrap_or_else(|| "N/A".to_string());
 
         println!(
-            "{:<4} {:<20} {:<6} {:<4} {:<14} {} {:<24} {:<30}",
+            "{:>id_w$}  {:<name_w$}  {:<team_w$}  {:<pos_w$}  {:<status_w$}  {:>avail_w$}  {:<news_added_w$}  {:<news_w$}",
             player.id,
             player.web_name,
             team_name,
@@ -83,7 +98,15 @@ pub async fn handle_availability(team: Option<String>, all: bool, limit: usize) 
             status_desc,
             avail_display,
             news_added,
-            player.news
+            player.news,
+            id_w = WIDTH_ID,
+            name_w = WIDTH_NAME,
+            team_w = WIDTH_TEAM_SHORT_NAME,
+            pos_w = WIDTH_POS,
+            status_w = WIDTH_STATUS,
+            avail_w = WIDTH_AVAIL,
+            news_added_w = WIDTH_TIME,
+            news_w = WIDTH_NEWS,
         );
     }
 

@@ -4,6 +4,7 @@ use crate::api::FplClient;
 use crate::error::Result;
 use crate::models::{Element, Position, SortBy};
 use crate::utils::team_helpers::{create_team_short_name_map, find_team_ids_by_name};
+use crate::utils::{constants::*, formatters::*};
 use std::collections::HashMap;
 
 #[derive(Debug, Default)]
@@ -206,13 +207,51 @@ fn print_players(players: &[Element], args: &PlayerFilterArgs, team_map: &HashMa
 
     if let Some(label) = stat_label {
         println!(
-            "{:<4} {:<20} {:<4} {:<6} {:<6} {:<8} {:<6} {:<8} {:<6}",
-            "ID", "Name", "Pos", "Team", "Cost", "Selected", "Form", "Points", label
+            "{:>id_w$}  {:<name_w$}  {:<pos_w$}  {:<team_w$}  {:>cost_w$}  {:>sel_w$}  {:>form_w$}  {:>pts_w$}  {:>avail_w$}  {:>stat_w$}",
+            "ID",
+            "Name",
+            "Pos",
+            "Team",
+            "Cost",
+            "Sel%",
+            "Form",
+            "Pts",
+            "Avail",
+            label,
+            id_w = WIDTH_ID,
+            name_w = WIDTH_NAME,
+            pos_w = WIDTH_POS,
+            team_w = WIDTH_TEAM_SHORT_NAME,
+            cost_w = WIDTH_COST,
+            sel_w = WIDTH_SEL,
+            form_w = WIDTH_FORM,
+            pts_w = WIDTH_PTS,
+            avail_w = WIDTH_AVAIL,
+            stat_w = WIDTH_STAT,
         );
     } else {
         println!(
-            "{:<4} {:<20} {:<4} {:<6} {:<6} {:<8} {:<6} {:<8} {:<30}",
-            "ID", "Name", "Pos", "Team", "Cost", "Selected", "Form", "Points", "News"
+            "{:>id_w$}  {:<name_w$}  {:<pos_w$}  {:<team_w$}  {:>cost_w$}  {:>sel_w$}  {:>form_w$}  {:>pts_w$}  {:>avail_w$}  {:<news_w$}",
+            "ID",
+            "Name",
+            "Pos",
+            "Team",
+            "Cost",
+            "Sel%",
+            "Form",
+            "Pts",
+            "Avail",
+            "News",
+            id_w = WIDTH_ID,
+            name_w = WIDTH_NAME,
+            pos_w = WIDTH_POS,
+            team_w = WIDTH_TEAM_SHORT_NAME,
+            cost_w = WIDTH_COST,
+            sel_w = WIDTH_SEL,
+            form_w = WIDTH_FORM,
+            pts_w = WIDTH_PTS,
+            avail_w = WIDTH_AVAIL,
+            news_w = WIDTH_NEWS,
         );
     }
 
@@ -227,33 +266,54 @@ fn print_players(players: &[Element], args: &PlayerFilterArgs, team_map: &HashMa
             .unwrap_or("N/A");
 
         let cost = format!("{:.1}", player.now_cost as f64 / 10.0);
+        let avail = format_chance_of_playing(player.chance_of_playing_next_round, &player.news);
 
         if stat_label.is_some() {
             let stat_value = get_stat_value(player, &args.sort);
             println!(
-                "{:<4} {:<20} {:<4} {:<6} {:<6} {:<8} {:<6} {:<8} {:<6}",
+                "{:>id_w$}  {:<name_w$}  {:<pos_w$}  {:<team_w$}  {:>cost_w$}  {:>sel_w$}  {:>form_w$}  {:>pts_w$}  {}  {:>stat_w$}",
                 player.id,
-                player.web_name,
+                truncate(&player.web_name, WIDTH_NAME),
                 pos_name,
-                team_name,
+                truncate(team_name, WIDTH_TEAM_SHORT_NAME),
                 cost,
                 player.selected_by_percent,
                 player.form,
                 player.total_points,
+                avail,
                 stat_value,
+                id_w = WIDTH_ID,
+                name_w = WIDTH_NAME,
+                pos_w = WIDTH_POS,
+                team_w = WIDTH_TEAM_SHORT_NAME,
+                cost_w = WIDTH_COST,
+                sel_w = WIDTH_SEL,
+                form_w = WIDTH_FORM,
+                pts_w = WIDTH_PTS,
+                stat_w = WIDTH_STAT,
             );
         } else {
             println!(
-                "{:<4} {:<20} {:<4} {:<6} {:<6} {:<8} {:<6} {:<8} {:<30}",
+                "{:>id_w$}  {:<name_w$}  {:<pos_w$}  {:<team_w$}  {:>cost_w$}  {:>sel_w$}  {:>form_w$}  {:>pts_w$}  {}  {:<news_w$}",
                 player.id,
-                player.web_name,
+                truncate(&player.web_name, WIDTH_NAME),
                 pos_name,
-                team_name,
+                truncate(team_name, WIDTH_TEAM_SHORT_NAME),
                 cost,
                 player.selected_by_percent,
                 player.form,
                 player.total_points,
+                avail,
                 player.news,
+                id_w = WIDTH_ID,
+                name_w = WIDTH_NAME,
+                pos_w = WIDTH_POS,
+                team_w = WIDTH_TEAM_SHORT_NAME,
+                cost_w = WIDTH_COST,
+                sel_w = WIDTH_SEL,
+                form_w = WIDTH_FORM,
+                pts_w = WIDTH_PTS,
+                news_w = WIDTH_NEWS,
             );
         }
     }

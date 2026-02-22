@@ -2,6 +2,15 @@ use clap::ValueEnum;
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Debug, Default, ValueEnum)]
+pub enum TeamSortBy {
+    #[default]
+    #[value(alias = "pos")]
+    Position,
+    #[value(alias = "str")]
+    Strength,
+}
+
+#[derive(Clone, Debug, Default, ValueEnum)]
 pub enum SortBy {
     Cost,
     SelectedBy,

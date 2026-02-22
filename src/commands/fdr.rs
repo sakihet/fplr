@@ -169,9 +169,9 @@ fn display_all_teams_fdr(fixtures: &[&Fixture], limit: usize, team_map: &HashMap
     print!("{:<20}", "Team");
     for (idx, event) in events_to_show.iter().enumerate() {
         let width = column_widths[idx];
-        print!(" {:<width$}", format!("GW{}", event));
+        print!("  {:<width$}", format!("GW{}", event));
     }
-    println!(" {:<5}", "Avg");
+    println!("  {:<5}", "Avg");
 
     // Print each team's FDR
     for (_, team, fdr_values) in team_fdr_data {
@@ -183,7 +183,7 @@ fn display_all_teams_fdr(fixtures: &[&Fixture], limit: usize, team_map: &HashMap
         for (idx, gw_fixtures) in fdr_values.iter().enumerate() {
             let width = column_widths[idx];
             if gw_fixtures.is_empty() {
-                print!(" {:>width$}", "-");
+                print!("  {:>width$}", "-");
             } else {
                 let mut display_parts = Vec::new();
                 let mut visual_length = 0;
@@ -199,7 +199,7 @@ fn display_all_teams_fdr(fixtures: &[&Fixture], limit: usize, team_map: &HashMap
                 let joined = display_parts.join(" ");
                 // Right-pad to match dynamic column width
                 let padding = width.saturating_sub(visual_length);
-                print!(" {}{}", joined, " ".repeat(padding));
+                print!("  {}{}", joined, " ".repeat(padding));
             }
         }
 
@@ -208,6 +208,6 @@ fn display_all_teams_fdr(fixtures: &[&Fixture], limit: usize, team_map: &HashMap
         } else {
             "-".to_string()
         };
-        println!(" {:<5}", avg);
+        println!("  {:<5}", avg);
     }
 }

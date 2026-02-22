@@ -1,19 +1,47 @@
 use crate::api::FplClient;
 use crate::error::Result;
 use crate::models::StatsPoints;
+use crate::utils::constants::*;
+use crate::utils::event_helpers::get_effective_event_id;
 use crate::utils::player_helpers::create_player_map;
 
-pub async fn handle_live(event: u32, limit: usize) -> Result<()> {
+pub async fn handle_live(gw: Option<u32>, limit: usize) -> Result<()> {
     let bootstrap_data = FplClient::fetch_bootstrap_static().await?;
     let player_map = create_player_map(&bootstrap_data.elements);
 
-    let data = FplClient::fetch_live(event).await?;
+    let event_id = match get_effective_event_id(&bootstrap_data.events, gw) {
+        Some(id) => id,
+        None => {
+            println!("Could not determine current Gameweek.");
+            return Ok(());
+        }
+    };
+
+    let data = FplClient::fetch_live(event_id).await?;
     let mut elements = data.elements;
     elements.sort_by(|a, b| b.stats.total_points.cmp(&a.stats.total_points));
 
+    println!("Live Stats for GW{}", event_id);
     println!(
-        "{:<4} {:<20} {:<8} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4}",
-        "ID", "Name", "Total", "Min", "G", "A", "CS", "GC", "S", "PS", "PM", "YC", "RC", "OG", "B"
+        "{:>id_w$}  {:<name_w$}  {:>pts_w$}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}",
+        "ID",
+        "Name",
+        "Pts",
+        "Min",
+        "G",
+        "A",
+        "CS",
+        "GC",
+        "S",
+        "PS",
+        "PM",
+        "YC",
+        "RC",
+        "OG",
+        "B",
+        id_w = WIDTH_ID,
+        name_w = WIDTH_NAME,
+        pts_w = WIDTH_PTS,
     );
     for element in elements.iter().take(limit) {
         let name = player_map
@@ -43,7 +71,7 @@ pub async fn handle_live(event: u32, limit: usize) -> Result<()> {
         }
 
         println!(
-            "{:<4} {:<20} {:<8} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4} {:<4}",
+            "{:>id_w$}  {:<name_w$}  {:>pts_w$}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}",
             element.id,
             name,
             element.stats.total_points,
@@ -58,7 +86,10 @@ pub async fn handle_live(event: u32, limit: usize) -> Result<()> {
             stats.yellow_cards,
             stats.red_cards,
             stats.own_goals,
-            stats.bonus
+            stats.bonus,
+            id_w = WIDTH_ID,
+            name_w = WIDTH_NAME,
+            pts_w = WIDTH_PTS,
         );
     }
 

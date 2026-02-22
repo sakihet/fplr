@@ -1,0 +1,17 @@
+pub const WIDTH_ID: usize = 4;
+pub const WIDTH_NAME: usize = 16;
+pub const WIDTH_TEAM_NAME: usize = 14;
+pub const WIDTH_POS: usize = 3;
+pub const WIDTH_TEAM_SHORT_NAME: usize = 4;
+pub const WIDTH_COST: usize = 4;
+pub const WIDTH_SEL: usize = 4;
+pub const WIDTH_FORM: usize = 4;
+pub const WIDTH_PTS: usize = 3;
+pub const WIDTH_AVAIL: usize = 5;
+pub const WIDTH_STAT: usize = 6;
+pub const WIDTH_TRANS: usize = 7;
+pub const WIDTH_STR: usize = 3;
+pub const WIDTH_TIME: usize = 20;
+pub const WIDTH_SCORE: usize = 7;
+pub const WIDTH_NEWS: usize = 30;
+pub const WIDTH_STATUS: usize = 13;
