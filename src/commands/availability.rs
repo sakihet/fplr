@@ -1,8 +1,8 @@
 use crate::api::FplClient;
 use crate::error::Result;
 use crate::models::{Element, Position};
-use crate::utils::formatters::*;
 use crate::utils::team_helpers::{create_team_short_name_map, find_team_ids_by_name};
+use crate::utils::{constants::*, formatters::*};
 
 pub async fn handle_availability(team: Option<String>, all: bool, limit: usize) -> Result<()> {
     let data = FplClient::fetch_bootstrap_static().await?;
@@ -62,7 +62,7 @@ pub async fn handle_availability(team: Option<String>, all: bool, limit: usize) 
         "News",
         id_w = WIDTH_ID,
         name_w = WIDTH_NAME,
-        team_w = WIDTH_TEAM,
+        team_w = WIDTH_TEAM_SHORT_NAME,
         pos_w = WIDTH_POS,
         status_w = 14,
         avail_w = 5,
@@ -101,7 +101,7 @@ pub async fn handle_availability(team: Option<String>, all: bool, limit: usize) 
             player.news,
             id_w = WIDTH_ID,
             name_w = WIDTH_NAME,
-            team_w = WIDTH_TEAM,
+            team_w = WIDTH_TEAM_SHORT_NAME,
             pos_w = WIDTH_POS,
             status_w = 14,
             avail_w = 5,

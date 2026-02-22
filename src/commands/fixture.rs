@@ -1,8 +1,8 @@
 use crate::api::FplClient;
 use crate::error::{FplrError, Result};
 use crate::utils::event_helpers::get_effective_event_id;
-use crate::utils::formatters::*;
 use crate::utils::team_helpers::create_team_map;
+use crate::utils::{constants::*, formatters::*};
 use clap::Args;
 
 #[derive(Debug, Args)]

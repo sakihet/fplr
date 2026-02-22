@@ -1,8 +1,8 @@
 use crate::api::FplClient;
 use crate::error::Result;
 use crate::models::{LiveData, Position};
-use crate::utils::formatters::*;
 use crate::utils::team_helpers::{create_team_short_name_map, find_team_ids_by_name};
+use crate::utils::{constants::*, formatters::*};
 use futures::future::join_all;
 use std::collections::HashMap;
 
@@ -128,7 +128,7 @@ pub async fn handle_trend(
         id_w = WIDTH_ID,
         name_w = WIDTH_NAME,
         pos_w = WIDTH_POS,
-        team_w = WIDTH_TEAM,
+        team_w = WIDTH_TEAM_SHORT_NAME,
         cost_w = WIDTH_COST,
         pts_w = WIDTH_PTS,
         form_w = WIDTH_FORM,
@@ -168,7 +168,7 @@ pub async fn handle_trend(
             id_w = WIDTH_ID,
             name_w = WIDTH_NAME,
             pos_w = WIDTH_POS,
-            team_w = WIDTH_TEAM,
+            team_w = WIDTH_TEAM_SHORT_NAME,
             cost_w = WIDTH_COST,
             pts_w = WIDTH_PTS,
             form_w = WIDTH_FORM,

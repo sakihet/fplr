@@ -1,8 +1,8 @@
 use crate::api::FplClient;
 use crate::error::Result;
 use crate::models::StatsPoints;
+use crate::utils::constants::*;
 use crate::utils::event_helpers::get_effective_event_id;
-use crate::utils::formatters::*;
 use crate::utils::player_helpers::create_player_map;
 
 pub async fn handle_live(gw: Option<u32>, limit: usize) -> Result<()> {

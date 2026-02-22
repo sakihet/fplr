@@ -3,8 +3,8 @@ use crate::config::Config;
 use crate::error::Result;
 use crate::models::{LiveData, Pick, Position};
 use crate::utils::event_helpers::get_effective_event_id;
-use crate::utils::formatters::*;
 use crate::utils::team_helpers::create_team_short_name_map;
+use crate::utils::{constants::*, formatters::*};
 use clap::Args;
 use futures::future::join_all;
 use std::collections::{HashMap, HashSet};
@@ -174,7 +174,7 @@ pub async fn handle_my_team(args: MyTeamArgs) -> Result<()> {
         id_w = WIDTH_ID,
         pos_w = WIDTH_POS,
         name_w = WIDTH_NAME,
-        team_w = WIDTH_TEAM,
+        team_w = WIDTH_TEAM_SHORT_NAME,
         opp_w = 15,
         avail_w = 5,
         pts_w = WIDTH_PTS,
@@ -248,7 +248,7 @@ pub async fn handle_my_team(args: MyTeamArgs) -> Result<()> {
                 id_w = WIDTH_ID,
                 pos_w = WIDTH_POS,
                 name_w = WIDTH_NAME,
-                team_w = WIDTH_TEAM,
+                team_w = WIDTH_TEAM_SHORT_NAME,
                 opp_w = 15,
                 avail_w = 5,
                 pts_w = WIDTH_PTS,

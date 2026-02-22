@@ -6,7 +6,7 @@ mod models;
 mod utils;
 
 use crate::error::{FplrError, Result};
-use crate::models::{Position, SortBy};
+use crate::models::{Position, SortBy, TeamSortBy};
 use clap::{Parser, Subcommand};
 
 #[derive(Parser, Debug)]
@@ -121,7 +121,10 @@ enum Commands {
     /// Show top teams in the overall league
     Top {},
     /// Show teams
-    Team {},
+    Team {
+        #[arg(short, long, default_value = "pos")]
+        sort: TeamSortBy,
+    },
     /// Show team form based on total player form
     #[command(name = "team-form")]
     TeamForm {},
@@ -213,7 +216,7 @@ async fn run() -> Result<()> {
         Commands::Status {} => commands::handle_status().await?,
         Commands::Table {} => commands::handle_table().await?,
         Commands::Top {} => commands::handle_top().await?,
-        Commands::Team {} => commands::handle_team().await?,
+        Commands::Team { sort } => commands::handle_team(&sort).await?,
         Commands::TeamForm {} => commands::handle_team_form().await?,
         Commands::TeamPerf { gw, last } => commands::handle_team_perf(gw, last).await?,
         Commands::Fixture(args) => commands::handle_fixture(args).await?,

@@ -1,8 +1,8 @@
 use crate::api::FplClient;
 use crate::error::Result;
 use crate::models::Position;
+use crate::utils::constants::*;
 use crate::utils::event_helpers::get_current_event_id;
-use crate::utils::formatters::*;
 use crate::utils::team_helpers::create_team_short_name_map;
 use clap::Args;
 use owo_colors::OwoColorize;
@@ -75,7 +75,7 @@ pub async fn handle_transfer(args: TransferArgs) -> Result<()> {
         id_w = WIDTH_ID,
         name_w = WIDTH_NAME,
         pos_w = WIDTH_POS,
-        team_w = WIDTH_TEAM,
+        team_w = WIDTH_TEAM_SHORT_NAME,
         cost_w = WIDTH_COST,
         trans_w = WIDTH_TRANS,
     );
@@ -131,7 +131,7 @@ pub async fn handle_transfer(args: TransferArgs) -> Result<()> {
             id_w = WIDTH_ID,
             name_w = WIDTH_NAME,
             pos_w = WIDTH_POS,
-            team_w = WIDTH_TEAM,
+            team_w = WIDTH_TEAM_SHORT_NAME,
             cost_w = WIDTH_COST,
             trans_w = WIDTH_TRANS,
         );

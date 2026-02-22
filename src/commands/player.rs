@@ -3,8 +3,8 @@ use deunicode::deunicode;
 use crate::api::FplClient;
 use crate::error::Result;
 use crate::models::{Element, Position, SortBy};
-use crate::utils::formatters::*;
 use crate::utils::team_helpers::{create_team_short_name_map, find_team_ids_by_name};
+use crate::utils::{constants::*, formatters::*};
 use std::collections::HashMap;
 
 #[derive(Debug, Default)]
@@ -221,7 +221,7 @@ fn print_players(players: &[Element], args: &PlayerFilterArgs, team_map: &HashMa
             id_w = WIDTH_ID,
             name_w = WIDTH_NAME,
             pos_w = WIDTH_POS,
-            team_w = WIDTH_TEAM,
+            team_w = WIDTH_TEAM_SHORT_NAME,
             cost_w = WIDTH_COST,
             sel_w = WIDTH_SEL,
             form_w = WIDTH_FORM,
@@ -245,7 +245,7 @@ fn print_players(players: &[Element], args: &PlayerFilterArgs, team_map: &HashMa
             id_w = WIDTH_ID,
             name_w = WIDTH_NAME,
             pos_w = WIDTH_POS,
-            team_w = WIDTH_TEAM,
+            team_w = WIDTH_TEAM_SHORT_NAME,
             cost_w = WIDTH_COST,
             sel_w = WIDTH_SEL,
             form_w = WIDTH_FORM,
@@ -275,7 +275,7 @@ fn print_players(players: &[Element], args: &PlayerFilterArgs, team_map: &HashMa
                 player.id,
                 truncate(&player.web_name, WIDTH_NAME),
                 pos_name,
-                truncate(team_name, WIDTH_TEAM),
+                truncate(team_name, WIDTH_TEAM_SHORT_NAME),
                 cost,
                 player.selected_by_percent,
                 player.form,
@@ -285,7 +285,7 @@ fn print_players(players: &[Element], args: &PlayerFilterArgs, team_map: &HashMa
                 id_w = WIDTH_ID,
                 name_w = WIDTH_NAME,
                 pos_w = WIDTH_POS,
-                team_w = WIDTH_TEAM,
+                team_w = WIDTH_TEAM_SHORT_NAME,
                 cost_w = WIDTH_COST,
                 sel_w = WIDTH_SEL,
                 form_w = WIDTH_FORM,
@@ -298,7 +298,7 @@ fn print_players(players: &[Element], args: &PlayerFilterArgs, team_map: &HashMa
                 player.id,
                 truncate(&player.web_name, WIDTH_NAME),
                 pos_name,
-                truncate(team_name, WIDTH_TEAM),
+                truncate(team_name, WIDTH_TEAM_SHORT_NAME),
                 cost,
                 player.selected_by_percent,
                 player.form,
@@ -308,7 +308,7 @@ fn print_players(players: &[Element], args: &PlayerFilterArgs, team_map: &HashMa
                 id_w = WIDTH_ID,
                 name_w = WIDTH_NAME,
                 pos_w = WIDTH_POS,
-                team_w = WIDTH_TEAM,
+                team_w = WIDTH_TEAM_SHORT_NAME,
                 cost_w = WIDTH_COST,
                 sel_w = WIDTH_SEL,
                 form_w = WIDTH_FORM,

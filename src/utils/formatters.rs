@@ -240,22 +240,3 @@ mod tests {
         assert_eq!(truncate("Manchester City", 10), "Mancheste…");
     }
 }
-
-// ============================================
-// Column width constants for consistent layout
-// ============================================
-
-pub const WIDTH_ID: usize = 4;
-pub const WIDTH_NAME: usize = 16;
-pub const WIDTH_POS: usize = 3;
-pub const WIDTH_TEAM: usize = 4;
-pub const WIDTH_COST: usize = 4;
-pub const WIDTH_SEL: usize = 4;
-pub const WIDTH_FORM: usize = 4;
-pub const WIDTH_PTS: usize = 3;
-pub const WIDTH_AVAIL: usize = 5;
-pub const WIDTH_STAT: usize = 6;
-pub const WIDTH_TRANS: usize = 7;
-pub const WIDTH_STR: usize = 3;
-pub const WIDTH_TIME: usize = 20;
-pub const WIDTH_SCORE: usize = 7;
