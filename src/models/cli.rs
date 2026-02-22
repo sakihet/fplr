@@ -11,6 +11,21 @@ pub enum TeamSortBy {
 }
 
 #[derive(Clone, Debug, Default, ValueEnum)]
+pub enum TeamFormSortBy {
+    #[default]
+    #[value(alias = "total")]
+    Total,
+    #[value(alias = "fwd")]
+    Forward,
+    #[value(alias = "mid")]
+    Midfielder,
+    #[value(alias = "def")]
+    Defender,
+    #[value(alias = "gkp", alias = "gk")]
+    Goalkeeper,
+}
+
+#[derive(Clone, Debug, Default, ValueEnum)]
 pub enum SortBy {
     Cost,
     SelectedBy,
