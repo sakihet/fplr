@@ -150,7 +150,7 @@ impl SortBy {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, std::hash::Hash, Serialize, Deserialize)]
 pub enum PlayerStatus {
     #[serde(rename = "a")]
     Available,
