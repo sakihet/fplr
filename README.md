@@ -46,9 +46,14 @@ Commands:
   table                      Show league table
   top                        Show top teams in the overall league
   team                       Show teams
+  talisman                   Show talisman players
   team-form                  Show team form based on total player form
   team-perf                  Show team performance based on player points per GW
   transfer                   Show popular transfers
   trend                      Show player performance trends with sparklines
+  xg                         Show xG vs Goals scored analysis (finishing ability and efficiency)
+  xa                         Show xA vs Assists analysis (creativity and efficiency)
+  xgi                        Show xGI vs Goal Involvements (Actual G + A) analysis
+  xgc                        Show xGC vs Goals Conceded analysis
   help                       Print this message or the help of the given subcommand(s)
 ```

@@ -6,7 +6,7 @@ mod models;
 mod utils;
 
 use crate::error::{FplrError, Result};
-use crate::models::{Position, SortBy, TeamSortBy};
+use crate::models::{Position, SortBy, TeamFormSortBy, TeamSortBy};
 use clap::{Parser, Subcommand};
 
 #[derive(Parser, Debug)]
@@ -125,9 +125,18 @@ enum Commands {
         #[arg(short, long, default_value = "pos")]
         sort: TeamSortBy,
     },
+    /// Show talisman players
+    Talisman {
+        /// Filter by team name
+        #[arg(short, long)]
+        team: Option<String>,
+    },
     /// Show team form based on total player form
     #[command(name = "team-form")]
-    TeamForm {},
+    TeamForm {
+        #[arg(short, long, default_value = "total")]
+        sort: TeamFormSortBy,
+    },
     /// Show team performance based on player points per GW
     #[command(name = "team-perf")]
     TeamPerf {
@@ -158,6 +167,66 @@ enum Commands {
         min_cost: Option<f64>,
         #[arg(long)]
         max_cost: Option<f64>,
+    },
+    /// Show xG vs Goals scored analysis (finishing ability and efficiency)
+    Xg {
+        /// Sort by metric
+        #[arg(short, long, default_value = "xg")]
+        sort: crate::models::XgSortBy,
+        /// Filter by team name
+        #[arg(short, long)]
+        team: Option<String>,
+        /// Filter by position
+        #[arg(short, long)]
+        position: Option<Position>,
+        /// Number of players to show
+        #[arg(short, long, default_value = "20")]
+        limit: usize,
+    },
+    /// Show xA vs Assists analysis (creativity and efficiency)
+    Xa {
+        /// Sort by metric
+        #[arg(short, long, default_value = "xa")]
+        sort: crate::models::XaSortBy,
+        /// Filter by team name
+        #[arg(short, long)]
+        team: Option<String>,
+        /// Filter by position
+        #[arg(short, long)]
+        position: Option<Position>,
+        /// Number of players to show
+        #[arg(short, long, default_value = "20")]
+        limit: usize,
+    },
+    /// Show xGI vs Goal Involvements (Actual G + A) analysis
+    Xgi {
+        /// Sort by metric
+        #[arg(short, long, default_value = "xgi")]
+        sort: crate::models::XgiSortBy,
+        /// Filter by team name
+        #[arg(short, long)]
+        team: Option<String>,
+        /// Filter by position
+        #[arg(short, long)]
+        position: Option<Position>,
+        /// Number of players to show
+        #[arg(short, long, default_value = "20")]
+        limit: usize,
+    },
+    /// Show xGC vs Goals Conceded analysis
+    Xgc {
+        /// Sort by metric
+        #[arg(short, long, default_value = "xgc")]
+        sort: crate::models::XgcSortBy,
+        /// Filter by team name
+        #[arg(short, long)]
+        team: Option<String>,
+        /// Filter by position
+        #[arg(short, long)]
+        position: Option<Position>,
+        /// Number of players to show
+        #[arg(short, long, default_value = "20")]
+        limit: usize,
     },
 }
 
@@ -215,9 +284,10 @@ async fn run() -> Result<()> {
         Commands::SetPiece { team } => commands::handle_set_piece(team).await?,
         Commands::Status {} => commands::handle_status().await?,
         Commands::Table {} => commands::handle_table().await?,
+        Commands::Talisman { team } => commands::handle_talisman(team).await?,
         Commands::Top {} => commands::handle_top().await?,
         Commands::Team { sort } => commands::handle_team(&sort).await?,
-        Commands::TeamForm {} => commands::handle_team_form().await?,
+        Commands::TeamForm { sort } => commands::handle_team_form(&sort).await?,
         Commands::TeamPerf { gw, last } => commands::handle_team_perf(gw, last).await?,
         Commands::Fixture(args) => commands::handle_fixture(args).await?,
         Commands::FixtureDifficultyRating {
@@ -234,6 +304,30 @@ async fn run() -> Result<()> {
             min_cost,
             max_cost,
         } => commands::handle_trend(team, position, limit, weeks, min_cost, max_cost).await?,
+        Commands::Xg {
+            sort,
+            team,
+            position,
+            limit,
+        } => commands::handle_xg(sort, team, position, limit).await?,
+        Commands::Xa {
+            sort,
+            team,
+            position,
+            limit,
+        } => commands::handle_xa(sort, team, position, limit).await?,
+        Commands::Xgi {
+            sort,
+            team,
+            position,
+            limit,
+        } => commands::handle_xgi(sort, team, position, limit).await?,
+        Commands::Xgc {
+            sort,
+            team,
+            position,
+            limit,
+        } => commands::handle_xgc(sort, team, position, limit).await?,
     }
     Ok(())
 }

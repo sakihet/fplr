@@ -11,6 +11,21 @@ pub enum TeamSortBy {
 }
 
 #[derive(Clone, Debug, Default, ValueEnum)]
+pub enum TeamFormSortBy {
+    #[default]
+    #[value(alias = "total")]
+    Total,
+    #[value(alias = "fwd")]
+    Forward,
+    #[value(alias = "mid")]
+    Midfielder,
+    #[value(alias = "def")]
+    Defender,
+    #[value(alias = "gkp", alias = "gk")]
+    Goalkeeper,
+}
+
+#[derive(Clone, Debug, Default, ValueEnum)]
 pub enum SortBy {
     Cost,
     SelectedBy,
@@ -135,7 +150,7 @@ impl SortBy {
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Eq, std::hash::Hash, Serialize, Deserialize)]
 pub enum PlayerStatus {
     #[serde(rename = "a")]
     Available,
@@ -212,6 +227,58 @@ impl Position {
             _ => None,
         }
     }
+}
+
+#[derive(Clone, Debug, Default, ValueEnum)]
+pub enum XgSortBy {
+    #[value(alias = "goals")]
+    Goals,
+    #[default]
+    #[value(alias = "xg")]
+    Xg,
+    #[value(alias = "diff")]
+    Diff,
+    #[value(alias = "ratio")]
+    Ratio,
+}
+
+#[derive(Clone, Debug, Default, ValueEnum)]
+pub enum XaSortBy {
+    #[value(alias = "assists")]
+    Assists,
+    #[default]
+    #[value(alias = "xa")]
+    Xa,
+    #[value(alias = "diff")]
+    Diff,
+    #[value(alias = "ratio")]
+    Ratio,
+}
+
+#[derive(Clone, Debug, Default, ValueEnum)]
+pub enum XgiSortBy {
+    #[value(alias = "actual")]
+    Actual,
+    #[default]
+    #[value(alias = "xgi")]
+    Xgi,
+    #[value(alias = "diff")]
+    Diff,
+    #[value(alias = "ratio")]
+    Ratio,
+}
+
+#[derive(Clone, Debug, Default, ValueEnum)]
+pub enum XgcSortBy {
+    #[value(alias = "goals")]
+    Goals,
+    #[default]
+    #[value(alias = "xgc")]
+    Xgc,
+    #[value(alias = "diff")]
+    Diff,
+    #[value(alias = "ratio")]
+    Ratio,
 }
 
 #[cfg(test)]
