@@ -158,6 +158,11 @@ pub async fn handle_my_team(args: MyTeamArgs) -> Result<()> {
         picks_data.entry_history.bank as f64 / 10.0
     );
     println!();
+
+    // Determine if any team has double gameweek to adjust column width
+    let has_dg = team_fixtures.values().any(|fixtures| fixtures.len() > 1);
+    let opp_w = if has_dg { 13 } else { 6 };
+
     println!(
         "{:>id_w$}  {:<pos_w$}  {:<name_w$}  {:<team_w$}  {:<opp_w$}  {:>avail_w$}  {:>pts_w$}  {:>cost_w$}  {:>form_w$}  {:<last5_w$}  {:<status_w$}",
         "ID",
@@ -175,7 +180,7 @@ pub async fn handle_my_team(args: MyTeamArgs) -> Result<()> {
         pos_w = WIDTH_POS,
         name_w = WIDTH_NAME,
         team_w = WIDTH_TEAM_SHORT_NAME,
-        opp_w = 15,
+        opp_w = opp_w,
         avail_w = 5,
         pts_w = WIDTH_PTS,
         cost_w = WIDTH_COST,
@@ -249,7 +254,7 @@ pub async fn handle_my_team(args: MyTeamArgs) -> Result<()> {
                 pos_w = WIDTH_POS,
                 name_w = WIDTH_NAME,
                 team_w = WIDTH_TEAM_SHORT_NAME,
-                opp_w = 15,
+                opp_w = opp_w,
                 avail_w = 5,
                 pts_w = WIDTH_PTS,
                 cost_w = WIDTH_COST,

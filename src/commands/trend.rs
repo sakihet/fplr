@@ -115,14 +115,15 @@ pub async fn handle_trend(
 
     // 4. Print table
     println!(
-        "{:>id_w$}  {:<name_w$}  {:<pos_w$}  {:<team_w$}  {:>cost_w$}  {:>pts_w$}  {:>form_w$}  {:>avail_w$}  {:<trend_w$}",
+        "{:>id_w$}  {:<name_w$}  {:<pos_w$}  {:<team_w$}  {:>cost_w$}  {:>sel_w$}  {:>form_w$}  {:>pts_w$}  {:>avail_w$}  {:<trend_w$}",
         "ID",
         "Name",
         "Pos",
         "Team",
         "Cost",
-        "Pts",
+        "Sel%",
         "Form",
+        "Pts",
         "Avail",
         "Trend",
         id_w = WIDTH_ID,
@@ -130,8 +131,9 @@ pub async fn handle_trend(
         pos_w = WIDTH_POS,
         team_w = WIDTH_TEAM_SHORT_NAME,
         cost_w = WIDTH_COST,
-        pts_w = WIDTH_PTS,
+        sel_w = WIDTH_SEL,
         form_w = WIDTH_FORM,
+        pts_w = WIDTH_PTS,
         avail_w = 5,
         trend_w = weeks.max(5)
     );
@@ -155,14 +157,15 @@ pub async fn handle_trend(
             format_chance_of_playing(player.chance_of_playing_next_round, &player.news);
 
         println!(
-            "{:>id_w$}  {:<name_w$}  {:<pos_w$}  {:<team_w$}  {:>cost_w$}  {:>pts_w$}  {:>form_w$}  {:>avail_w$}  {:<trend_w$}",
+            "{:>id_w$}  {:<name_w$}  {:<pos_w$}  {:<team_w$}  {:>cost_w$}  {:>sel_w$}  {:>form_w$}  {:>pts_w$}  {:>avail_w$}  {:<trend_w$}",
             player.id,
             player.web_name,
             pos_name,
             team_name,
             cost,
-            player.total_points,
+            player.selected_by_percent,
             player.form,
+            player.total_points,
             availability,
             sparkline,
             id_w = WIDTH_ID,
@@ -170,8 +173,9 @@ pub async fn handle_trend(
             pos_w = WIDTH_POS,
             team_w = WIDTH_TEAM_SHORT_NAME,
             cost_w = WIDTH_COST,
-            pts_w = WIDTH_PTS,
+            sel_w = WIDTH_SEL,
             form_w = WIDTH_FORM,
+            pts_w = WIDTH_PTS,
             avail_w = 5,
             trend_w = weeks.max(5)
         );

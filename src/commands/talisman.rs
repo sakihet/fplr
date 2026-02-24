@@ -57,7 +57,7 @@ pub async fn handle_talisman(team_opt: Option<String>) -> Result<()> {
         println!("Team: {} (Total Points: {})", t_name, total_pts);
         println!(
             "{:>id_w$}  {:<name_w$}  {:<pos_w$}  {:>pts_w$}  {:>pct_w$}",
-            "Id",
+            "ID",
             "Player",
             "Pos",
             "Pts",

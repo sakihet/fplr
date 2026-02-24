@@ -182,7 +182,7 @@ pub async fn handle_team_perf(gw: Option<u32>, last: usize) -> Result<()> {
     team_stats.sort_by(|a, b| b.3.partial_cmp(&a.3).unwrap());
 
     // Print header
-    let mut header = format!("{:<5} {:<4} {:<20}", "Rank", "ID", "Team");
+    let mut header = format!("{:<5} {:<20}", "Rank", "Team");
     for gw in &gw_list {
         header.push_str(&format!(" {:>5}", format!("GW{}", gw)));
     }
@@ -194,10 +194,10 @@ pub async fn handle_team_perf(gw: Option<u32>, last: usize) -> Result<()> {
     println!("{}", header);
 
     // Print data
-    for (rank, (team_id, name, points, avg, min, max, season_avg, trend)) in
+    for (rank, (_team_id, name, points, avg, min, max, season_avg, trend)) in
         team_stats.iter().enumerate()
     {
-        let mut row = format!("{:<5} {:<4} {:<20}", rank + 1, team_id, name);
+        let mut row = format!("{:<5} {:<20}", rank + 1, name);
         for p in points {
             match p {
                 Some(val) => row.push_str(&format!(" {:>5}", val)),

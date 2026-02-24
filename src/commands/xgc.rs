@@ -36,9 +36,10 @@ pub async fn handle_xgc(
 
             // Position filter
             if let Some(pos) = &pos_opt
-                && p.element_type != pos.element_type_id() as u64 {
-                    return false;
-                }
+                && p.element_type != pos.element_type_id() as u64
+            {
+                return false;
+            }
 
             true
         })
