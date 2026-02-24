@@ -21,6 +21,10 @@ pub mod team_perf;
 pub mod top;
 pub mod transfer;
 pub mod trend;
+pub mod xa;
+pub mod xg;
+pub mod xgc;
+pub mod xgi;
 
 pub use availability::handle_availability;
 pub use config::{ConfigArgs, handle_config};
@@ -45,3 +49,7 @@ pub use team_perf::handle_team_perf;
 pub use top::handle_top;
 pub use transfer::{TransferArgs, handle_transfer};
 pub use trend::handle_trend;
+pub use xa::handle_xa;
+pub use xg::handle_xg;
+pub use xgc::handle_xgc;
+pub use xgi::handle_xgi;

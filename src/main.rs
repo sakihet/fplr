@@ -168,6 +168,66 @@ enum Commands {
         #[arg(long)]
         max_cost: Option<f64>,
     },
+    /// Show xG vs Goals scored analysis (finishing ability and efficiency)
+    Xg {
+        /// Sort by metric
+        #[arg(short, long, default_value = "xg")]
+        sort: crate::models::XgSortBy,
+        /// Filter by team name
+        #[arg(short, long)]
+        team: Option<String>,
+        /// Filter by position
+        #[arg(short, long)]
+        position: Option<Position>,
+        /// Number of players to show
+        #[arg(short, long, default_value = "20")]
+        limit: usize,
+    },
+    /// Show xA vs Assists analysis (creativity and efficiency)
+    Xa {
+        /// Sort by metric
+        #[arg(short, long, default_value = "xa")]
+        sort: crate::models::XaSortBy,
+        /// Filter by team name
+        #[arg(short, long)]
+        team: Option<String>,
+        /// Filter by position
+        #[arg(short, long)]
+        position: Option<Position>,
+        /// Number of players to show
+        #[arg(short, long, default_value = "20")]
+        limit: usize,
+    },
+    /// Show xGI vs Goal Involvements (Actual G + A) analysis
+    Xgi {
+        /// Sort by metric
+        #[arg(short, long, default_value = "xgi")]
+        sort: crate::models::XgiSortBy,
+        /// Filter by team name
+        #[arg(short, long)]
+        team: Option<String>,
+        /// Filter by position
+        #[arg(short, long)]
+        position: Option<Position>,
+        /// Number of players to show
+        #[arg(short, long, default_value = "20")]
+        limit: usize,
+    },
+    /// Show xGC vs Goals Conceded analysis
+    Xgc {
+        /// Sort by metric
+        #[arg(short, long, default_value = "xgc")]
+        sort: crate::models::XgcSortBy,
+        /// Filter by team name
+        #[arg(short, long)]
+        team: Option<String>,
+        /// Filter by position
+        #[arg(short, long)]
+        position: Option<Position>,
+        /// Number of players to show
+        #[arg(short, long, default_value = "20")]
+        limit: usize,
+    },
 }
 
 #[tokio::main]
@@ -244,6 +304,30 @@ async fn run() -> Result<()> {
             min_cost,
             max_cost,
         } => commands::handle_trend(team, position, limit, weeks, min_cost, max_cost).await?,
+        Commands::Xg {
+            sort,
+            team,
+            position,
+            limit,
+        } => commands::handle_xg(sort, team, position, limit).await?,
+        Commands::Xa {
+            sort,
+            team,
+            position,
+            limit,
+        } => commands::handle_xa(sort, team, position, limit).await?,
+        Commands::Xgi {
+            sort,
+            team,
+            position,
+            limit,
+        } => commands::handle_xgi(sort, team, position, limit).await?,
+        Commands::Xgc {
+            sort,
+            team,
+            position,
+            limit,
+        } => commands::handle_xgc(sort, team, position, limit).await?,
     }
     Ok(())
 }
