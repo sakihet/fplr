@@ -30,6 +30,9 @@ enum Commands {
         #[arg(short, long, default_value = "20")]
         limit: usize,
     },
+    /// Show team availability statistics
+    #[command(visible_alias = "ta")]
+    TeamAvailability,
     /// Manage configuration
     Config(commands::ConfigArgs),
     /// Show dream team
@@ -245,6 +248,7 @@ async fn run() -> Result<()> {
         Commands::Availability { team, all, limit } => {
             commands::handle_availability(team, all, limit).await?
         }
+        Commands::TeamAvailability => commands::handle_team_availability().await?,
         Commands::Config(args) => commands::handle_config(args)?,
         Commands::DreamTeam { gw } => commands::handle_dream_team(gw).await?,
         Commands::Gameweek {} => commands::handle_gameweek().await?,

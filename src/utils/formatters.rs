@@ -167,6 +167,21 @@ pub fn to_sparkline(values: &[i64], max_val: i64) -> String {
         .collect()
 }
 
+/// Convert a percentage to a visual bar graph string
+pub fn to_bar_graph(percentage: f32, width: usize) -> String {
+    let fractional_ticks = [" ", "▏", "▎", "▍", "▌", "▋", "▊", "▉", "█"];
+    let total_slots = (percentage / 100.0 * width as f32) * 8.0;
+    let full_blocks = (total_slots / 8.0).floor() as usize;
+    let tick_index = (total_slots % 8.0).round() as usize;
+
+    let mut bar = "█".repeat(full_blocks);
+    if full_blocks < width {
+        bar.push_str(fractional_ticks[tick_index]);
+        bar.push_str(&" ".repeat(width - full_blocks - 1));
+    }
+    format!("|{}|", bar)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -233,5 +248,27 @@ mod tests {
         assert_eq!(truncate("Hello", 10), "Hello");
         assert_eq!(truncate("Hello World", 5), "Hell…");
         assert_eq!(truncate("Manchester City", 10), "Mancheste…");
+    }
+
+    #[test]
+    fn test_to_bar_graph_full() {
+        assert_eq!(to_bar_graph(100.0, 10), "|██████████|");
+    }
+
+    #[test]
+    fn test_to_bar_graph_empty() {
+        assert_eq!(to_bar_graph(0.0, 10), "|          |");
+    }
+
+    #[test]
+    fn test_to_bar_graph_half() {
+        // 50% of 10 blocks = 5 full blocks
+        assert_eq!(to_bar_graph(50.0, 10), "|█████     |");
+    }
+
+    #[test]
+    fn test_to_bar_graph_partial() {
+        // 5% of 10 blocks = 0.5 blocks -> 4/8 -> "▌"
+        assert_eq!(to_bar_graph(5.0, 10), "|▌         |");
     }
 }
