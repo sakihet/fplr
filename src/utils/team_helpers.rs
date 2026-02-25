@@ -31,6 +31,7 @@ pub fn find_team_ids_by_name(teams: &[Team], name: &str) -> Vec<u64> {
         .filter(|team| {
             team.name.to_lowercase().contains(&search_term)
                 || team.short_name.to_lowercase().contains(&search_term)
+                || team.id.to_string() == search_term
         })
         .map(|team| team.id)
         .collect()

@@ -2,11 +2,6 @@ use chrono::{DateTime, Local, Utc};
 use chrono_tz::Tz;
 use owo_colors::OwoColorize;
 
-pub fn format_datetime(datetime_str: &str) -> String {
-    let dt = datetime_str.parse::<DateTime<Utc>>().unwrap();
-    dt.format("%Y-%m-%d %H:%M UTC").to_string()
-}
-
 pub fn format_datetime_local(datetime_str: &str) -> String {
     let dt = datetime_str.parse::<DateTime<Utc>>().unwrap();
 
