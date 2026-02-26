@@ -10,10 +10,28 @@ pub fn find_next_event(events: &[Event]) -> Option<&Event> {
     events.iter().find(|e| e.is_next)
 }
 
-/// Get the effective event ID based on user input or current/next gameweek
+/// Find the previous gameweek event relative to the current one
+pub fn find_prev_event(events: &[Event]) -> Option<&Event> {
+    if let Some(current) = find_current_event(events) {
+        if current.id > 1 {
+            return events.iter().find(|e| e.id == current.id - 1);
+        }
+    } else if let Some(next) = find_next_event(events) {
+        // Between gameweeks: "prev" is two before next (i.e. next - 2)
+        if next.id > 2 {
+            return events.iter().find(|e| e.id == next.id - 2);
+        } else if next.id == 2 {
+            return events.iter().find(|e| e.id == 1);
+        }
+    }
+    None
+}
+
+/// Get the effective event ID based on user input or current/next gameweek.
 ///
 /// Returns the specified event ID if provided, otherwise:
-/// - Returns current event ID if available
+/// - Returns next event ID if the current event is finished
+/// - Returns current event ID if available and not yet finished
 /// - Falls back to next event ID - 1 if no current event
 /// - Falls back to the last event ID if season is over
 pub fn get_effective_event_id(events: &[Event], specified: Option<u32>) -> Option<u32> {
@@ -21,8 +39,13 @@ pub fn get_effective_event_id(events: &[Event], specified: Option<u32>) -> Optio
         return Some(id);
     }
 
-    // Try current event first
+    // If current event is finished, show the next gameweek instead
     if let Some(current) = find_current_event(events) {
+        if current.finished
+            && let Some(next) = find_next_event(events)
+        {
+            return Some(next.id as u32);
+        }
         return Some(current.id as u32);
     }
 
