@@ -8,16 +8,26 @@ use clap::Args;
 #[derive(Debug, Args)]
 pub struct FixtureArgs {
     /// Specific Gameweek (defaults to current)
-    #[arg(short, long)]
+    #[arg(short, long, conflicts_with = "next")]
     pub gw: Option<u32>,
+
+    /// Next Gameweek
+    #[arg(short, long)]
+    pub next: bool,
 }
 
 pub async fn handle_fixture(args: FixtureArgs) -> Result<()> {
     let bootstrap_data = FplClient::fetch_bootstrap_static().await?;
     let team_map = create_team_map(&bootstrap_data.teams);
 
-    let event_id = get_effective_event_id(&bootstrap_data.events, args.gw)
-        .ok_or(FplrError::NoNextEvent)? as u64;
+    let event_id = if args.next {
+        crate::utils::event_helpers::find_next_event(&bootstrap_data.events)
+            .ok_or(FplrError::NoNextEvent)?
+            .id
+    } else {
+        get_effective_event_id(&bootstrap_data.events, args.gw).ok_or(FplrError::NoNextEvent)?
+            as u64
+    };
 
     let fixtures = FplClient::fetch_fixtures().await?;
 
