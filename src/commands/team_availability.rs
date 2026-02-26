@@ -14,6 +14,8 @@ struct TeamStats {
     unavailable: usize,
     not_available: usize,
     unknown: usize,
+    played: usize,
+    unplayed: usize,
     total: usize,
 }
 
@@ -38,6 +40,11 @@ pub async fn handle_team_availability() -> Result<()> {
         if let Some(stats) = team_stats.get_mut(&element.team) {
             if element.status != PlayerStatus::Unavailable {
                 stats.total += 1;
+            }
+            if element.minutes > 0 {
+                stats.played += 1;
+            } else {
+                stats.unplayed += 1;
             }
             match element.status {
                 PlayerStatus::Available => stats.available += 1,
@@ -71,7 +78,7 @@ pub async fn handle_team_availability() -> Result<()> {
     let team_w = WIDTH_TEAM_NAME;
 
     println!(
-        "{:<team_w$}  {:>5}  {:>5}  {:>5}  {:>5}  {:>5}  {:>5}  {:>5}  {:>5}  {:>7}  {:<10}",
+        "{:<team_w$}  {:>5}  {:>5}  {:>5}  {:>5}  {:>5}  {:>5}  {:>5}  {:>5}  {:>5}  {:>5}  {:>7}  {:<10}",
         "Team",
         "Avail",
         "Doub",
@@ -80,6 +87,8 @@ pub async fn handle_team_availability() -> Result<()> {
         "Unav",
         "N/A",
         "Unk",
+        "Play",
+        "Unpl",
         "Total",
         "Avail%",
         "Status Chart"
@@ -95,7 +104,7 @@ pub async fn handle_team_availability() -> Result<()> {
         let bar = to_bar_graph(avail_pct, 10);
 
         println!(
-            "{:<team_w$}  {:>5}  {:>5}  {:>5}  {:>5}  {:>5}  {:>5}  {:>5}  {:>5}  {:>6.1}%  {:<10}",
+            "{:<team_w$}  {:>5}  {:>5}  {:>5}  {:>5}  {:>5}  {:>5}  {:>5}  {:>5}  {:>5}  {:>5}  {:>6.1}%  {:<10}",
             s.name,
             s.available,
             s.doubtful,
@@ -104,6 +113,8 @@ pub async fn handle_team_availability() -> Result<()> {
             s.unavailable,
             s.not_available,
             s.unknown,
+            s.played,
+            s.unplayed,
             s.total,
             avail_pct,
             bar
