@@ -51,19 +51,19 @@ pub async fn handle_availability(team: Option<String>, all: bool, limit: usize) 
     players.sort_by(|a, b| b.news_added.cmp(&a.news_added));
 
     println!(
-        "{:>id_w$}  {:<name_w$}  {:<team_w$}  {:<pos_w$}  {:<status_w$}  {:>avail_w$}  {:<news_added_w$}  {:<news_w$}",
+        "{:>id_w$}  {:<name_w$}  {:<pos_w$}  {:<team_w$}  {:<status_w$}  {:>avail_w$}  {:<news_added_w$}  {:<news_w$}",
         "ID",
         "Name",
-        "Team",
         "Pos",
+        "Team",
         "Status",
         "Avail",
         "News Added",
         "News",
         id_w = WIDTH_ID,
         name_w = WIDTH_NAME,
-        team_w = WIDTH_TEAM_SHORT_NAME,
         pos_w = WIDTH_POS,
+        team_w = WIDTH_TEAM_SHORT_NAME,
         status_w = WIDTH_STATUS,
         avail_w = WIDTH_AVAIL,
         news_added_w = WIDTH_TIME,
@@ -88,21 +88,21 @@ pub async fn handle_availability(team: Option<String>, all: bool, limit: usize) 
             .unwrap_or_else(|| "N/A".to_string());
 
         println!(
-            "{:>id_w$}  {:<name_w$}  {:<team_w$}  {:<pos_w$}  {:<status_w$}  {:>avail_w$}  {:<news_added_w$}  {:<news_w$}",
+            "{:>id_w$}  {:<name_w$}  {:<pos_w$}  {:<team_w$}  {:<status_w$}  {:>avail_w$}  {:<news_added_w$}  {:<news_w$}",
             player.id,
             player.web_name,
-            team_name,
             Position::from_element_type_id(player.element_type)
                 .map(|p| p.display_name().to_string())
                 .unwrap_or_default(),
+            team_name,
             status_desc,
             avail_display,
             news_added,
             player.news,
             id_w = WIDTH_ID,
             name_w = WIDTH_NAME,
-            team_w = WIDTH_TEAM_SHORT_NAME,
             pos_w = WIDTH_POS,
+            team_w = WIDTH_TEAM_SHORT_NAME,
             status_w = WIDTH_STATUS,
             avail_w = WIDTH_AVAIL,
             news_added_w = WIDTH_TIME,

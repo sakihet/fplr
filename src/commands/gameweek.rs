@@ -1,12 +1,12 @@
 use crate::api::FplClient;
 use crate::error::Result;
-use crate::utils::formatters::format_datetime;
+use crate::utils::formatters::format_datetime_local;
 
 pub async fn handle_gameweek() -> Result<()> {
     let data = FplClient::fetch_bootstrap_static().await?;
 
     println!(
-        "{:<4} {:<16} {:<12} {:<20}",
+        "{:<4} {:<16} {:<12} {:<24}",
         "ID", "Name", "Status", "Deadline"
     );
     for event in data.events {
@@ -20,11 +20,11 @@ pub async fn handle_gameweek() -> Result<()> {
             "Upcoming"
         };
         println!(
-            "{:<4} {:<16} {:<12} {:<20}",
+            "{:<4} {:<16} {:<12} {:<24}",
             event.id,
             event.name,
             status,
-            format_datetime(&event.deadline_time)
+            format_datetime_local(&event.deadline_time)
         );
     }
 

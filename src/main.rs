@@ -30,6 +30,9 @@ enum Commands {
         #[arg(short, long, default_value = "20")]
         limit: usize,
     },
+    /// Show team availability statistics
+    #[command(visible_alias = "ta")]
+    TeamAvailability,
     /// Manage configuration
     Config(commands::ConfigArgs),
     /// Show dream team
@@ -44,7 +47,7 @@ enum Commands {
     #[command(visible_alias = "fdr")]
     FixtureDifficultyRating {
         #[arg(short, long)]
-        team_id: Option<u64>,
+        team: Option<String>,
         #[arg(short, long, default_value = "5")]
         limit: usize,
         #[arg(short, long)]
@@ -245,6 +248,7 @@ async fn run() -> Result<()> {
         Commands::Availability { team, all, limit } => {
             commands::handle_availability(team, all, limit).await?
         }
+        Commands::TeamAvailability => commands::handle_team_availability().await?,
         Commands::Config(args) => commands::handle_config(args)?,
         Commands::DreamTeam { gw } => commands::handle_dream_team(gw).await?,
         Commands::Gameweek {} => commands::handle_gameweek().await?,
@@ -290,11 +294,9 @@ async fn run() -> Result<()> {
         Commands::TeamForm { sort } => commands::handle_team_form(&sort).await?,
         Commands::TeamPerf { gw, last } => commands::handle_team_perf(gw, last).await?,
         Commands::Fixture(args) => commands::handle_fixture(args).await?,
-        Commands::FixtureDifficultyRating {
-            team_id,
-            limit,
-            all,
-        } => commands::handle_fixture_difficulty_rating(team_id, limit, all).await?,
+        Commands::FixtureDifficultyRating { team, limit, all } => {
+            commands::handle_fixture_difficulty_rating(team, limit, all).await?
+        }
         Commands::Transfer(args) => commands::handle_transfer(args).await?,
         Commands::Trend {
             team,

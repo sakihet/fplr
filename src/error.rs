@@ -29,6 +29,9 @@ pub enum FplrError {
     #[error("Team not found: {0}")]
     TeamNotFound(u64),
 
+    #[error("Team not found: {0}")]
+    TeamNotFoundByName(String),
+
     #[error("Unknown config key: {0}")]
     UnknownConfigKey(String),
 }

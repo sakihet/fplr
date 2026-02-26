@@ -3,13 +3,15 @@ use std::collections::HashMap;
 use crate::api::FplClient;
 use crate::error::{FplrError, Result};
 use crate::models::{Fixture, Team};
-use crate::utils::formatters::{colorize_text_by_difficulty, difficulty_to_stars, format_datetime};
-use crate::utils::team_helpers::create_team_ref_map;
+use crate::utils::formatters::{
+    colorize_text_by_difficulty, difficulty_to_stars, format_datetime_local,
+};
+use crate::utils::team_helpers::{create_team_ref_map, find_team_ids_by_name};
 
 type TeamFdrData<'a> = (u64, &'a Team, Vec<Vec<(String, u8)>>);
 
 pub async fn handle_fixture_difficulty_rating(
-    team_id: Option<u64>,
+    team: Option<String>,
     limit: usize,
     all_teams: bool,
 ) -> Result<()> {
@@ -22,8 +24,13 @@ pub async fn handle_fixture_difficulty_rating(
         .filter(|f| !f.finished && f.event.is_some())
         .collect();
 
-    if let Some(tid) = team_id {
-        // Show fixtures for a specific team
+    if let Some(team_name) = team {
+        let team_ids = find_team_ids_by_name(&bootstrap_data.teams, &team_name);
+        if team_ids.is_empty() {
+            return Err(FplrError::TeamNotFoundByName(team_name));
+        }
+        // Use the first matching team
+        let tid = team_ids[0];
         display_team_fdr(&unfinished_fixtures, tid, limit, &team_map)?;
     } else if all_teams {
         // Show FDR matrix for all teams
@@ -48,7 +55,7 @@ fn display_team_fdr(
 
     println!("Team: {} ({})", team.name, team.short_name);
     println!(
-        "{:<4} {:<20} {:<20} {:<5} {:<15}",
+        "{:<4} {:<24} {:<20} {:<5} {:<15}",
         "GW", "Date", "Opponent", "H/A", "Difficulty"
     );
 
@@ -86,13 +93,13 @@ fn display_team_fdr(
         let kickoff = fixture
             .kickoff_time
             .as_ref()
-            .map(|kt| format_datetime(kt))
+            .map(|kt| format_datetime_local(kt))
             .unwrap_or_else(|| "TBD".to_string());
         let event = fixture.event.unwrap_or(0);
         let difficulty_display = difficulty_to_stars(difficulty);
 
         println!(
-            "{:<4} {:<20} {:<20} {:<5} {:<15}",
+            "{:<4} {:<24} {:<20} {:<5} {:<15}",
             event, kickoff, opponent, location, difficulty_display
         );
     }
