@@ -17,11 +17,32 @@ pub async fn handle_live(gw: Option<u32>, limit: usize) -> Result<()> {
         }
     };
 
-    let data = FplClient::fetch_live(event_id).await?;
+    let (data, event_id) = match FplClient::fetch_live(event_id).await {
+        Ok(data) if data.elements.is_empty() && gw.is_none() && event_id > 1 => {
+            println!(
+                "No live data available for GW {}. Falling back to GW {}.",
+                event_id,
+                event_id - 1
+            );
+            (FplClient::fetch_live(event_id - 1).await?, event_id - 1)
+        }
+        Ok(data) => (data, event_id),
+        Err(e) => return Err(e),
+    };
+
+    if data.elements.is_empty() {
+        println!(
+            "No live data available for GW {}. The matches might not have started yet.",
+            event_id
+        );
+        return Ok(());
+    }
+
     let mut elements = data.elements;
     elements.sort_by(|a, b| b.stats.total_points.cmp(&a.stats.total_points));
 
     println!("Live Stats for GW{}", event_id);
+
     println!(
         "{:>id_w$}  {:<name_w$}  {:>pts_w$}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}",
         "ID",
