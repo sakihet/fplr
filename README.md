@@ -29,6 +29,7 @@ fplr config set manager-id YOUR_MANAGER_ID
 ```
 Commands:
   availability               Show player availability (injuries, suspensions, etc.)
+  team-availability          Show team availability statistics [aliases: ta]
   config                     Manage configuration
   dream-team                 Show dream team
   fixture                    Show upcoming fixtures
@@ -51,6 +52,7 @@ Commands:
   team-perf                  Show team performance based on player points per GW
   transfer                   Show popular transfers
   trend                      Show player performance trends with sparklines
+  team-trend                 Show team performance trends with sparklines
   xg                         Show xG vs Goals scored analysis (finishing ability and efficiency)
   xa                         Show xA vs Assists analysis (creativity and efficiency)
   xgi                        Show xGI vs Goal Involvements (Actual G + A) analysis
