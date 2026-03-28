@@ -6,7 +6,7 @@ mod models;
 mod utils;
 
 use crate::error::{FplrError, Result};
-use crate::models::{Position, SortBy, TeamFormSortBy, TeamSortBy};
+use crate::models::{Position, SortBy, TeamFormSortBy, TeamSortBy, TeamTrendSortBy};
 use clap::{Parser, Subcommand};
 
 #[derive(Parser, Debug)]
@@ -171,6 +171,16 @@ enum Commands {
         #[arg(long)]
         max_cost: Option<f64>,
     },
+    /// Show team performance trends with sparklines
+    #[command(name = "team-trend")]
+    TeamTrend {
+        /// Sort by metric
+        #[arg(short, long, default_value = "pts")]
+        sort: TeamTrendSortBy,
+        /// Number of recent gameweeks to show
+        #[arg(short, long, default_value = "5")]
+        weeks: usize,
+    },
     /// Show xG vs Goals scored analysis (finishing ability and efficiency)
     Xg {
         /// Sort by metric
@@ -318,6 +328,7 @@ async fn run() -> Result<()> {
             position,
             limit,
         } => commands::handle_xa(sort, team, position, limit).await?,
+        Commands::TeamTrend { sort, weeks } => commands::handle_team_trend(sort, weeks).await?,
         Commands::Xgi {
             sort,
             team,

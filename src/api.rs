@@ -14,6 +14,13 @@ impl FplClient {
     async fn fetch<T: DeserializeOwned>(endpoint: &str) -> Result<T> {
         let url = format!("{}{}", BASE_URL, endpoint);
         let response = reqwest::get(&url).await?;
+
+        if !response.status().is_success() {
+            let status = response.status();
+            let body = response.text().await.unwrap_or_else(|_| "".to_string());
+            return Err(crate::error::FplrError::ApiStatus(status, body));
+        }
+
         let json: T = response.json().await?;
         Ok(json)
     }

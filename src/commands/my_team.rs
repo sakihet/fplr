@@ -39,7 +39,38 @@ pub async fn handle_my_team(args: MyTeamArgs) -> Result<()> {
     );
 
     // 3. Fetch Manager Picks
-    let picks_data = FplClient::fetch_manager_picks(manager_id, event_id).await?;
+    let picks_data = match FplClient::fetch_manager_picks(manager_id, event_id).await {
+        Ok(data) => data,
+        Err(e) => {
+            if let crate::error::FplrError::ApiStatus(status, _) = &e {
+                if status.as_u16() == 404 && args.gw.is_none() && event_id > 1 {
+                    println!(
+                        "GW {} team is not yet public. Falling back to GW {}.",
+                        event_id,
+                        event_id - 1
+                    );
+                    FplClient::fetch_manager_picks(manager_id, event_id - 1).await?
+                } else if status.as_u16() == 404 {
+                    println!(
+                        "Error: GW {} team not found. It might not be public yet.",
+                        event_id
+                    );
+                    return Ok(());
+                } else {
+                    return Err(e);
+                }
+            } else {
+                return Err(e);
+            }
+        }
+    };
+
+    // Update event_id if we fell back
+    let event_id = if picks_data.entry_history.event as u32 != event_id {
+        picks_data.entry_history.event as u32
+    } else {
+        event_id
+    };
 
     // 4. Fetch Live Data for points (current + last 5 GWs for sparkline)
     let history_count = 5;

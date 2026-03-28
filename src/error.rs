@@ -5,6 +5,9 @@ pub enum FplrError {
     #[error("API request failed: {0}")]
     Api(#[from] reqwest::Error),
 
+    #[error("API request failed with status {0}: {1}")]
+    ApiStatus(reqwest::StatusCode, String),
+
     #[error("Failed to read config file: {0}")]
     ConfigRead(#[from] std::io::Error),
 

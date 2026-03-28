@@ -252,6 +252,7 @@ pub struct StatsPoints {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct EntryHistory {
+    pub event: u64,
     pub points: i64,
     pub total_points: i64,
     pub rank: Option<u64>,
