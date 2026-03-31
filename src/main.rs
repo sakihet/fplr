@@ -43,6 +43,12 @@ enum Commands {
     },
     /// Show upcoming fixtures
     Fixture(commands::FixtureArgs),
+    /// Show detailed points summary for a specific fixture
+    #[command(name = "fixture-summary")]
+    FixtureSummary {
+        /// Fixture ID
+        id: u64,
+    },
     /// Show fixture difficulty rating
     #[command(visible_alias = "fdr")]
     FixtureDifficultyRating {
@@ -304,6 +310,7 @@ async fn run() -> Result<()> {
         Commands::TeamForm { sort } => commands::handle_team_form(&sort).await?,
         Commands::TeamPerf { gw, last } => commands::handle_team_perf(gw, last).await?,
         Commands::Fixture(args) => commands::handle_fixture(args).await?,
+        Commands::FixtureSummary { id } => commands::handle_fixture_summary(id).await?,
         Commands::FixtureDifficultyRating { team, limit, all } => {
             commands::handle_fixture_difficulty_rating(team, limit, all).await?
         }
