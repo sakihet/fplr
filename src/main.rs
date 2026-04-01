@@ -30,6 +30,13 @@ enum Commands {
         #[arg(short, long, default_value = "20")]
         limit: usize,
     },
+    /// Compare two players side-by-side
+    Compare {
+        /// First player ID
+        id1: u64,
+        /// Second player ID
+        id2: u64,
+    },
     /// Manage configuration
     Config(commands::ConfigArgs),
     /// Show dream team
@@ -264,6 +271,7 @@ async fn run() -> Result<()> {
         Commands::Availability { team, all, limit } => {
             commands::handle_availability(team, all, limit).await?
         }
+        Commands::Compare { id1, id2 } => commands::handle_compare(id1, id2).await?,
         Commands::Config(args) => commands::handle_config(args)?,
         Commands::DreamTeam { gw } => commands::handle_dream_team(gw).await?,
         Commands::Fixture(args) => commands::handle_fixture(args).await?,
