@@ -63,24 +63,27 @@ pub async fn handle_fixture_summary(fixture_id: u64) -> Result<()> {
                         .push(format!("{}({}:{}p)", identifier, stat.value, stat.points));
                 }
 
-                let played_or_action = explain.stats.iter().any(|s| {
-                    s.identifier != "minutes" || s.value > 0
-                });
+                let played_or_action = explain
+                    .stats
+                    .iter()
+                    .any(|s| s.identifier != "minutes" || s.value > 0);
 
-                if played_or_action && !breakdown_parts.is_empty()
-                    && let Some(element) = element_map.get(&live_element.id) {
-                        let stat_record = MatchPlayerStat {
-                            name: element.web_name.clone(),
-                            points,
-                            breakdown: breakdown_parts.join(", "),
-                        };
+                if played_or_action
+                    && !breakdown_parts.is_empty()
+                    && let Some(element) = element_map.get(&live_element.id)
+                {
+                    let stat_record = MatchPlayerStat {
+                        name: element.web_name.clone(),
+                        points,
+                        breakdown: breakdown_parts.join(", "),
+                    };
 
-                        if element.team == target_fixture.team_h {
-                            home_stats.push(stat_record);
-                        } else if element.team == target_fixture.team_a {
-                            away_stats.push(stat_record);
-                        }
+                    if element.team == target_fixture.team_h {
+                        home_stats.push(stat_record);
+                    } else if element.team == target_fixture.team_a {
+                        away_stats.push(stat_record);
                     }
+                }
             }
         }
     }
