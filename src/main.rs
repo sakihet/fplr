@@ -161,6 +161,16 @@ enum Commands {
         #[arg(short, long, default_value = "5")]
         last: usize,
     },
+    /// Show form-adjusted fixture difficulty rating
+    #[command(name = "fdr-form")]
+    FdrForm {
+        #[arg(short, long)]
+        team: Option<String>,
+        #[arg(short, long, default_value = "5")]
+        limit: usize,
+        #[arg(short, long)]
+        all: bool,
+    },
     /// Show team performance trends with sparklines
     #[command(name = "team-trend")]
     TeamTrend {
@@ -321,6 +331,9 @@ async fn run() -> Result<()> {
         Commands::TeamAvailability => commands::handle_team_availability().await?,
         Commands::TeamForm { sort } => commands::handle_team_form(&sort).await?,
         Commands::TeamPerf { gw, last } => commands::handle_team_perf(gw, last).await?,
+        Commands::FdrForm { team, limit, all } => {
+            commands::handle_fdr_form(team, limit, all).await?
+        }
         Commands::TeamTrend { sort, weeks } => commands::handle_team_trend(sort, weeks).await?,
         Commands::Top {} => commands::handle_top().await?,
         Commands::Transfer(args) => commands::handle_transfer(args).await?,
