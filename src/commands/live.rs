@@ -1,13 +1,24 @@
 use crate::api::FplClient;
 use crate::error::Result;
-use crate::models::StatsPoints;
+use crate::models::{Position, StatsPoints};
 use crate::utils::constants::*;
 use crate::utils::event_helpers::get_effective_event_id;
-use crate::utils::player_helpers::create_player_map;
+use crate::utils::team_helpers::create_team_short_name_map;
 
 pub async fn handle_live(gw: Option<u32>, limit: usize) -> Result<()> {
     let bootstrap_data = FplClient::fetch_bootstrap_static().await?;
-    let player_map = create_player_map(&bootstrap_data.elements);
+    let team_map = create_team_short_name_map(&bootstrap_data.teams);
+    let mut player_info_map = std::collections::HashMap::new();
+    for player in &bootstrap_data.elements {
+        let pos = Position::from_element_type_id(player.element_type)
+            .map(|p| p.display_name())
+            .unwrap_or("UNK");
+        let team = team_map
+            .get(&player.team)
+            .map(|s| s.as_str())
+            .unwrap_or("UNK");
+        player_info_map.insert(player.id, (player.web_name.clone(), pos, team));
+    }
 
     let event_id = match get_effective_event_id(&bootstrap_data.events, gw) {
         Some(id) => id,
@@ -44,9 +55,11 @@ pub async fn handle_live(gw: Option<u32>, limit: usize) -> Result<()> {
     println!("Live Stats for GW{}", event_id);
 
     println!(
-        "{:>id_w$}  {:<name_w$}  {:>pts_w$}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}",
+        "{:>id_w$}  {:<name_w$}  {:<pos_w$}  {:<team_w$}  {:>pts_w$}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}",
         "ID",
         "Name",
+        "Pos",
+        "Team",
         "Pts",
         "Min",
         "G",
@@ -62,13 +75,15 @@ pub async fn handle_live(gw: Option<u32>, limit: usize) -> Result<()> {
         "B",
         id_w = WIDTH_ID,
         name_w = WIDTH_NAME,
+        pos_w = WIDTH_POS,
+        team_w = WIDTH_TEAM_SHORT_NAME,
         pts_w = WIDTH_PTS,
     );
     for element in elements.iter().take(limit) {
-        let name = player_map
+        let (name, pos, team) = player_info_map
             .get(&element.id)
-            .map(|s| s.as_str())
-            .unwrap_or("Unknown");
+            .map(|(n, p, t)| (n.as_str(), *p, *t))
+            .unwrap_or(("Unknown", "UNK", "UNK"));
 
         let mut stats = StatsPoints::default();
         for explain in &element.explain {
@@ -92,9 +107,11 @@ pub async fn handle_live(gw: Option<u32>, limit: usize) -> Result<()> {
         }
 
         println!(
-            "{:>id_w$}  {:<name_w$}  {:>pts_w$}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}",
+            "{:>id_w$}  {:<name_w$}  {:<pos_w$}  {:<team_w$}  {:>pts_w$}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}",
             element.id,
             name,
+            pos,
+            team,
             element.stats.total_points,
             stats.minutes,
             stats.goals_scored,
@@ -110,6 +127,8 @@ pub async fn handle_live(gw: Option<u32>, limit: usize) -> Result<()> {
             stats.bonus,
             id_w = WIDTH_ID,
             name_w = WIDTH_NAME,
+            pos_w = WIDTH_POS,
+            team_w = WIDTH_TEAM_SHORT_NAME,
             pts_w = WIDTH_PTS,
         );
     }
