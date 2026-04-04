@@ -6,7 +6,7 @@ mod models;
 mod utils;
 
 use crate::error::{FplrError, Result};
-use crate::models::{Position, SortBy, TeamFormSortBy, TeamSortBy, TeamTrendSortBy};
+use crate::models::{Position, SortBy, TeamFormSortBy, TeamHaSortBy, TeamSortBy, TeamTrendSortBy};
 use clap::{Parser, Subcommand};
 
 #[derive(Parser, Debug)]
@@ -145,6 +145,12 @@ enum Commands {
     /// Show team availability statistics
     #[command(visible_alias = "ta")]
     TeamAvailability,
+    /// Show team home/away performance stats
+    #[command(name = "team-ha")]
+    TeamHa {
+        #[arg(short, long, default_value = "hpts")]
+        sort: TeamHaSortBy,
+    },
     /// Show team form based on total player form
     #[command(name = "team-form")]
     TeamForm {
@@ -329,6 +335,7 @@ async fn run() -> Result<()> {
         Commands::Talisman { team } => commands::handle_talisman(team).await?,
         Commands::Team { sort } => commands::handle_team(&sort).await?,
         Commands::TeamAvailability => commands::handle_team_availability().await?,
+        Commands::TeamHa { sort } => commands::handle_team_ha(&sort).await?,
         Commands::TeamForm { sort } => commands::handle_team_form(&sort).await?,
         Commands::TeamPerf { gw, last } => commands::handle_team_perf(gw, last).await?,
         Commands::FdrForm { team, limit, all } => {
