@@ -298,6 +298,19 @@ pub enum XgcSortBy {
     Ratio,
 }
 
+#[derive(Clone, Debug, Default, ValueEnum)]
+pub enum TeamHaSortBy {
+    #[value(alias = "pts")]
+    Pts,
+    #[default]
+    #[value(alias = "hpts")]
+    HomePts,
+    #[value(alias = "apts")]
+    AwayPts,
+    #[value(alias = "diff")]
+    Diff,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

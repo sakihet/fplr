@@ -130,7 +130,7 @@ pub async fn handle_talisman(team_opt: Option<String>) -> Result<()> {
             "Team",
             "Name",
             "Top Player",
-            "Id",
+            "ID",
             "Pts",
             "Team Pts",
             "% Cont.",

@@ -35,8 +35,17 @@ pub enum FplrError {
     #[error("Team not found: {0}")]
     TeamNotFoundByName(String),
 
+    #[error("Player not found: {0}")]
+    PlayerNotFound(u64),
+
     #[error("Unknown config key: {0}")]
     UnknownConfigKey(String),
+
+    #[error("Fixture not found: {0}")]
+    FixtureNotFound(u64),
+
+    #[error("Fixture is not scheduled (no Gameweek assigned): {0}")]
+    FixtureNotScheduled(u64),
 }
 
 pub type Result<T> = std::result::Result<T, FplrError>;
