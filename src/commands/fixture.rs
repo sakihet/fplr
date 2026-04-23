@@ -1,6 +1,6 @@
 use crate::api::FplClient;
 use crate::error::{FplrError, Result};
-use crate::utils::event_helpers::{find_next_event, find_prev_event, get_effective_event_id};
+use crate::utils::event_helpers::get_effective_event_id;
 use crate::utils::team_helpers::create_team_map;
 use crate::utils::{constants::*, formatters::*};
 use clap::Args;
@@ -50,17 +50,19 @@ pub async fn handle_fixture(args: FixtureArgs) -> Result<()> {
     let bootstrap_data = FplClient::fetch_bootstrap_static().await?;
     let team_map = create_team_map(&bootstrap_data.teams);
 
+    let base_event_id = get_effective_event_id(&bootstrap_data.events, args.gw)
+        .ok_or(FplrError::NoNextEvent)? as u32;
+
     let event_id = if args.next {
-        find_next_event(&bootstrap_data.events)
-            .ok_or(FplrError::NoNextEvent)?
-            .id
+        (base_event_id + 1) as u64
     } else if args.prev {
-        find_prev_event(&bootstrap_data.events)
-            .ok_or(FplrError::NoNextEvent)?
-            .id
+        if base_event_id > 1 {
+            (base_event_id - 1) as u64
+        } else {
+            return Err(FplrError::NoPreviousEvent);
+        }
     } else {
-        get_effective_event_id(&bootstrap_data.events, args.gw).ok_or(FplrError::NoNextEvent)?
-            as u64
+        base_event_id as u64
     };
 
     let fixtures = FplClient::fetch_fixtures().await?;
