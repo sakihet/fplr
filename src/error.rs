@@ -29,6 +29,9 @@ pub enum FplrError {
     #[error("No next event found")]
     NoNextEvent,
 
+    #[error("No previous event found")]
+    NoPreviousEvent,
+
     #[error("Team not found: {0}")]
     TeamNotFound(u64),
 
