@@ -129,6 +129,8 @@ enum Commands {
     },
     /// Show status
     Status {},
+    /// Show mathematically calculated Fixture Swings
+    Swing(commands::SwingArgs),
     /// Show league table
     Table {},
     /// Show talisman players
@@ -331,6 +333,7 @@ async fn run() -> Result<()> {
         }
         Commands::SetPiece { team } => commands::handle_set_piece(team).await?,
         Commands::Status {} => commands::handle_status().await?,
+        Commands::Swing(args) => commands::handle_swing(args).await?,
         Commands::Table {} => commands::handle_table().await?,
         Commands::Talisman { team } => commands::handle_talisman(team).await?,
         Commands::Team { sort } => commands::handle_team(&sort).await?,
