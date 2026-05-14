@@ -23,6 +23,15 @@ enum Commands {
         /// Filter by team name
         #[arg(short, long)]
         team: Option<String>,
+        /// Filter by player name
+        #[arg(short, long)]
+        name: Option<String>,
+        /// Filter by news content
+        #[arg(short = 'N', long)]
+        news: Option<String>,
+        /// Filter by position
+        #[arg(short, long)]
+        position: Option<Position>,
         /// Show all players, not just those with issues
         #[arg(short, long)]
         all: bool,
@@ -286,9 +295,14 @@ async fn run() -> Result<()> {
     let args = Args::parse();
 
     match args.commands {
-        Commands::Availability { team, all, limit } => {
-            commands::handle_availability(team, all, limit).await?
-        }
+        Commands::Availability {
+            team,
+            name,
+            news,
+            position,
+            all,
+            limit,
+        } => commands::handle_availability(team, name, news, position, all, limit).await?,
         Commands::Compare { id1, id2 } => commands::handle_compare(id1, id2).await?,
         Commands::Config(args) => commands::handle_config(args)?,
         Commands::DreamTeam { gw } => commands::handle_dream_team(gw).await?,
