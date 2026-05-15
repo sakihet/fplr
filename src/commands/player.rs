@@ -14,6 +14,7 @@ pub struct PlayerFilterArgs {
     pub limit: usize,
     pub team: Option<String>,
     pub name: Option<String>,
+    pub region: Option<u64>,
     pub min_cost: Option<f64>,
     pub max_cost: Option<f64>,
     pub available: bool,
@@ -62,6 +63,11 @@ fn filter_players(
             } else {
                 true
             };
+            let region_match = if let Some(r) = args.region {
+                player.region == Some(r)
+            } else {
+                true
+            };
             let cost_match = {
                 let p_cost = player.now_cost as f64;
                 let min_match = if let Some(min) = args.min_cost {
@@ -83,7 +89,12 @@ fn filter_players(
             } else {
                 true
             };
-            position_match && team_match && name_match && cost_match && available_match
+            position_match
+                && team_match
+                && name_match
+                && region_match
+                && cost_match
+                && available_match
         })
         .collect()
 }

@@ -114,6 +114,8 @@ enum Commands {
         team: Option<String>,
         #[arg(short, long)]
         name: Option<String>,
+        #[arg(short, long)]
+        region: Option<u64>,
         #[arg(long)]
         min_cost: Option<f64>,
         #[arg(long)]
@@ -326,6 +328,7 @@ async fn run() -> Result<()> {
             limit,
             team,
             name,
+            region,
             min_cost,
             max_cost,
             available,
@@ -336,6 +339,7 @@ async fn run() -> Result<()> {
                 limit,
                 team,
                 name,
+                region,
                 min_cost,
                 max_cost,
                 available,
