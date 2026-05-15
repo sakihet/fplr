@@ -102,6 +102,8 @@ enum Commands {
         /// Event ID
         event_id: u32,
     },
+    /// Show regions
+    Region {},
     /// Show players
     Player {
         #[arg(short, long, default_value = "points")]
@@ -322,6 +324,7 @@ async fn run() -> Result<()> {
             manager_id,
             event_id,
         } => commands::handle_pick(manager_id, event_id).await?,
+        Commands::Region {} => commands::handle_region().await?,
         Commands::Player {
             sort,
             position,

@@ -106,19 +106,10 @@ pub struct Team {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct Region {
-    pub id: u64,
-    pub name: String,
-    pub iso_code_short: String,
-    pub iso_code_long: String,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
 pub struct BootstrapStatic {
     pub events: Vec<Event>,
     pub elements: Vec<Element>,
     pub teams: Vec<Team>,
-    pub regions: Option<Vec<Region>>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
