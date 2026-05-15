@@ -35,6 +35,7 @@ pub struct Event {
 pub struct Element {
     pub id: u64,
     pub web_name: String,
+    pub region: Option<u64>,
     pub element_type: u64,
     pub team: u64,
     pub now_cost: u64,

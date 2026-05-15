@@ -1,10 +1,19 @@
+use deunicode::deunicode;
+
 use crate::api::FplClient;
 use crate::error::Result;
 use crate::models::{Element, Position};
 use crate::utils::team_helpers::{create_team_short_name_map, find_team_ids_by_name};
 use crate::utils::{constants::*, formatters::*};
 
-pub async fn handle_availability(team: Option<String>, all: bool, limit: usize) -> Result<()> {
+pub async fn handle_availability(
+    team: Option<String>,
+    name: Option<String>,
+    news: Option<String>,
+    position: Option<Position>,
+    all: bool,
+    limit: usize,
+) -> Result<()> {
     let data = FplClient::fetch_bootstrap_static().await?;
 
     let team_map = create_team_short_name_map(&data.teams);
@@ -25,6 +34,38 @@ pub async fn handle_availability(team: Option<String>, all: bool, limit: usize) 
             };
 
             if !team_match {
+                return false;
+            }
+
+            let name_match = if let Some(ref n) = name {
+                let normalized_player_name = deunicode(&player.web_name).to_lowercase();
+                let normalized_query = deunicode(n).to_lowercase();
+                normalized_player_name.contains(&normalized_query)
+            } else {
+                true
+            };
+
+            if !name_match {
+                return false;
+            }
+
+            let news_match = if let Some(ref n) = news {
+                player.news.to_lowercase().contains(&n.to_lowercase())
+            } else {
+                true
+            };
+
+            if !news_match {
+                return false;
+            }
+
+            let position_match = if let Some(ref pos) = position {
+                player.element_type == pos.element_type_id() as u64
+            } else {
+                true
+            };
+
+            if !position_match {
                 return false;
             }
 

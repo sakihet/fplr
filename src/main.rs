@@ -23,6 +23,15 @@ enum Commands {
         /// Filter by team name
         #[arg(short, long)]
         team: Option<String>,
+        /// Filter by player name
+        #[arg(short, long)]
+        name: Option<String>,
+        /// Filter by news content
+        #[arg(short = 'N', long)]
+        news: Option<String>,
+        /// Filter by position
+        #[arg(short, long)]
+        position: Option<Position>,
         /// Show all players, not just those with issues
         #[arg(short, long)]
         all: bool,
@@ -93,6 +102,8 @@ enum Commands {
         /// Event ID
         event_id: u32,
     },
+    /// Show regions
+    Region {},
     /// Show players
     Player {
         #[arg(short, long, default_value = "points")]
@@ -105,6 +116,8 @@ enum Commands {
         team: Option<String>,
         #[arg(short, long)]
         name: Option<String>,
+        #[arg(short, long)]
+        region: Option<u64>,
         #[arg(long)]
         min_cost: Option<f64>,
         #[arg(long)]
@@ -286,9 +299,14 @@ async fn run() -> Result<()> {
     let args = Args::parse();
 
     match args.commands {
-        Commands::Availability { team, all, limit } => {
-            commands::handle_availability(team, all, limit).await?
-        }
+        Commands::Availability {
+            team,
+            name,
+            news,
+            position,
+            all,
+            limit,
+        } => commands::handle_availability(team, name, news, position, all, limit).await?,
         Commands::Compare { id1, id2 } => commands::handle_compare(id1, id2).await?,
         Commands::Config(args) => commands::handle_config(args)?,
         Commands::DreamTeam { gw } => commands::handle_dream_team(gw).await?,
@@ -306,12 +324,14 @@ async fn run() -> Result<()> {
             manager_id,
             event_id,
         } => commands::handle_pick(manager_id, event_id).await?,
+        Commands::Region {} => commands::handle_region().await?,
         Commands::Player {
             sort,
             position,
             limit,
             team,
             name,
+            region,
             min_cost,
             max_cost,
             available,
@@ -322,6 +342,7 @@ async fn run() -> Result<()> {
                 limit,
                 team,
                 name,
+                region,
                 min_cost,
                 max_cost,
                 available,
