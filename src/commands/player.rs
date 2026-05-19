@@ -3,6 +3,7 @@ use deunicode::deunicode;
 use crate::api::FplClient;
 use crate::error::Result;
 use crate::models::{Element, Position, SortBy};
+use crate::utils::region_helpers::find_region_id;
 use crate::utils::team_helpers::{create_team_short_name_map, find_team_ids_by_name};
 use crate::utils::{constants::*, formatters::*};
 use std::collections::HashMap;
@@ -14,7 +15,7 @@ pub struct PlayerFilterArgs {
     pub limit: usize,
     pub team: Option<String>,
     pub name: Option<String>,
-    pub region: Option<u64>,
+    pub region: Option<String>,
     pub min_cost: Option<f64>,
     pub max_cost: Option<f64>,
     pub available: bool,
@@ -30,7 +31,13 @@ pub async fn handle_player(args: PlayerFilterArgs) -> Result<()> {
         Vec::new()
     };
 
-    let mut players = filter_players(data.elements, &args, &target_team_ids);
+    let target_region_id = if let Some(ref region_query) = args.region {
+        find_region_id(region_query)
+    } else {
+        None
+    };
+
+    let mut players = filter_players(data.elements, &args, &target_team_ids, target_region_id);
     sort_players(&mut players, &args.sort);
 
     print_players(&players, &args, &team_map);
@@ -42,6 +49,7 @@ fn filter_players(
     players: Vec<Element>,
     args: &PlayerFilterArgs,
     target_team_ids: &[u64],
+    target_region_id: Option<u64>,
 ) -> Vec<Element> {
     players
         .into_iter()
@@ -63,8 +71,12 @@ fn filter_players(
             } else {
                 true
             };
-            let region_match = if let Some(r) = args.region {
-                player.region == Some(r)
+            let region_match = if args.region.is_some() {
+                if let Some(r) = target_region_id {
+                    player.region == Some(r)
+                } else {
+                    false
+                }
             } else {
                 true
             };

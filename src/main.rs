@@ -117,7 +117,7 @@ enum Commands {
         #[arg(short, long)]
         name: Option<String>,
         #[arg(short, long)]
-        region: Option<u64>,
+        region: Option<String>,
         #[arg(long)]
         min_cost: Option<f64>,
         #[arg(long)]

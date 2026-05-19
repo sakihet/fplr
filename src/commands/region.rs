@@ -2,7 +2,7 @@ use crate::error::Result;
 use crate::utils::constants::*;
 use owo_colors::OwoColorize;
 
-const REGIONS: &[(u16, &str, &str, &str)] = &[
+pub const REGIONS: &[(u16, &str, &str, &str)] = &[
     (1, "Afghanistan", "AF", "AFG"),
     (2, "Albania", "AL", "ALB"),
     (3, "Algeria", "DZ", "DZA"),
