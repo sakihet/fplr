@@ -167,7 +167,7 @@ pub async fn handle_fixture(args: FixtureArgs) -> Result<()> {
             .unwrap_or("Unknown");
         let kickoff = fixture.kickoff_time.as_deref().unwrap_or("");
 
-        let score = if fixture.finished {
+        let score = if fixture.finished || fixture.started.unwrap_or(false) {
             format!(
                 "{} - {}",
                 fixture.team_h_score.unwrap_or(0),
@@ -209,7 +209,7 @@ pub async fn handle_fixture(args: FixtureArgs) -> Result<()> {
         }
 
         if args.xg {
-            if fixture.finished {
+            if fixture.finished || fixture.started.unwrap_or(false) {
                 let mut h_xg = team_xg.get(&fixture.team_h).cloned().unwrap_or(0.0);
                 let mut a_xg = team_xg.get(&fixture.team_a).cloned().unwrap_or(0.0);
 

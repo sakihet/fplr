@@ -6,9 +6,10 @@ pub fn find_region_id(query: &str) -> Option<u64> {
 
     // 1. Try to parse as ID
     if let Ok(id) = query.parse::<u64>()
-        && REGIONS.iter().any(|(rid, _, _, _)| *rid as u64 == id) {
-            return Some(id);
-        }
+        && REGIONS.iter().any(|(rid, _, _, _)| *rid as u64 == id)
+    {
+        return Some(id);
+    }
 
     // 2. Search by Name, ISO2, or ISO3
     REGIONS.iter().find_map(|(id, name, iso2, iso3)| {
