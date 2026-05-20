@@ -54,6 +54,16 @@ enum Commands {
         #[arg(short, long)]
         gw: Option<u32>,
     },
+    /// Show form-adjusted fixture difficulty rating
+    #[command(name = "fdr-form")]
+    FdrForm {
+        #[arg(short, long)]
+        team: Option<String>,
+        #[arg(short, long, default_value = "5")]
+        limit: usize,
+        #[arg(short, long)]
+        all: bool,
+    },
     /// Show upcoming fixtures
     Fixture(commands::FixtureArgs),
     /// Show fixture difficulty rating
@@ -108,8 +118,6 @@ enum Commands {
         /// Event ID
         event_id: u32,
     },
-    /// Show regions
-    Region {},
     /// Show players
     Player {
         #[arg(short, long, default_value = "points")]
@@ -139,6 +147,8 @@ enum Commands {
         #[arg(short, long)]
         graph: bool,
     },
+    /// Show regions
+    Region {},
     /// Show set piece takers (penalties, free kicks, corners)
     #[command(name = "set-piece")]
     SetPiece {
@@ -166,17 +176,17 @@ enum Commands {
     /// Show team availability statistics
     #[command(visible_alias = "ta")]
     TeamAvailability,
-    /// Show team home/away performance stats
-    #[command(name = "team-ha")]
-    TeamHa {
-        #[arg(short, long, default_value = "hpts")]
-        sort: TeamHaSortBy,
-    },
     /// Show team form based on total player form
     #[command(name = "team-form")]
     TeamForm {
         #[arg(short, long, default_value = "total")]
         sort: TeamFormSortBy,
+    },
+    /// Show team home/away performance stats
+    #[command(name = "team-ha")]
+    TeamHa {
+        #[arg(short, long, default_value = "hpts")]
+        sort: TeamHaSortBy,
     },
     /// Show team performance based on player points per GW
     #[command(name = "team-perf")]
@@ -187,16 +197,6 @@ enum Commands {
         /// Number of recent gameweeks to show
         #[arg(short, long, default_value = "5")]
         last: usize,
-    },
-    /// Show form-adjusted fixture difficulty rating
-    #[command(name = "fdr-form")]
-    FdrForm {
-        #[arg(short, long)]
-        team: Option<String>,
-        #[arg(short, long, default_value = "5")]
-        limit: usize,
-        #[arg(short, long)]
-        all: bool,
     },
     /// Show team performance trends with sparklines
     #[command(name = "team-trend")]
@@ -316,6 +316,9 @@ async fn run() -> Result<()> {
         Commands::Compare { id1, id2 } => commands::handle_compare(id1, id2).await?,
         Commands::Config(args) => commands::handle_config(args)?,
         Commands::DreamTeam { gw } => commands::handle_dream_team(gw).await?,
+        Commands::FdrForm { team, limit, all } => {
+            commands::handle_fdr_form(team, limit, all).await?
+        }
         Commands::Fixture(args) => commands::handle_fixture(args).await?,
         Commands::FixtureDifficultyRating { team, limit, all } => {
             commands::handle_fixture_difficulty_rating(team, limit, all).await?
@@ -331,7 +334,6 @@ async fn run() -> Result<()> {
             manager_id,
             event_id,
         } => commands::handle_pick(manager_id, event_id).await?,
-        Commands::Region {} => commands::handle_region().await?,
         Commands::Player {
             sort,
             position,
@@ -359,6 +361,7 @@ async fn run() -> Result<()> {
         Commands::PlayerSummary { player_id, graph } => {
             commands::handle_player_summary(player_id, graph).await?
         }
+        Commands::Region {} => commands::handle_region().await?,
         Commands::SetPiece { team } => commands::handle_set_piece(team).await?,
         Commands::Status {} => commands::handle_status().await?,
         Commands::Swing(args) => commands::handle_swing(args).await?,
@@ -366,12 +369,9 @@ async fn run() -> Result<()> {
         Commands::Talisman { team } => commands::handle_talisman(team).await?,
         Commands::Team { sort } => commands::handle_team(&sort).await?,
         Commands::TeamAvailability => commands::handle_team_availability().await?,
-        Commands::TeamHa { sort } => commands::handle_team_ha(&sort).await?,
         Commands::TeamForm { sort } => commands::handle_team_form(&sort).await?,
+        Commands::TeamHa { sort } => commands::handle_team_ha(&sort).await?,
         Commands::TeamPerf { gw, last } => commands::handle_team_perf(gw, last).await?,
-        Commands::FdrForm { team, limit, all } => {
-            commands::handle_fdr_form(team, limit, all).await?
-        }
         Commands::TeamTrend { sort, weeks } => commands::handle_team_trend(sort, weeks).await?,
         Commands::Top {} => commands::handle_top().await?,
         Commands::Transfer(args) => commands::handle_transfer(args).await?,
