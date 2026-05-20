@@ -174,8 +174,40 @@ pub struct PlayerHistory {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
+pub struct HistoryPast {
+    pub season_name: String,
+    pub element_code: u64,
+    pub start_cost: u64,
+    pub end_cost: u64,
+    pub total_points: i64,
+    pub minutes: u64,
+    pub goals_scored: u64,
+    pub assists: u64,
+    pub clean_sheets: u64,
+    pub goals_conceded: u64,
+    pub own_goals: u64,
+    pub penalties_saved: u64,
+    pub penalties_missed: u64,
+    pub yellow_cards: u64,
+    pub red_cards: u64,
+    pub saves: u64,
+    pub bonus: u64,
+    pub bps: i64,
+    pub influence: String,
+    pub creativity: String,
+    pub threat: String,
+    pub ict_index: String,
+    pub starts: u64,
+    pub expected_goals: String,
+    pub expected_assists: String,
+    pub expected_goal_involvements: String,
+    pub expected_goals_conceded: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
 pub struct PlayerSummary {
     pub history: Vec<PlayerHistory>,
+    pub history_past: Vec<HistoryPast>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

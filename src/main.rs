@@ -76,6 +76,12 @@ enum Commands {
     Gameweek {},
     /// Show manager's season history
     History(commands::HistoryArgs),
+    /// Show a player's performance in previous seasons
+    #[command(name = "history-past")]
+    HistoryPast {
+        /// Player ID
+        player_id: u64,
+    },
     /// Show live player stats for a specific event
     Live {
         /// Specific Gameweek (defaults to current)
@@ -317,6 +323,7 @@ async fn run() -> Result<()> {
         Commands::FixtureSummary { id } => commands::handle_fixture_summary(id).await?,
         Commands::Gameweek {} => commands::handle_gameweek().await?,
         Commands::History(args) => commands::handle_history(args).await?,
+        Commands::HistoryPast { player_id } => commands::handle_history_past(player_id).await?,
         Commands::Live { gw, limit } => commands::handle_live(gw, limit).await?,
         Commands::Manager { manager_id, gw } => commands::handle_manager(manager_id, gw).await?,
         Commands::MyTeam(args) => commands::handle_my_team(args).await?,
