@@ -119,19 +119,21 @@ pub async fn handle_fixture(args: FixtureArgs) -> Result<()> {
 
     println!("Fixtures for Gameweek {}:", event_id);
 
-    // Width for extra columns (Form and xG)
+    // Width for extra columns
     const EXTRA_COL: usize = 6;
 
     // Build and print header
     let mut header = format!(
-        "{:>id_w$}  {:<time_w$}  {:<home_w$}  {:<away_w$}  {:<score_w$}",
+        "{:>id_w$}  {:<time_w$}  {:<status_w$}  {:<home_w$}  {:<away_w$}  {:<score_w$}",
         "ID",
         "Kickoff Time",
+        "Stat",
         "Home",
         "Away",
         "Score",
         id_w = WIDTH_ID,
         time_w = WIDTH_TIME,
+        status_w = WIDTH_STAT,
         home_w = WIDTH_TEAM_NAME,
         away_w = WIDTH_TEAM_NAME,
         score_w = WIDTH_SCORE,
@@ -167,20 +169,44 @@ pub async fn handle_fixture(args: FixtureArgs) -> Result<()> {
             .unwrap_or("Unknown");
         let kickoff = fixture.kickoff_time.as_deref().unwrap_or("");
 
-        let score = if fixture.finished {
-            format!(
-                "{} - {}",
-                fixture.team_h_score.unwrap_or(0),
-                fixture.team_a_score.unwrap_or(0)
+        let started = fixture.started.unwrap_or(false);
+        let finished = fixture.finished;
+
+        let (status_text, score) = if finished {
+            (
+                format!("{:<width$}", "FIN", width = WIDTH_STAT)
+                    .green()
+                    .to_string(),
+                format!(
+                    "{} - {}",
+                    fixture.team_h_score.unwrap_or(0),
+                    fixture.team_a_score.unwrap_or(0)
+                ),
+            )
+        } else if started {
+            (
+                format!("{:<width$}", "LIVE", width = WIDTH_STAT)
+                    .red()
+                    .bold()
+                    .to_string(),
+                format!(
+                    "{} - {}",
+                    fixture.team_h_score.unwrap_or(0),
+                    fixture.team_a_score.unwrap_or(0)
+                ),
             )
         } else {
-            "-".to_string()
+            (
+                format!("{:<width$}", "PRE", width = WIDTH_STAT),
+                "-".to_string(),
+            )
         };
 
         let mut row = format!(
-            "{:>id_w$}  {:<time_w$}  {:<home_w$}  {:<away_w$}  {:<score_w$}",
+            "{:>id_w$}  {:<time_w$}  {}  {:<home_w$}  {:<away_w$}  {:<score_w$}",
             fixture.id,
             format_datetime_local(kickoff),
+            status_text,
             home_team,
             away_team,
             score,
@@ -209,7 +235,7 @@ pub async fn handle_fixture(args: FixtureArgs) -> Result<()> {
         }
 
         if args.xg {
-            if fixture.finished {
+            if fixture.finished || fixture.started.unwrap_or(false) {
                 let mut h_xg = team_xg.get(&fixture.team_h).cloned().unwrap_or(0.0);
                 let mut a_xg = team_xg.get(&fixture.team_a).cloned().unwrap_or(0.0);
 

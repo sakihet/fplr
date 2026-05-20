@@ -37,14 +37,17 @@ Commands:
   fixture-summary            Show detailed points summary for a specific fixture
   gameweek                   Show gameweeks
   history                    Show manager's season history
+  history-past               Show a player's performance in previous seasons
   live                       Show live player stats for a specific event
   manager                    Show a specific manager's team
   my-team                    Show my team
   pick                       Show a manager's team picks for a specific event
+  region                     Show regions
   player                     Show players
   player-summary             Show player summary
   set-piece                  Show set piece takers (penalties, free kicks, corners)
   status                     Show status
+  swing                      Show mathematically calculated Fixture Swings
   table                      Show league table
   talisman                   Show talisman players
   team                       Show teams
