@@ -99,10 +99,10 @@ pub async fn handle_xgc(
         name_w = WIDTH_NAME,
         pos_w = WIDTH_POS,
         team_w = WIDTH_TEAM_SHORT_NAME,
-        goal_w = 4,
-        xgc_w = 6,
-        diff_w = 6,
-        ratio_w = 6,
+        goal_w = WIDTH_COST,
+        xgc_w = WIDTH_STAT,
+        diff_w = WIDTH_STAT,
+        ratio_w = WIDTH_STAT,
     );
 
     for (id, name, pos, team, goals, xgc, diff, ratio) in players.into_iter().take(limit) {
@@ -120,10 +120,10 @@ pub async fn handle_xgc(
             name_w = WIDTH_NAME,
             pos_w = WIDTH_POS,
             team_w = WIDTH_TEAM_SHORT_NAME,
-            goal_w = 4,
-            xgc_w = 6,
-            diff_w = 6,
-            ratio_w = 6,
+            goal_w = WIDTH_COST,
+            xgc_w = WIDTH_STAT,
+            diff_w = WIDTH_STAT,
+            ratio_w = WIDTH_STAT,
         );
     }
 

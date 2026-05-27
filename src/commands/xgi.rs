@@ -99,10 +99,10 @@ pub async fn handle_xgi(
         name_w = WIDTH_NAME,
         pos_w = WIDTH_POS,
         team_w = WIDTH_TEAM_SHORT_NAME,
-        act_w = 6,
-        xgi_w = 6,
-        diff_w = 6,
-        ratio_w = 6,
+        act_w = WIDTH_STAT,
+        xgi_w = WIDTH_STAT,
+        diff_w = WIDTH_STAT,
+        ratio_w = WIDTH_STAT,
     );
 
     for (id, name, pos, team, actual, xgi, diff, ratio) in players.into_iter().take(limit) {
@@ -120,10 +120,10 @@ pub async fn handle_xgi(
             name_w = WIDTH_NAME,
             pos_w = WIDTH_POS,
             team_w = WIDTH_TEAM_SHORT_NAME,
-            act_w = 6,
-            xgi_w = 6,
-            diff_w = 6,
-            ratio_w = 6,
+            act_w = WIDTH_STAT,
+            xgi_w = WIDTH_STAT,
+            diff_w = WIDTH_STAT,
+            ratio_w = WIDTH_STAT,
         );
     }
 
