@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use crate::api::FplClient;
 use crate::error::Result;
+use crate::utils::constants::*;
 use crate::utils::formatters::{color_form_result, color_league_position, format_signed_number};
 
 #[derive(Debug, Clone)]
@@ -144,15 +145,36 @@ pub async fn handle_table() -> Result<()> {
 
     // Display table
     println!(
-        "{:<4} {:<20} {:<4} {:<4} {:<4} {:<4} {:<6} {:<6} {:<5} {:<4} {:<7}",
-        "Pos", "Team", "P", "W", "D", "L", "GF", "GA", "GD", "Pts", "Last 5"
+        "{:<pos_w$} {:<name_w$} {:<p_w$} {:<w_w$} {:<d_w$} {:<l_w$} {:>gf_w$} {:>ga_w$} {:>gd_w$} {:>pts_w$} {:<form_w$}",
+        "Pos",
+        "Team",
+        "P",
+        "W",
+        "D",
+        "L",
+        "GF",
+        "GA",
+        "GD",
+        "Pts",
+        "Last 5",
+        pos_w = WIDTH_RANK,
+        name_w = 20,
+        p_w = WIDTH_PLAYED,
+        w_w = WIDTH_WIN,
+        d_w = WIDTH_DRAW,
+        l_w = WIDTH_LOSS,
+        gf_w = WIDTH_POINTS,
+        ga_w = WIDTH_POINTS,
+        gd_w = WIDTH_GD,
+        pts_w = WIDTH_RANK,
+        form_w = 7,
     );
 
     for (i, team) in teams.iter().enumerate() {
         let pos = i + 1;
 
         // Color code by position using helper
-        let pos_str = color_league_position(pos, 4);
+        let pos_str = color_league_position(pos, WIDTH_RANK);
 
         let gd = team.goal_difference();
         let gd_str = format_signed_number(gd);
@@ -161,7 +183,7 @@ pub async fn handle_table() -> Result<()> {
         let form_str: String = team.form.iter().map(|&c| color_form_result(c)).collect();
 
         println!(
-            "{} {:<20} {:<4} {:<4} {:<4} {:<4} {:<6} {:<6} {:<5} {:<4} {}",
+            "{} {:<name_w$} {:<p_w$} {:<w_w$} {:<d_w$} {:<l_w$} {:>gf_w$} {:>ga_w$} {:>gd_w$} {:>pts_w$} {}",
             pos_str,
             team.name,
             team.played,
@@ -172,7 +194,16 @@ pub async fn handle_table() -> Result<()> {
             team.goals_against,
             gd_str,
             team.points,
-            form_str
+            form_str,
+            name_w = 20,
+            p_w = WIDTH_PLAYED,
+            w_w = WIDTH_WIN,
+            d_w = WIDTH_DRAW,
+            l_w = WIDTH_LOSS,
+            gf_w = WIDTH_POINTS,
+            ga_w = WIDTH_POINTS,
+            gd_w = WIDTH_GD,
+            pts_w = WIDTH_RANK,
         );
     }
 

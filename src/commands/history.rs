@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use crate::api::FplClient;
 use crate::config::Config;
 use crate::error::Result;
+use crate::utils::constants::*;
 use crate::utils::formatters::color_by_comparison;
 use clap::Args;
 
@@ -49,8 +50,26 @@ pub async fn handle_history(args: HistoryArgs) -> Result<()> {
     println!("=== Current Season ===\n");
 
     println!(
-        "{:<3} {:>5} {:>4} {:>4} {:>6} {:>10} {:>10} {:>4} {:>5} {:>5}",
-        "GW", "Pts", "Avg", "Max", "Total", "Rank", "ΔRank", "Trn", "Bnch", "Value"
+        "{:<gw_w$} {:>pts_w$} {:>avg_w$} {:>max_w$} {:>total_w$} {:>rank_w$} {:>rank_w$} {:>trn_w$} {:>bnch_w$} {:>val_w$}",
+        "GW",
+        "Pts",
+        "Avg",
+        "Max",
+        "Total",
+        "Rank",
+        "ΔRank",
+        "Trn",
+        "Bnch",
+        "Value",
+        gw_w = WIDTH_PTS,
+        pts_w = WIDTH_AVAIL,
+        avg_w = WIDTH_STAT_SMALL,
+        max_w = WIDTH_STAT_SMALL,
+        total_w = WIDTH_POINTS,
+        rank_w = WIDTH_RANK_WIDE,
+        trn_w = WIDTH_STAT_SMALL,
+        bnch_w = WIDTH_AVAIL,
+        val_w = WIDTH_AVAIL,
     );
 
     let mut prev_rank: Option<u64> = None;
@@ -87,11 +106,11 @@ pub async fn handle_history(args: HistoryArgs) -> Result<()> {
         // Color the points based on comparison with average
         let pts_str = match avg_score {
             Some(avg) => color_by_comparison(gw.points, avg as i64),
-            _ => format!("{:>5}", gw.points),
+            _ => format!("{:>width$}", gw.points, width = WIDTH_AVAIL),
         };
 
         println!(
-            "{:<3} {} {:>4} {:>4} {:>6} {:>10} {:>10} {:>4} {:>5} {:>5}",
+            "{:<gw_w$} {} {:>avg_w$} {:>max_w$} {:>total_w$} {:>rank_w$} {:>rank_w$} {:>trn_w$} {:>bnch_w$} {:>val_w$}",
             gw.event,
             pts_str,
             avg_str,
@@ -101,7 +120,15 @@ pub async fn handle_history(args: HistoryArgs) -> Result<()> {
             rank_change,
             gw.event_transfers,
             gw.points_on_bench,
-            value
+            value,
+            gw_w = WIDTH_PTS,
+            avg_w = WIDTH_STAT_SMALL,
+            max_w = WIDTH_STAT_SMALL,
+            total_w = WIDTH_POINTS,
+            rank_w = WIDTH_RANK_WIDE,
+            trn_w = WIDTH_STAT_SMALL,
+            bnch_w = WIDTH_AVAIL,
+            val_w = WIDTH_AVAIL,
         );
 
         prev_rank = gw.overall_rank;
