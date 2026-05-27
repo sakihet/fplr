@@ -71,17 +71,17 @@ pub async fn handle_xgc(
 
     // Sort by selected metric descending
     match sort {
-        XgcSortBy::Goals => {
-            players.sort_by(|a, b| b.4.partial_cmp(&a.4).unwrap_or(std::cmp::Ordering::Equal))
-        }
-        XgcSortBy::Xgc => {
-            players.sort_by(|a, b| b.5.partial_cmp(&a.5).unwrap_or(std::cmp::Ordering::Equal))
-        }
         XgcSortBy::Diff => {
             players.sort_by(|a, b| b.6.partial_cmp(&a.6).unwrap_or(std::cmp::Ordering::Equal))
         }
+        XgcSortBy::Goals => {
+            players.sort_by(|a, b| b.4.partial_cmp(&a.4).unwrap_or(std::cmp::Ordering::Equal))
+        }
         XgcSortBy::Ratio => {
             players.sort_by(|a, b| b.7.partial_cmp(&a.7).unwrap_or(std::cmp::Ordering::Equal))
+        }
+        XgcSortBy::Xgc => {
+            players.sort_by(|a, b| b.5.partial_cmp(&a.5).unwrap_or(std::cmp::Ordering::Equal))
         }
     }
 

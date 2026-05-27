@@ -74,14 +74,14 @@ pub async fn handle_xa(
         XaSortBy::Assists => {
             players.sort_by(|a, b| b.4.partial_cmp(&a.4).unwrap_or(std::cmp::Ordering::Equal))
         }
-        XaSortBy::Xa => {
-            players.sort_by(|a, b| b.5.partial_cmp(&a.5).unwrap_or(std::cmp::Ordering::Equal))
-        }
         XaSortBy::Diff => {
             players.sort_by(|a, b| b.6.partial_cmp(&a.6).unwrap_or(std::cmp::Ordering::Equal))
         }
         XaSortBy::Ratio => {
             players.sort_by(|a, b| b.7.partial_cmp(&a.7).unwrap_or(std::cmp::Ordering::Equal))
+        }
+        XaSortBy::Xa => {
+            players.sort_by(|a, b| b.5.partial_cmp(&a.5).unwrap_or(std::cmp::Ordering::Equal))
         }
     }
 

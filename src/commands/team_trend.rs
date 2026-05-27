@@ -150,9 +150,21 @@ pub async fn handle_team_trend(sort: TeamTrendSortBy, weeks: usize) -> Result<()
 
     // Sort
     rows.sort_by(|a, b| match sort {
+        TeamTrendSortBy::Bps => b
+            .avg_bps
+            .partial_cmp(&a.avg_bps)
+            .unwrap_or(std::cmp::Ordering::Equal),
+        TeamTrendSortBy::Ict => b
+            .avg_ict
+            .partial_cmp(&a.avg_ict)
+            .unwrap_or(std::cmp::Ordering::Equal),
         TeamTrendSortBy::Pts => b
             .avg_pts
             .partial_cmp(&a.avg_pts)
+            .unwrap_or(std::cmp::Ordering::Equal),
+        TeamTrendSortBy::Saves => b
+            .avg_saves
+            .partial_cmp(&a.avg_saves)
             .unwrap_or(std::cmp::Ordering::Equal),
         TeamTrendSortBy::Xg => b
             .avg_xg
@@ -162,18 +174,6 @@ pub async fn handle_team_trend(sort: TeamTrendSortBy, weeks: usize) -> Result<()
             .avg_xgc
             .partial_cmp(&b.avg_xgc)
             .unwrap_or(std::cmp::Ordering::Equal), // Lower is better
-        TeamTrendSortBy::Bps => b
-            .avg_bps
-            .partial_cmp(&a.avg_bps)
-            .unwrap_or(std::cmp::Ordering::Equal),
-        TeamTrendSortBy::Ict => b
-            .avg_ict
-            .partial_cmp(&a.avg_ict)
-            .unwrap_or(std::cmp::Ordering::Equal),
-        TeamTrendSortBy::Saves => b
-            .avg_saves
-            .partial_cmp(&a.avg_saves)
-            .unwrap_or(std::cmp::Ordering::Equal),
     });
 
     let max_pts = rows
