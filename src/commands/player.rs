@@ -113,66 +113,24 @@ fn filter_players(
 
 fn sort_players(players: &mut [Element], sort_by: &SortBy) {
     match sort_by {
-        SortBy::Cost => players.sort_by(|a, b| b.now_cost.cmp(&a.now_cost)),
-        SortBy::Form => {
-            players.sort_by(|a, b| parse_f64(&b.form).partial_cmp(&parse_f64(&a.form)).unwrap())
-        }
-        SortBy::Minutes => players.sort_by(|a, b| b.minutes.cmp(&a.minutes)),
-        SortBy::GoalsScored => players.sort_by(|a, b| b.goals_scored.cmp(&a.goals_scored)),
         SortBy::Assists => players.sort_by(|a, b| b.assists.cmp(&a.assists)),
-        SortBy::CleanSheets => players.sort_by(|a, b| b.clean_sheets.cmp(&a.clean_sheets)),
-        SortBy::GoalsConceded => players.sort_by(|a, b| b.goals_conceded.cmp(&a.goals_conceded)),
-        SortBy::OwnGoals => players.sort_by(|a, b| b.own_goals.cmp(&a.own_goals)),
-        SortBy::PenaltiesSaved => players.sort_by(|a, b| b.penalties_saved.cmp(&a.penalties_saved)),
-        SortBy::PenaltiesMissed => {
-            players.sort_by(|a, b| b.penalties_missed.cmp(&a.penalties_missed))
-        }
-        SortBy::YellowCards => players.sort_by(|a, b| b.yellow_cards.cmp(&a.yellow_cards)),
-        SortBy::RedCards => players.sort_by(|a, b| b.red_cards.cmp(&a.red_cards)),
-        SortBy::Saves => players.sort_by(|a, b| b.saves.cmp(&a.saves)),
         SortBy::Bonus => players.sort_by(|a, b| b.bonus.cmp(&a.bonus)),
         SortBy::Bps => players.sort_by(|a, b| b.bps.cmp(&a.bps)),
-        SortBy::Influence => players.sort_by(|a, b| {
-            parse_f64(&b.influence)
-                .partial_cmp(&parse_f64(&a.influence))
-                .unwrap()
+        SortBy::CleanSheets => players.sort_by(|a, b| b.clean_sheets.cmp(&a.clean_sheets)),
+        SortBy::ClearancesBlocksInterceptions => players.sort_by(|a, b| {
+            b.clearances_blocks_interceptions
+                .cmp(&a.clearances_blocks_interceptions)
         }),
+        SortBy::Cost => players.sort_by(|a, b| b.now_cost.cmp(&a.now_cost)),
         SortBy::Creativity => players.sort_by(|a, b| {
             parse_f64(&b.creativity)
                 .partial_cmp(&parse_f64(&a.creativity))
                 .unwrap()
         }),
-        SortBy::Threat => players.sort_by(|a, b| {
-            parse_f64(&b.threat)
-                .partial_cmp(&parse_f64(&a.threat))
-                .unwrap()
-        }),
-        SortBy::IctIndex => players.sort_by(|a, b| {
-            parse_f64(&b.ict_index)
-                .partial_cmp(&parse_f64(&a.ict_index))
-                .unwrap()
-        }),
+        SortBy::DefensiveContribution => {
+            players.sort_by(|a, b| b.defensive_contribution.cmp(&a.defensive_contribution))
+        }
         SortBy::DreamTeamCount => players.sort_by(|a, b| b.dreamteam_count.cmp(&a.dreamteam_count)),
-        SortBy::ValueForm => players.sort_by(|a, b| {
-            parse_f64(&b.value_form)
-                .partial_cmp(&parse_f64(&a.value_form))
-                .unwrap()
-        }),
-        SortBy::ValueSeason => players.sort_by(|a, b| {
-            parse_f64(&b.value_season)
-                .partial_cmp(&parse_f64(&a.value_season))
-                .unwrap()
-        }),
-        SortBy::PointsPerGame => players.sort_by(|a, b| {
-            parse_f64(&b.points_per_game)
-                .partial_cmp(&parse_f64(&a.points_per_game))
-                .unwrap()
-        }),
-        SortBy::ExpectedGoals => players.sort_by(|a, b| {
-            parse_f64(&b.expected_goals)
-                .partial_cmp(&parse_f64(&a.expected_goals))
-                .unwrap()
-        }),
         SortBy::ExpectedAssists => players.sort_by(|a, b| {
             parse_f64(&b.expected_assists)
                 .partial_cmp(&parse_f64(&a.expected_assists))
@@ -183,41 +141,83 @@ fn sort_players(players: &mut [Element], sort_by: &SortBy) {
                 .partial_cmp(&parse_f64(&a.expected_goal_involvements))
                 .unwrap()
         }),
+        SortBy::ExpectedGoals => players.sort_by(|a, b| {
+            parse_f64(&b.expected_goals)
+                .partial_cmp(&parse_f64(&a.expected_goals))
+                .unwrap()
+        }),
         SortBy::ExpectedGoalsConceded => players.sort_by(|a, b| {
             parse_f64(&b.expected_goals_conceded)
                 .partial_cmp(&parse_f64(&a.expected_goals_conceded))
                 .unwrap()
         }),
-        SortBy::Starts => players.sort_by(|a, b| b.starts.cmp(&a.starts)),
-        SortBy::Tackles => players.sort_by(|a, b| b.tackles.cmp(&a.tackles)),
-        SortBy::ClearancesBlocksInterceptions => players.sort_by(|a, b| {
-            b.clearances_blocks_interceptions
-                .cmp(&a.clearances_blocks_interceptions)
+        SortBy::Form => {
+            players.sort_by(|a, b| parse_f64(&b.form).partial_cmp(&parse_f64(&a.form)).unwrap())
+        }
+        SortBy::GoalsConceded => players.sort_by(|a, b| b.goals_conceded.cmp(&a.goals_conceded)),
+        SortBy::GoalsScored => players.sort_by(|a, b| b.goals_scored.cmp(&a.goals_scored)),
+        SortBy::IctIndex => players.sort_by(|a, b| {
+            parse_f64(&b.ict_index)
+                .partial_cmp(&parse_f64(&a.ict_index))
+                .unwrap()
         }),
-        SortBy::Recoveries => players.sort_by(|a, b| b.recoveries.cmp(&a.recoveries)),
-        SortBy::DefensiveContribution => {
-            players.sort_by(|a, b| b.defensive_contribution.cmp(&a.defensive_contribution))
+        SortBy::Influence => players.sort_by(|a, b| {
+            parse_f64(&b.influence)
+                .partial_cmp(&parse_f64(&a.influence))
+                .unwrap()
+        }),
+        SortBy::Minutes => players.sort_by(|a, b| b.minutes.cmp(&a.minutes)),
+        SortBy::OwnGoals => players.sort_by(|a, b| b.own_goals.cmp(&a.own_goals)),
+        SortBy::PenaltiesMissed => {
+            players.sort_by(|a, b| b.penalties_missed.cmp(&a.penalties_missed))
         }
-        SortBy::TransfersIn => players.sort_by(|a, b| b.transfers_in.cmp(&a.transfers_in)),
-        SortBy::TransfersOut => players.sort_by(|a, b| b.transfers_out.cmp(&a.transfers_out)),
-        SortBy::TransfersInEvent => {
-            players.sort_by(|a, b| b.transfers_in_event.cmp(&a.transfers_in_event))
-        }
-        SortBy::TransfersOutEvent => {
-            players.sort_by(|a, b| b.transfers_out_event.cmp(&a.transfers_out_event))
-        }
+        SortBy::PenaltiesSaved => players.sort_by(|a, b| b.penalties_saved.cmp(&a.penalties_saved)),
+        SortBy::Points => players.sort_by(|a, b| b.total_points.cmp(&a.total_points)),
+        SortBy::PointsPerGame => players.sort_by(|a, b| {
+            parse_f64(&b.points_per_game)
+                .partial_cmp(&parse_f64(&a.points_per_game))
+                .unwrap()
+        }),
         SortBy::PriceRiseEvent => {
             players.sort_by(|a, b| b.cost_change_event.cmp(&a.cost_change_event))
         }
         SortBy::PriceRiseStart => {
             players.sort_by(|a, b| b.cost_change_start.cmp(&a.cost_change_start))
         }
-        SortBy::Points => players.sort_by(|a, b| b.total_points.cmp(&a.total_points)),
+        SortBy::Recoveries => players.sort_by(|a, b| b.recoveries.cmp(&a.recoveries)),
+        SortBy::RedCards => players.sort_by(|a, b| b.red_cards.cmp(&a.red_cards)),
+        SortBy::Saves => players.sort_by(|a, b| b.saves.cmp(&a.saves)),
         SortBy::SelectedBy => players.sort_by(|a, b| {
             parse_f64(&b.selected_by_percent)
                 .partial_cmp(&parse_f64(&a.selected_by_percent))
                 .unwrap()
         }),
+        SortBy::Starts => players.sort_by(|a, b| b.starts.cmp(&a.starts)),
+        SortBy::Tackles => players.sort_by(|a, b| b.tackles.cmp(&a.tackles)),
+        SortBy::Threat => players.sort_by(|a, b| {
+            parse_f64(&b.threat)
+                .partial_cmp(&parse_f64(&a.threat))
+                .unwrap()
+        }),
+        SortBy::TransfersIn => players.sort_by(|a, b| b.transfers_in.cmp(&a.transfers_in)),
+        SortBy::TransfersInEvent => {
+            players.sort_by(|a, b| b.transfers_in_event.cmp(&a.transfers_in_event))
+        }
+        SortBy::TransfersOut => players.sort_by(|a, b| b.transfers_out.cmp(&a.transfers_out)),
+        SortBy::TransfersOutEvent => {
+            players.sort_by(|a, b| b.transfers_out_event.cmp(&a.transfers_out_event))
+        }
+        SortBy::ValueForm => players.sort_by(|a, b| {
+            parse_f64(&b.value_form)
+                .partial_cmp(&parse_f64(&a.value_form))
+                .unwrap()
+        }),
+        SortBy::ValueSeason => players.sort_by(|a, b| {
+            parse_f64(&b.value_season)
+                .partial_cmp(&parse_f64(&a.value_season))
+                .unwrap()
+        }),
+        SortBy::YellowCards => players.sort_by(|a, b| b.yellow_cards.cmp(&a.yellow_cards)),
     }
 }
 
@@ -344,42 +344,42 @@ fn print_players(players: &[Element], args: &PlayerFilterArgs, team_map: &HashMa
 
 fn get_stat_value(player: &Element, sort_by: &SortBy) -> String {
     match sort_by {
-        SortBy::Minutes => player.minutes.to_string(),
-        SortBy::GoalsScored => player.goals_scored.to_string(),
         SortBy::Assists => player.assists.to_string(),
-        SortBy::CleanSheets => player.clean_sheets.to_string(),
-        SortBy::GoalsConceded => player.goals_conceded.to_string(),
-        SortBy::OwnGoals => player.own_goals.to_string(),
-        SortBy::PenaltiesSaved => player.penalties_saved.to_string(),
-        SortBy::PenaltiesMissed => player.penalties_missed.to_string(),
-        SortBy::YellowCards => player.yellow_cards.to_string(),
-        SortBy::RedCards => player.red_cards.to_string(),
-        SortBy::Saves => player.saves.to_string(),
         SortBy::Bonus => player.bonus.to_string(),
         SortBy::Bps => player.bps.to_string(),
-        SortBy::Influence => player.influence.clone(),
+        SortBy::CleanSheets => player.clean_sheets.to_string(),
+        SortBy::ClearancesBlocksInterceptions => player.clearances_blocks_interceptions.to_string(),
         SortBy::Creativity => player.creativity.clone(),
-        SortBy::Threat => player.threat.clone(),
-        SortBy::IctIndex => player.ict_index.clone(),
+        SortBy::DefensiveContribution => player.defensive_contribution.to_string(),
         SortBy::DreamTeamCount => player.dreamteam_count.to_string(),
-        SortBy::ValueForm => player.value_form.clone(),
-        SortBy::ValueSeason => player.value_season.clone(),
-        SortBy::PointsPerGame => player.points_per_game.clone(),
-        SortBy::ExpectedGoals => player.expected_goals.clone(),
         SortBy::ExpectedAssists => player.expected_assists.clone(),
         SortBy::ExpectedGoalInvolvements => player.expected_goal_involvements.clone(),
+        SortBy::ExpectedGoals => player.expected_goals.clone(),
         SortBy::ExpectedGoalsConceded => player.expected_goals_conceded.clone(),
-        SortBy::Starts => player.starts.to_string(),
-        SortBy::Tackles => player.tackles.to_string(),
-        SortBy::ClearancesBlocksInterceptions => player.clearances_blocks_interceptions.to_string(),
-        SortBy::Recoveries => player.recoveries.to_string(),
-        SortBy::DefensiveContribution => player.defensive_contribution.to_string(),
-        SortBy::TransfersIn => player.transfers_in.to_string(),
-        SortBy::TransfersOut => player.transfers_out.to_string(),
-        SortBy::TransfersInEvent => player.transfers_in_event.to_string(),
-        SortBy::TransfersOutEvent => player.transfers_out_event.to_string(),
+        SortBy::GoalsConceded => player.goals_conceded.to_string(),
+        SortBy::GoalsScored => player.goals_scored.to_string(),
+        SortBy::IctIndex => player.ict_index.clone(),
+        SortBy::Influence => player.influence.clone(),
+        SortBy::Minutes => player.minutes.to_string(),
+        SortBy::OwnGoals => player.own_goals.to_string(),
+        SortBy::PenaltiesMissed => player.penalties_missed.to_string(),
+        SortBy::PenaltiesSaved => player.penalties_saved.to_string(),
+        SortBy::PointsPerGame => player.points_per_game.clone(),
         SortBy::PriceRiseEvent => format!("{:.1}", player.cost_change_event as f64 / 10.0),
         SortBy::PriceRiseStart => format!("{:.1}", player.cost_change_start as f64 / 10.0),
+        SortBy::Recoveries => player.recoveries.to_string(),
+        SortBy::RedCards => player.red_cards.to_string(),
+        SortBy::Saves => player.saves.to_string(),
+        SortBy::Starts => player.starts.to_string(),
+        SortBy::Tackles => player.tackles.to_string(),
+        SortBy::Threat => player.threat.clone(),
+        SortBy::TransfersIn => player.transfers_in.to_string(),
+        SortBy::TransfersInEvent => player.transfers_in_event.to_string(),
+        SortBy::TransfersOut => player.transfers_out.to_string(),
+        SortBy::TransfersOutEvent => player.transfers_out_event.to_string(),
+        SortBy::ValueForm => player.value_form.clone(),
+        SortBy::ValueSeason => player.value_season.clone(),
+        SortBy::YellowCards => player.yellow_cards.to_string(),
         _ => "".to_string(),
     }
 }

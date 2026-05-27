@@ -5,3 +5,4 @@
 - Run `make fmt` after generating the code.
 - Run `make lint-fix` after formatting the code.
 - Keep CLI subcommands sorted alphabetically in `src/main.rs` to ensure consistent help output.
+- Sort `match` arms alphabetically whenever possible to improve maintainability.
