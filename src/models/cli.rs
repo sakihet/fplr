@@ -210,11 +210,11 @@ impl PlayerStatus {
 pub enum Position {
     #[value(alias = "gkp", alias = "gk")]
     Goalkeeper,
-    #[value(alias = "def")]
+    #[value(alias = "def", alias = "df")]
     Defender,
-    #[value(alias = "mid")]
+    #[value(alias = "mid", alias = "mf")]
     Midfielder,
-    #[value(alias = "fwd")]
+    #[value(alias = "fwd", alias = "fw")]
     Forward,
 }
 
