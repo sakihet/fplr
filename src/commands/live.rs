@@ -55,7 +55,7 @@ pub async fn handle_live(gw: Option<u32>, limit: usize) -> Result<()> {
     println!("Live Stats for GW{}", event_id);
 
     println!(
-        "{:>id_w$}  {:<name_w$}  {:<pos_w$}  {:<team_w$}  {:>pts_w$}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}",
+        "{:>id_w$}  {:<name_w$}  {:<pos_w$}  {:<team_w$}  {:>pts_w$}  {:>s_w$}  {:>s_w$}  {:>s_w$}  {:>s_w$}  {:>s_w$}  {:>s_w$}  {:>s_w$}  {:>s_w$}  {:>s_w$}  {:>s_w$}  {:>s_w$}  {:>s_w$}",
         "ID",
         "Name",
         "Pos",
@@ -78,6 +78,7 @@ pub async fn handle_live(gw: Option<u32>, limit: usize) -> Result<()> {
         pos_w = WIDTH_POS,
         team_w = WIDTH_TEAM_SHORT_NAME,
         pts_w = WIDTH_PTS,
+        s_w = WIDTH_STAT_SMALL,
     );
     for element in elements.iter().take(limit) {
         let (name, pos, team) = player_info_map
@@ -107,7 +108,7 @@ pub async fn handle_live(gw: Option<u32>, limit: usize) -> Result<()> {
         }
 
         println!(
-            "{:>id_w$}  {:<name_w$}  {:<pos_w$}  {:<team_w$}  {:>pts_w$}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}  {:>4}",
+            "{:>id_w$}  {:<name_w$}  {:<pos_w$}  {:<team_w$}  {:>pts_w$}  {:>s_w$}  {:>s_w$}  {:>s_w$}  {:>s_w$}  {:>s_w$}  {:>s_w$}  {:>s_w$}  {:>s_w$}  {:>s_w$}  {:>s_w$}  {:>s_w$}  {:>s_w$}",
             element.id,
             name,
             pos,
@@ -130,6 +131,7 @@ pub async fn handle_live(gw: Option<u32>, limit: usize) -> Result<()> {
             pos_w = WIDTH_POS,
             team_w = WIDTH_TEAM_SHORT_NAME,
             pts_w = WIDTH_PTS,
+            s_w = WIDTH_STAT_SMALL,
         );
     }
 

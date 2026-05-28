@@ -74,14 +74,14 @@ pub async fn handle_xgi(
         XgiSortBy::Actual => {
             players.sort_by(|a, b| b.4.partial_cmp(&a.4).unwrap_or(std::cmp::Ordering::Equal))
         }
-        XgiSortBy::Xgi => {
-            players.sort_by(|a, b| b.5.partial_cmp(&a.5).unwrap_or(std::cmp::Ordering::Equal))
-        }
         XgiSortBy::Diff => {
             players.sort_by(|a, b| b.6.partial_cmp(&a.6).unwrap_or(std::cmp::Ordering::Equal))
         }
         XgiSortBy::Ratio => {
             players.sort_by(|a, b| b.7.partial_cmp(&a.7).unwrap_or(std::cmp::Ordering::Equal))
+        }
+        XgiSortBy::Xgi => {
+            players.sort_by(|a, b| b.5.partial_cmp(&a.5).unwrap_or(std::cmp::Ordering::Equal))
         }
     }
 
@@ -99,10 +99,10 @@ pub async fn handle_xgi(
         name_w = WIDTH_NAME,
         pos_w = WIDTH_POS,
         team_w = WIDTH_TEAM_SHORT_NAME,
-        act_w = 6,
-        xgi_w = 6,
-        diff_w = 6,
-        ratio_w = 6,
+        act_w = WIDTH_STAT,
+        xgi_w = WIDTH_STAT,
+        diff_w = WIDTH_STAT,
+        ratio_w = WIDTH_STAT,
     );
 
     for (id, name, pos, team, actual, xgi, diff, ratio) in players.into_iter().take(limit) {
@@ -120,10 +120,10 @@ pub async fn handle_xgi(
             name_w = WIDTH_NAME,
             pos_w = WIDTH_POS,
             team_w = WIDTH_TEAM_SHORT_NAME,
-            act_w = 6,
-            xgi_w = 6,
-            diff_w = 6,
-            ratio_w = 6,
+            act_w = WIDTH_STAT,
+            xgi_w = WIDTH_STAT,
+            diff_w = WIDTH_STAT,
+            ratio_w = WIDTH_STAT,
         );
     }
 

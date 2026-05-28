@@ -71,17 +71,17 @@ pub async fn handle_xgc(
 
     // Sort by selected metric descending
     match sort {
-        XgcSortBy::Goals => {
-            players.sort_by(|a, b| b.4.partial_cmp(&a.4).unwrap_or(std::cmp::Ordering::Equal))
-        }
-        XgcSortBy::Xgc => {
-            players.sort_by(|a, b| b.5.partial_cmp(&a.5).unwrap_or(std::cmp::Ordering::Equal))
-        }
         XgcSortBy::Diff => {
             players.sort_by(|a, b| b.6.partial_cmp(&a.6).unwrap_or(std::cmp::Ordering::Equal))
         }
+        XgcSortBy::Goals => {
+            players.sort_by(|a, b| b.4.partial_cmp(&a.4).unwrap_or(std::cmp::Ordering::Equal))
+        }
         XgcSortBy::Ratio => {
             players.sort_by(|a, b| b.7.partial_cmp(&a.7).unwrap_or(std::cmp::Ordering::Equal))
+        }
+        XgcSortBy::Xgc => {
+            players.sort_by(|a, b| b.5.partial_cmp(&a.5).unwrap_or(std::cmp::Ordering::Equal))
         }
     }
 
@@ -99,10 +99,10 @@ pub async fn handle_xgc(
         name_w = WIDTH_NAME,
         pos_w = WIDTH_POS,
         team_w = WIDTH_TEAM_SHORT_NAME,
-        goal_w = 4,
-        xgc_w = 6,
-        diff_w = 6,
-        ratio_w = 6,
+        goal_w = WIDTH_COST,
+        xgc_w = WIDTH_STAT,
+        diff_w = WIDTH_STAT,
+        ratio_w = WIDTH_STAT,
     );
 
     for (id, name, pos, team, goals, xgc, diff, ratio) in players.into_iter().take(limit) {
@@ -120,10 +120,10 @@ pub async fn handle_xgc(
             name_w = WIDTH_NAME,
             pos_w = WIDTH_POS,
             team_w = WIDTH_TEAM_SHORT_NAME,
-            goal_w = 4,
-            xgc_w = 6,
-            diff_w = 6,
-            ratio_w = 6,
+            goal_w = WIDTH_COST,
+            xgc_w = WIDTH_STAT,
+            diff_w = WIDTH_STAT,
+            ratio_w = WIDTH_STAT,
         );
     }
 

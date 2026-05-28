@@ -32,6 +32,7 @@ Commands:
   compare                    Compare two players side-by-side
   config                     Manage configuration
   dream-team                 Show dream team
+  fdr-form                   Show form-adjusted fixture difficulty rating
   fixture                    Show upcoming fixtures
   fixture-difficulty-rating  Show fixture difficulty rating [aliases: fdr]
   fixture-summary            Show detailed points summary for a specific fixture
@@ -42,9 +43,9 @@ Commands:
   manager                    Show a specific manager's team
   my-team                    Show my team
   pick                       Show a manager's team picks for a specific event
-  region                     Show regions
   player                     Show players
   player-summary             Show player summary
+  region                     Show regions
   set-piece                  Show set piece takers (penalties, free kicks, corners)
   status                     Show status
   swing                      Show mathematically calculated Fixture Swings
@@ -52,10 +53,9 @@ Commands:
   talisman                   Show talisman players
   team                       Show teams
   team-availability          Show team availability statistics [aliases: ta]
-  team-ha                    Show team home/away performance stats
   team-form                  Show team form based on total player form
+  team-ha                    Show team home/away performance stats
   team-perf                  Show team performance based on player points per GW
-  fdr-form                   Show form-adjusted fixture difficulty rating
   team-trend                 Show team performance trends with sparklines
   top                        Show top teams in the overall league
   transfer                   Show popular transfers

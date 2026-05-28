@@ -97,20 +97,20 @@ pub async fn handle_team_form(sort_by: &TeamFormSortBy) -> Result<()> {
 
     // Sort
     match sort_by {
-        TeamFormSortBy::Total => {
-            results.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal))
+        TeamFormSortBy::Defender => {
+            results.sort_by(|a, b| b.4.partial_cmp(&a.4).unwrap_or(std::cmp::Ordering::Equal))
         }
         TeamFormSortBy::Forward => {
             results.sort_by(|a, b| b.2.partial_cmp(&a.2).unwrap_or(std::cmp::Ordering::Equal))
         }
+        TeamFormSortBy::Goalkeeper => {
+            results.sort_by(|a, b| b.5.partial_cmp(&a.5).unwrap_or(std::cmp::Ordering::Equal))
+        }
         TeamFormSortBy::Midfielder => {
             results.sort_by(|a, b| b.3.partial_cmp(&a.3).unwrap_or(std::cmp::Ordering::Equal))
         }
-        TeamFormSortBy::Defender => {
-            results.sort_by(|a, b| b.4.partial_cmp(&a.4).unwrap_or(std::cmp::Ordering::Equal))
-        }
-        TeamFormSortBy::Goalkeeper => {
-            results.sort_by(|a, b| b.5.partial_cmp(&a.5).unwrap_or(std::cmp::Ordering::Equal))
+        TeamFormSortBy::Total => {
+            results.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap_or(std::cmp::Ordering::Equal))
         }
     }
 
