@@ -7,7 +7,8 @@ mod utils;
 
 use crate::error::{FplrError, Result};
 use crate::models::{Position, SortBy, TeamFormSortBy, TeamHaSortBy, TeamSortBy, TeamTrendSortBy};
-use clap::{Parser, Subcommand};
+use clap::{CommandFactory, Parser, Subcommand};
+use clap_complete::{Shell, generate};
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -45,6 +46,11 @@ enum Commands {
         id1: u64,
         /// Second player ID
         id2: u64,
+    },
+    /// Generate shell completion scripts
+    Completions {
+        /// Shell to generate completions for
+        shell: Shell,
     },
     /// Manage configuration
     Config(commands::ConfigArgs),
@@ -314,6 +320,9 @@ async fn run() -> Result<()> {
             limit,
         } => commands::handle_availability(team, name, news, position, all, limit).await?,
         Commands::Compare { id1, id2 } => commands::handle_compare(id1, id2).await?,
+        Commands::Completions { shell } => {
+            generate(shell, &mut Args::command(), "fplr", &mut std::io::stdout());
+        }
         Commands::Config(args) => commands::handle_config(args)?,
         Commands::DreamTeam { gw } => commands::handle_dream_team(gw).await?,
         Commands::FdrForm { team, limit, all } => {

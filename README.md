@@ -66,3 +66,33 @@ Commands:
   xgi                        Show xGI vs Goal Involvements (Actual G + A) analysis
   help                       Print this message or the help of the given subcommand(s)
 ```
+
+## Shell Completion
+
+Generate and install tab completion scripts for your shell:
+
+**zsh**
+
+```sh
+mkdir -p ~/.zfunc
+fplr completions zsh > ~/.zfunc/_fplr
+```
+
+Add the following to `~/.zshrc` if not already present:
+
+```sh
+fpath+=~/.zfunc
+autoload -Uz compinit && compinit
+```
+
+**bash**
+
+```sh
+fplr completions bash > ~/.local/share/bash-completion/completions/fplr
+```
+
+**fish**
+
+```sh
+fplr completions fish > ~/.config/fish/completions/fplr.fish
+```
