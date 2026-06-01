@@ -171,6 +171,15 @@ enum Commands {
         player_id: u64,
         #[arg(short, long)]
         graph: bool,
+        /// Show xG/xA/xGI/xGC stats
+        #[arg(long)]
+        xg: bool,
+        /// Show ICT index stats
+        #[arg(long)]
+        ict: bool,
+        /// Show FPL management stats (price, ownership, transfers)
+        #[arg(long)]
+        fpl: bool,
     },
     /// Show regions
     Region {},
@@ -402,9 +411,13 @@ async fn run() -> Result<()> {
             })
             .await?
         }
-        Commands::PlayerSummary { player_id, graph } => {
-            commands::handle_player_summary(player_id, graph).await?
-        }
+        Commands::PlayerSummary {
+            player_id,
+            graph,
+            xg,
+            ict,
+            fpl,
+        } => commands::handle_player_summary(player_id, graph, xg, ict, fpl).await?,
         Commands::Region {} => commands::handle_region().await?,
         Commands::SetPiece { team } => commands::handle_set_piece(team).await?,
         Commands::Status {} => commands::handle_status().await?,
