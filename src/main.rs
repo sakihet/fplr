@@ -233,6 +233,9 @@ enum Commands {
     Top {},
     /// Show popular transfers
     Transfer(commands::TransferArgs),
+    /// Show manager's transfer history
+    #[command(name = "transfer-history")]
+    TransferHistory(commands::TransferHistoryArgs),
     /// Show player performance trends with sparklines
     Trend {
         /// Filter by team name
@@ -409,6 +412,7 @@ async fn run() -> Result<()> {
         Commands::Template {} => commands::handle_template().await?,
         Commands::Top {} => commands::handle_top().await?,
         Commands::Transfer(args) => commands::handle_transfer(args).await?,
+        Commands::TransferHistory(args) => commands::handle_transfer_history(args).await?,
         Commands::Trend {
             team,
             position,

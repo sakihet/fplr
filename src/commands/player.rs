@@ -103,11 +103,7 @@ fn filter_players(
                 true
             };
             let sel_match = if let Some(max_sel) = args.max_sel {
-                player
-                    .selected_by_percent
-                    .parse::<f64>()
-                    .unwrap_or(0.0)
-                    <= max_sel
+                player.selected_by_percent.parse::<f64>().unwrap_or(0.0) <= max_sel
             } else {
                 true
             };

@@ -382,3 +382,14 @@ pub struct LeagueStandingsResponse {
     pub league: League,
     pub standings: Standings,
 }
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Transfer {
+    pub element_in: u64,
+    pub element_in_cost: u64,
+    pub element_out: u64,
+    pub element_out_cost: u64,
+    pub entry: u64,
+    pub event: u64,
+    pub time: String,
+}
