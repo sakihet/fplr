@@ -1,5 +1,6 @@
 pub mod availability;
 pub mod compare;
+pub mod differential;
 pub mod config;
 pub mod dream_team;
 pub mod fdr;
@@ -38,6 +39,7 @@ pub mod xgi;
 
 pub use availability::handle_availability;
 pub use compare::handle_compare;
+pub use differential::handle_differential;
 pub use config::{ConfigArgs, handle_config};
 pub use dream_team::handle_dream_team;
 pub use fdr::handle_fixture_difficulty_rating;

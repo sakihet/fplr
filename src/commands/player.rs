@@ -19,6 +19,7 @@ pub struct PlayerFilterArgs {
     pub min_cost: Option<f64>,
     pub max_cost: Option<f64>,
     pub available: bool,
+    pub max_sel: Option<f64>,
 }
 
 pub async fn handle_player(args: PlayerFilterArgs) -> Result<()> {
@@ -101,12 +102,22 @@ fn filter_players(
             } else {
                 true
             };
+            let sel_match = if let Some(max_sel) = args.max_sel {
+                player
+                    .selected_by_percent
+                    .parse::<f64>()
+                    .unwrap_or(0.0)
+                    <= max_sel
+            } else {
+                true
+            };
             position_match
                 && team_match
                 && name_match
                 && region_match
                 && cost_match
                 && available_match
+                && sel_match
         })
         .collect()
 }

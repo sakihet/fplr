@@ -54,6 +54,18 @@ enum Commands {
     },
     /// Manage configuration
     Config(commands::ConfigArgs),
+    /// Show low-ownership players with high potential
+    Differential {
+        /// Maximum ownership threshold (%)
+        #[arg(long, default_value = "10.0")]
+        max_sel: f64,
+        #[arg(short, long, default_value = "points")]
+        sort: SortBy,
+        #[arg(short, long)]
+        position: Option<Position>,
+        #[arg(short, long, default_value = "20")]
+        limit: usize,
+    },
     /// Show dream team
     DreamTeam {
         /// Specific Gameweek (defaults to current)
@@ -327,6 +339,12 @@ async fn run() -> Result<()> {
             generate(shell, &mut Args::command(), "fplr", &mut std::io::stdout());
         }
         Commands::Config(args) => commands::handle_config(args)?,
+        Commands::Differential {
+            max_sel,
+            sort,
+            position,
+            limit,
+        } => commands::handle_differential(max_sel, sort, position, limit).await?,
         Commands::DreamTeam { gw } => commands::handle_dream_team(gw).await?,
         Commands::FdrForm { team, limit, all } => {
             commands::handle_fdr_form(team, limit, all).await?
@@ -369,6 +387,7 @@ async fn run() -> Result<()> {
                 min_cost,
                 max_cost,
                 available,
+                max_sel: None,
             })
             .await?
         }
