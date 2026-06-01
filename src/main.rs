@@ -130,6 +130,9 @@ enum Commands {
         #[arg(short, long)]
         gw: Option<u32>,
     },
+    /// Show my leagues
+    #[command(name = "my-leagues")]
+    MyLeagues(commands::MyLeaguesArgs),
     /// Show my team
     #[command(name = "my-team")]
     MyTeam(commands::MyTeamArgs),
@@ -368,6 +371,7 @@ async fn run() -> Result<()> {
         Commands::Live { gw, limit } => commands::handle_live(gw, limit).await?,
         Commands::MiniLeague(args) => commands::handle_mini_league(args).await?,
         Commands::Manager { manager_id, gw } => commands::handle_manager(manager_id, gw).await?,
+        Commands::MyLeagues(args) => commands::handle_my_leagues(args).await?,
         Commands::MyTeam(args) => commands::handle_my_team(args).await?,
         Commands::Pick {
             manager_id,

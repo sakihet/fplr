@@ -393,3 +393,24 @@ pub struct Transfer {
     pub event: u64,
     pub time: String,
 }
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct EntryLeagueItem {
+    pub id: u64,
+    pub name: String,
+    pub league_type: String,
+    pub entry_rank: u64,
+    pub entry_last_rank: u64,
+    pub rank_count: u64,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct EntryLeagues {
+    pub classic: Vec<EntryLeagueItem>,
+    pub h2h: Vec<EntryLeagueItem>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct EntryDetail {
+    pub leagues: EntryLeagues,
+}
