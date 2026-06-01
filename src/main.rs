@@ -215,6 +215,8 @@ enum Commands {
         #[arg(short, long, default_value = "5")]
         weeks: usize,
     },
+    /// Show template squad (top players by ownership per position)
+    Template {},
     /// Show top teams in the overall league
     Top {},
     /// Show popular transfers
@@ -385,6 +387,7 @@ async fn run() -> Result<()> {
         Commands::TeamHa { sort } => commands::handle_team_ha(&sort).await?,
         Commands::TeamPerf { gw, last } => commands::handle_team_perf(gw, last).await?,
         Commands::TeamTrend { sort, weeks } => commands::handle_team_trend(sort, weeks).await?,
+        Commands::Template {} => commands::handle_template().await?,
         Commands::Top {} => commands::handle_top().await?,
         Commands::Transfer(args) => commands::handle_transfer(args).await?,
         Commands::Trend {
