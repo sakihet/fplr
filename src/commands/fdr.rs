@@ -13,7 +13,7 @@ type TeamFdrData<'a> = (u64, &'a Team, Vec<Vec<(String, u8)>>);
 pub async fn handle_fixture_difficulty_rating(
     team: Option<String>,
     limit: usize,
-    all_teams: bool,
+    sort_by_avg: bool,
 ) -> Result<()> {
     let bootstrap_data = FplClient::fetch_bootstrap_static().await?;
     let team_map = create_team_ref_map(&bootstrap_data.teams);
@@ -29,15 +29,10 @@ pub async fn handle_fixture_difficulty_rating(
         if team_ids.is_empty() {
             return Err(FplrError::TeamNotFoundByName(team_name));
         }
-        // Use the first matching team
         let tid = team_ids[0];
         display_team_fdr(&unfinished_fixtures, tid, limit, &team_map)?;
-    } else if all_teams {
-        // Show FDR matrix for all teams
-        display_all_teams_fdr(&unfinished_fixtures, limit, &team_map);
     } else {
-        // Default: show all teams
-        display_all_teams_fdr(&unfinished_fixtures, limit, &team_map);
+        display_all_teams_fdr(&unfinished_fixtures, limit, &team_map, sort_by_avg);
     }
 
     Ok(())
@@ -107,7 +102,12 @@ fn display_team_fdr(
     Ok(())
 }
 
-fn display_all_teams_fdr(fixtures: &[&Fixture], limit: usize, team_map: &HashMap<u64, &Team>) {
+fn display_all_teams_fdr(
+    fixtures: &[&Fixture],
+    limit: usize,
+    team_map: &HashMap<u64, &Team>,
+    sort_by_avg: bool,
+) {
     // Get all unique event IDs and sort them
     let mut events: Vec<u64> = fixtures
         .iter()
@@ -154,8 +154,21 @@ fn display_all_teams_fdr(fixtures: &[&Fixture], limit: usize, team_map: &HashMap
         team_fdr_data.push((*team_id, *team, fdr_values));
     }
 
-    // Sort by team name
-    team_fdr_data.sort_by(|a, b| a.1.name.cmp(&b.1.name));
+    if sort_by_avg {
+        team_fdr_data.sort_by(|a, b| {
+            let avg = |data: &TeamFdrData| -> f32 {
+                let (total, count) = data
+                    .2
+                    .iter()
+                    .flatten()
+                    .fold((0.0f32, 0usize), |(s, c), (_, d)| (s + *d as f32, c + 1));
+                if count > 0 { total / count as f32 } else { f32::MAX }
+            };
+            avg(a).partial_cmp(&avg(b)).unwrap()
+        });
+    } else {
+        team_fdr_data.sort_by(|a, b| a.1.name.cmp(&b.1.name));
+    }
 
     // Calculate dynamic column widths based on content
     let mut column_widths: Vec<usize> = vec![6; events_to_show.len()]; // Minimum width for "GWxx"

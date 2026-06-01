@@ -7,7 +7,8 @@ mod utils;
 
 use crate::error::{FplrError, Result};
 use crate::models::{Position, SortBy, TeamFormSortBy, TeamHaSortBy, TeamSortBy, TeamTrendSortBy};
-use clap::{Parser, Subcommand};
+use clap::{CommandFactory, Parser, Subcommand};
+use clap_complete::{Shell, generate};
 
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
@@ -46,8 +47,25 @@ enum Commands {
         /// Second player ID
         id2: u64,
     },
+    /// Generate shell completion scripts
+    Completions {
+        /// Shell to generate completions for
+        shell: Shell,
+    },
     /// Manage configuration
     Config(commands::ConfigArgs),
+    /// Show low-ownership players with high potential
+    Differential {
+        /// Maximum ownership threshold (%)
+        #[arg(long, default_value = "10.0")]
+        max_sel: f64,
+        #[arg(short, long, default_value = "points")]
+        sort: SortBy,
+        #[arg(short, long)]
+        position: Option<Position>,
+        #[arg(short, long, default_value = "20")]
+        limit: usize,
+    },
     /// Show dream team
     DreamTeam {
         /// Specific Gameweek (defaults to current)
@@ -73,8 +91,9 @@ enum Commands {
         team: Option<String>,
         #[arg(short, long, default_value = "5")]
         limit: usize,
-        #[arg(short, long)]
-        all: bool,
+        /// Sort teams by average difficulty (ascending)
+        #[arg(long)]
+        sort_by_avg: bool,
     },
     /// Show detailed points summary for a specific fixture
     #[command(name = "fixture-summary")]
@@ -208,6 +227,8 @@ enum Commands {
         #[arg(short, long, default_value = "5")]
         weeks: usize,
     },
+    /// Show template squad (top players by ownership per position)
+    Template {},
     /// Show top teams in the overall league
     Top {},
     /// Show popular transfers
@@ -314,15 +335,26 @@ async fn run() -> Result<()> {
             limit,
         } => commands::handle_availability(team, name, news, position, all, limit).await?,
         Commands::Compare { id1, id2 } => commands::handle_compare(id1, id2).await?,
+        Commands::Completions { shell } => {
+            generate(shell, &mut Args::command(), "fplr", &mut std::io::stdout());
+        }
         Commands::Config(args) => commands::handle_config(args)?,
+        Commands::Differential {
+            max_sel,
+            sort,
+            position,
+            limit,
+        } => commands::handle_differential(max_sel, sort, position, limit).await?,
         Commands::DreamTeam { gw } => commands::handle_dream_team(gw).await?,
         Commands::FdrForm { team, limit, all } => {
             commands::handle_fdr_form(team, limit, all).await?
         }
         Commands::Fixture(args) => commands::handle_fixture(args).await?,
-        Commands::FixtureDifficultyRating { team, limit, all } => {
-            commands::handle_fixture_difficulty_rating(team, limit, all).await?
-        }
+        Commands::FixtureDifficultyRating {
+            team,
+            limit,
+            sort_by_avg,
+        } => commands::handle_fixture_difficulty_rating(team, limit, sort_by_avg).await?,
         Commands::FixtureSummary { id } => commands::handle_fixture_summary(id).await?,
         Commands::Gameweek {} => commands::handle_gameweek().await?,
         Commands::History(args) => commands::handle_history(args).await?,
@@ -355,6 +387,7 @@ async fn run() -> Result<()> {
                 min_cost,
                 max_cost,
                 available,
+                max_sel: None,
             })
             .await?
         }
@@ -373,6 +406,7 @@ async fn run() -> Result<()> {
         Commands::TeamHa { sort } => commands::handle_team_ha(&sort).await?,
         Commands::TeamPerf { gw, last } => commands::handle_team_perf(gw, last).await?,
         Commands::TeamTrend { sort, weeks } => commands::handle_team_trend(sort, weeks).await?,
+        Commands::Template {} => commands::handle_template().await?,
         Commands::Top {} => commands::handle_top().await?,
         Commands::Transfer(args) => commands::handle_transfer(args).await?,
         Commands::Trend {
