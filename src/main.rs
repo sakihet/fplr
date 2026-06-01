@@ -119,6 +119,9 @@ enum Commands {
         #[arg(short, long, default_value = "20")]
         limit: usize,
     },
+    /// Show mini-league standings
+    #[command(name = "mini-league")]
+    MiniLeague(commands::MiniLeagueArgs),
     /// Show a specific manager's team
     Manager {
         /// Manager ID
@@ -363,6 +366,7 @@ async fn run() -> Result<()> {
         Commands::History(args) => commands::handle_history(args).await?,
         Commands::HistoryPast { player_id } => commands::handle_history_past(player_id).await?,
         Commands::Live { gw, limit } => commands::handle_live(gw, limit).await?,
+        Commands::MiniLeague(args) => commands::handle_mini_league(args).await?,
         Commands::Manager { manager_id, gw } => commands::handle_manager(manager_id, gw).await?,
         Commands::MyTeam(args) => commands::handle_my_team(args).await?,
         Commands::Pick {
