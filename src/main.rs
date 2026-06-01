@@ -79,8 +79,9 @@ enum Commands {
         team: Option<String>,
         #[arg(short, long, default_value = "5")]
         limit: usize,
-        #[arg(short, long)]
-        all: bool,
+        /// Sort teams by average difficulty (ascending)
+        #[arg(long)]
+        sort_by_avg: bool,
     },
     /// Show detailed points summary for a specific fixture
     #[command(name = "fixture-summary")]
@@ -329,9 +330,11 @@ async fn run() -> Result<()> {
             commands::handle_fdr_form(team, limit, all).await?
         }
         Commands::Fixture(args) => commands::handle_fixture(args).await?,
-        Commands::FixtureDifficultyRating { team, limit, all } => {
-            commands::handle_fixture_difficulty_rating(team, limit, all).await?
-        }
+        Commands::FixtureDifficultyRating {
+            team,
+            limit,
+            sort_by_avg,
+        } => commands::handle_fixture_difficulty_rating(team, limit, sort_by_avg).await?,
         Commands::FixtureSummary { id } => commands::handle_fixture_summary(id).await?,
         Commands::Gameweek {} => commands::handle_gameweek().await?,
         Commands::History(args) => commands::handle_history(args).await?,
