@@ -30,7 +30,9 @@ fplr config set manager-id YOUR_MANAGER_ID
 Commands:
   availability               Show player availability (injuries, suspensions, etc.)
   compare                    Compare two players side-by-side
+  completions                Generate shell completion scripts
   config                     Manage configuration
+  differential               Show low-ownership players with high potential
   dream-team                 Show dream team
   fdr-form                   Show form-adjusted fixture difficulty rating
   fixture                    Show upcoming fixtures
@@ -57,6 +59,7 @@ Commands:
   team-ha                    Show team home/away performance stats
   team-perf                  Show team performance based on player points per GW
   team-trend                 Show team performance trends with sparklines
+  template                   Show template squad (top players by ownership per position)
   top                        Show top teams in the overall league
   transfer                   Show popular transfers
   trend                      Show player performance trends with sparklines
