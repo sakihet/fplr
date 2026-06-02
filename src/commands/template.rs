@@ -81,7 +81,11 @@ pub async fn handle_template() -> Result<()> {
         }
     }
 
-    println!("Total: {:.1}  Budget remaining: {:.1}", total_cost, 100.0 - total_cost);
+    println!(
+        "Total: {:.1}  Budget remaining: {:.1}",
+        total_cost,
+        100.0 - total_cost
+    );
 
     Ok(())
 }

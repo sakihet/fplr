@@ -119,6 +119,9 @@ enum Commands {
         #[arg(short, long, default_value = "20")]
         limit: usize,
     },
+    /// Show mini-league standings
+    #[command(name = "mini-league")]
+    MiniLeague(commands::MiniLeagueArgs),
     /// Show a specific manager's team
     Manager {
         /// Manager ID
@@ -127,6 +130,9 @@ enum Commands {
         #[arg(short, long)]
         gw: Option<u32>,
     },
+    /// Show my leagues
+    #[command(name = "my-leagues")]
+    MyLeagues(commands::MyLeaguesArgs),
     /// Show my team
     #[command(name = "my-team")]
     MyTeam(commands::MyTeamArgs),
@@ -165,9 +171,20 @@ enum Commands {
         player_id: u64,
         #[arg(short, long)]
         graph: bool,
+        /// Show xG/xA/xGI/xGC stats
+        #[arg(long)]
+        xg: bool,
+        /// Show ICT index stats
+        #[arg(long)]
+        ict: bool,
+        /// Show FPL management stats (price, ownership, transfers)
+        #[arg(long)]
+        fpl: bool,
     },
     /// Show regions
     Region {},
+    /// Show season results matrix
+    Results {},
     /// Show set piece takers (penalties, free kicks, corners)
     #[command(name = "set-piece")]
     SetPiece {
@@ -195,6 +212,9 @@ enum Commands {
     /// Show team availability statistics
     #[command(visible_alias = "ta")]
     TeamAvailability,
+    /// Show team FPL points rank vs Premier League position
+    #[command(name = "team-fpl-rank")]
+    TeamFplRank {},
     /// Show team form based on total player form
     #[command(name = "team-form")]
     TeamForm {
@@ -233,6 +253,9 @@ enum Commands {
     Top {},
     /// Show popular transfers
     Transfer(commands::TransferArgs),
+    /// Show manager's transfer history
+    #[command(name = "transfer-history")]
+    TransferHistory(commands::TransferHistoryArgs),
     /// Show player performance trends with sparklines
     Trend {
         /// Filter by team name
@@ -360,7 +383,9 @@ async fn run() -> Result<()> {
         Commands::History(args) => commands::handle_history(args).await?,
         Commands::HistoryPast { player_id } => commands::handle_history_past(player_id).await?,
         Commands::Live { gw, limit } => commands::handle_live(gw, limit).await?,
+        Commands::MiniLeague(args) => commands::handle_mini_league(args).await?,
         Commands::Manager { manager_id, gw } => commands::handle_manager(manager_id, gw).await?,
+        Commands::MyLeagues(args) => commands::handle_my_leagues(args).await?,
         Commands::MyTeam(args) => commands::handle_my_team(args).await?,
         Commands::Pick {
             manager_id,
@@ -391,10 +416,15 @@ async fn run() -> Result<()> {
             })
             .await?
         }
-        Commands::PlayerSummary { player_id, graph } => {
-            commands::handle_player_summary(player_id, graph).await?
-        }
+        Commands::PlayerSummary {
+            player_id,
+            graph,
+            xg,
+            ict,
+            fpl,
+        } => commands::handle_player_summary(player_id, graph, xg, ict, fpl).await?,
         Commands::Region {} => commands::handle_region().await?,
+        Commands::Results {} => commands::handle_results().await?,
         Commands::SetPiece { team } => commands::handle_set_piece(team).await?,
         Commands::Status {} => commands::handle_status().await?,
         Commands::Swing(args) => commands::handle_swing(args).await?,
@@ -402,6 +432,7 @@ async fn run() -> Result<()> {
         Commands::Talisman { team } => commands::handle_talisman(team).await?,
         Commands::Team { sort } => commands::handle_team(&sort).await?,
         Commands::TeamAvailability => commands::handle_team_availability().await?,
+        Commands::TeamFplRank {} => commands::handle_team_fpl_rank().await?,
         Commands::TeamForm { sort } => commands::handle_team_form(&sort).await?,
         Commands::TeamHa { sort } => commands::handle_team_ha(&sort).await?,
         Commands::TeamPerf { gw, last } => commands::handle_team_perf(gw, last).await?,
@@ -409,6 +440,7 @@ async fn run() -> Result<()> {
         Commands::Template {} => commands::handle_template().await?,
         Commands::Top {} => commands::handle_top().await?,
         Commands::Transfer(args) => commands::handle_transfer(args).await?,
+        Commands::TransferHistory(args) => commands::handle_transfer_history(args).await?,
         Commands::Trend {
             team,
             position,

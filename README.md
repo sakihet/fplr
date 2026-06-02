@@ -42,12 +42,15 @@ Commands:
   history                    Show manager's season history
   history-past               Show a player's performance in previous seasons
   live                       Show live player stats for a specific event
+  mini-league                Show mini-league standings
   manager                    Show a specific manager's team
+  my-leagues                 Show my leagues
   my-team                    Show my team
   pick                       Show a manager's team picks for a specific event
   player                     Show players
   player-summary             Show player summary
   region                     Show regions
+  results                    Show season results matrix
   set-piece                  Show set piece takers (penalties, free kicks, corners)
   status                     Show status
   swing                      Show mathematically calculated Fixture Swings
@@ -55,6 +58,7 @@ Commands:
   talisman                   Show talisman players
   team                       Show teams
   team-availability          Show team availability statistics [aliases: ta]
+  team-fpl-rank              Show team FPL points rank vs Premier League position
   team-form                  Show team form based on total player form
   team-ha                    Show team home/away performance stats
   team-perf                  Show team performance based on player points per GW
@@ -62,6 +66,7 @@ Commands:
   template                   Show template squad (top players by ownership per position)
   top                        Show top teams in the overall league
   transfer                   Show popular transfers
+  transfer-history           Show manager's transfer history
   trend                      Show player performance trends with sparklines
   xa                         Show xA vs Assists analysis (creativity and efficiency)
   xg                         Show xG vs Goals scored analysis (finishing ability and efficiency)

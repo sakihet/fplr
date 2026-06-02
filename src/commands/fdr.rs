@@ -162,7 +162,11 @@ fn display_all_teams_fdr(
                     .iter()
                     .flatten()
                     .fold((0.0f32, 0usize), |(s, c), (_, d)| (s + *d as f32, c + 1));
-                if count > 0 { total / count as f32 } else { f32::MAX }
+                if count > 0 {
+                    total / count as f32
+                } else {
+                    f32::MAX
+                }
             };
             avg(a).partial_cmp(&avg(b)).unwrap()
         });
