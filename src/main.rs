@@ -183,6 +183,8 @@ enum Commands {
     },
     /// Show regions
     Region {},
+    /// Show season results matrix
+    Results {},
     /// Show set piece takers (penalties, free kicks, corners)
     #[command(name = "set-piece")]
     SetPiece {
@@ -419,6 +421,7 @@ async fn run() -> Result<()> {
             fpl,
         } => commands::handle_player_summary(player_id, graph, xg, ict, fpl).await?,
         Commands::Region {} => commands::handle_region().await?,
+        Commands::Results {} => commands::handle_results().await?,
         Commands::SetPiece { team } => commands::handle_set_piece(team).await?,
         Commands::Status {} => commands::handle_status().await?,
         Commands::Swing(args) => commands::handle_swing(args).await?,
