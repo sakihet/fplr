@@ -212,6 +212,9 @@ enum Commands {
     /// Show team availability statistics
     #[command(visible_alias = "ta")]
     TeamAvailability,
+    /// Show team FPL points rank vs Premier League position
+    #[command(name = "team-fpl-rank")]
+    TeamFplRank {},
     /// Show team form based on total player form
     #[command(name = "team-form")]
     TeamForm {
@@ -429,6 +432,7 @@ async fn run() -> Result<()> {
         Commands::Talisman { team } => commands::handle_talisman(team).await?,
         Commands::Team { sort } => commands::handle_team(&sort).await?,
         Commands::TeamAvailability => commands::handle_team_availability().await?,
+        Commands::TeamFplRank {} => commands::handle_team_fpl_rank().await?,
         Commands::TeamForm { sort } => commands::handle_team_form(&sort).await?,
         Commands::TeamHa { sort } => commands::handle_team_ha(&sort).await?,
         Commands::TeamPerf { gw, last } => commands::handle_team_perf(gw, last).await?,
