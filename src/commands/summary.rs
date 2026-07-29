@@ -20,9 +20,10 @@ pub async fn handle_player_summary(
     let histories = summary.history;
 
     if let Ok(bs) = bootstrap
-        && let Some(element) = bs.elements.iter().find(|e| e.id == player_id) {
-            println!("{}", element.web_name);
-        }
+        && let Some(element) = bs.elements.iter().find(|e| e.id == player_id)
+    {
+        println!("{}", element.web_name);
+    }
 
     if show_graph {
         let points_data: Vec<(f32, f32)> = histories

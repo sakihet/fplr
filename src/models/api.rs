@@ -92,7 +92,7 @@ pub struct Team {
     pub draw: u64,
     pub loss: u64,
     pub points: u64,
-    pub strength: u8,
+    pub strength: Option<u8>,
     pub strength_overall_home: u64,
     pub strength_overall_away: u64,
     pub strength_attack_home: u64,
