@@ -27,3 +27,6 @@ pub const WIDTH_WIN: usize = 4;
 pub const WIDTH_DRAW: usize = 4;
 pub const WIDTH_LOSS: usize = 4;
 pub const WIDTH_GD: usize = 5;
+pub const WIDTH_SEASON: usize = 7;
+pub const WIDTH_COST_RANGE: usize = 9;
+pub const WIDTH_MINUTES: usize = 5;

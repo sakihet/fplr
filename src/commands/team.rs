@@ -24,12 +24,16 @@ pub async fn handle_team(sort_by: &TeamSortBy) -> Result<()> {
     );
 
     for team in data.teams {
+        let strength = team
+            .strength
+            .map(|s| s.to_string())
+            .unwrap_or_else(|| "-".to_string());
         println!(
             "{:<team_w$}  {:<name_w$}  {:>pos_w$}  {:>str_w$}",
             team.short_name,
             team.name,
             team.position,
-            team.strength,
+            strength,
             team_w = WIDTH_TEAM_SHORT_NAME,
             name_w = WIDTH_TEAM_NAME,
             pos_w = WIDTH_POS,
