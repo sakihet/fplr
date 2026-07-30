@@ -15,8 +15,9 @@ pub fn find_next_event(events: &[Event]) -> Option<&Event> {
 /// Returns the specified event ID if provided, otherwise:
 /// - Returns next event ID if the current event is finished
 /// - Returns current event ID if available and not yet finished
-/// - Falls back to next event ID - 1 if no current event
-/// - Falls back to the last event ID if season is over
+/// - Falls back to next event ID - 1 if no current event (between gameweeks)
+/// - Returns None if the season hasn't started yet (next event is GW1)
+/// - Falls back to the last event ID if the season is over (no next event scheduled)
 pub fn get_effective_event_id(events: &[Event], specified: Option<u32>) -> Option<u32> {
     if let Some(id) = specified {
         return Some(id);
@@ -32,14 +33,18 @@ pub fn get_effective_event_id(events: &[Event], specified: Option<u32>) -> Optio
         return Some(current.id as u32);
     }
 
-    // Try next event - 1 (between gameweeks)
-    if let Some(next) = find_next_event(events)
-        && next.id > 1
-    {
-        return Some((next.id - 1) as u32);
+    // Between gameweeks: no current event, but there's a previous gameweek to fall back to.
+    // If the next event is GW1, the season hasn't started and no gameweek data exists yet —
+    // this must be distinguished from "no next event" (season over), which falls through below.
+    if let Some(next) = find_next_event(events) {
+        return if next.id > 1 {
+            Some((next.id - 1) as u32)
+        } else {
+            None
+        };
     }
 
-    // Fall back to last event (season ended)
+    // Fall back to last event (season ended, no next event scheduled)
     events.last().map(|e| e.id as u32)
 }
 

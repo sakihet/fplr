@@ -40,3 +40,12 @@ After generating or modifying code: run `make fmt` then `make lint-fix`.
 - Keep CLI subcommands sorted alphabetically in `src/main.rs` (both the `Commands` enum variants and the `match` arms).
 - Sort `match` arms alphabetically whenever possible.
 - Code comments in English only.
+
+## Commit messages
+
+Follow Conventional Commits: `type: short summary` (or `type(scope): summary`).
+
+- Types used in this repo: `feat`, `fix`, `refactor`, `style`, `docs`, `chore`, `ci`
+- Summary: lowercase, imperative mood ("add", not "added"/"adds"), no trailing period
+- Keep the subject line concise; add a body only when the "why" isn't obvious from the diff
+- Default to a single-line commit message (subject only, no body) unless the user asks for more detail

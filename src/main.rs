@@ -119,9 +119,6 @@ enum Commands {
         #[arg(short, long, default_value = "20")]
         limit: usize,
     },
-    /// Show mini-league standings
-    #[command(name = "mini-league")]
-    MiniLeague(commands::MiniLeagueArgs),
     /// Show a specific manager's team
     Manager {
         /// Manager ID
@@ -130,6 +127,9 @@ enum Commands {
         #[arg(short, long)]
         gw: Option<u32>,
     },
+    /// Show mini-league standings
+    #[command(name = "mini-league")]
+    MiniLeague(commands::MiniLeagueArgs),
     /// Show my leagues
     #[command(name = "my-leagues")]
     MyLeagues(commands::MyLeaguesArgs),
@@ -181,8 +181,11 @@ enum Commands {
         #[arg(long)]
         fpl: bool,
     },
-    /// Show regions
-    Region {},
+    /// Show regions, or players from a specific region if a name is given
+    Region {
+        /// Region name (shows players from this region instead of the region list)
+        name: Option<String>,
+    },
     /// Show season results matrix
     Results {},
     /// Show set piece takers (penalties, free kicks, corners)
@@ -383,8 +386,8 @@ async fn run() -> Result<()> {
         Commands::History(args) => commands::handle_history(args).await?,
         Commands::HistoryPast { player_id } => commands::handle_history_past(player_id).await?,
         Commands::Live { gw, limit } => commands::handle_live(gw, limit).await?,
-        Commands::MiniLeague(args) => commands::handle_mini_league(args).await?,
         Commands::Manager { manager_id, gw } => commands::handle_manager(manager_id, gw).await?,
+        Commands::MiniLeague(args) => commands::handle_mini_league(args).await?,
         Commands::MyLeagues(args) => commands::handle_my_leagues(args).await?,
         Commands::MyTeam(args) => commands::handle_my_team(args).await?,
         Commands::Pick {
@@ -423,7 +426,17 @@ async fn run() -> Result<()> {
             ict,
             fpl,
         } => commands::handle_player_summary(player_id, graph, xg, ict, fpl).await?,
-        Commands::Region {} => commands::handle_region().await?,
+        Commands::Region { name } => match name {
+            Some(name) => {
+                commands::handle_player(commands::PlayerFilterArgs {
+                    region: Some(name),
+                    limit: 20,
+                    ..Default::default()
+                })
+                .await?
+            }
+            None => commands::handle_region().await?,
+        },
         Commands::Results {} => commands::handle_results().await?,
         Commands::SetPiece { team } => commands::handle_set_piece(team).await?,
         Commands::Status {} => commands::handle_status().await?,

@@ -3,6 +3,7 @@ use crate::error::Result;
 use crate::models::Position;
 use crate::utils::constants::*;
 use crate::utils::event_helpers::get_current_event_id;
+use crate::utils::formatters::format_compact_number;
 use crate::utils::team_helpers::create_team_short_name_map;
 use clap::Args;
 use owo_colors::OwoColorize;
@@ -100,12 +101,12 @@ pub async fn handle_transfer(args: TransferArgs) -> Result<()> {
 
         let net = transfers_in as i64 - transfers_out as i64;
 
-        let in_str = format_number(transfers_in);
-        let out_str = format_number(transfers_out);
+        let in_str = format_compact_number(transfers_in);
+        let out_str = format_compact_number(transfers_out);
         let net_str = if net >= 0 {
-            format!("+{}", format_number(net.unsigned_abs()))
+            format!("+{}", format_compact_number(net.unsigned_abs()))
         } else {
-            format!("-{}", format_number(net.unsigned_abs()))
+            format!("-{}", format_compact_number(net.unsigned_abs()))
         };
 
         // Apply padding first, then color
@@ -139,14 +140,4 @@ pub async fn handle_transfer(args: TransferArgs) -> Result<()> {
 
     println!();
     Ok(())
-}
-
-fn format_number(n: u64) -> String {
-    if n >= 1_000_000 {
-        format!("{:.1}M", n as f64 / 1_000_000.0)
-    } else if n >= 1_000 {
-        format!("{:.1}K", n as f64 / 1_000.0)
-    } else {
-        n.to_string()
-    }
 }

@@ -4,7 +4,7 @@ use crate::api::FplClient;
 use crate::config::Config;
 use crate::error::Result;
 use crate::utils::constants::*;
-use crate::utils::formatters::color_by_comparison;
+use crate::utils::formatters::{color_by_comparison, format_compact_number};
 use clap::Args;
 
 #[derive(Debug, Args)]
@@ -77,15 +77,15 @@ pub async fn handle_history(args: HistoryArgs) -> Result<()> {
     for gw in &history.current {
         let rank_str = gw
             .overall_rank
-            .map(format_number)
+            .map(format_compact_number)
             .unwrap_or_else(|| "-".to_string());
 
         let rank_change = match (prev_rank, gw.overall_rank) {
             (Some(prev), Some(curr)) => {
                 if prev > curr {
-                    format!("↑{}", format_number(prev - curr))
+                    format!("↑{}", format_compact_number(prev - curr))
                 } else if curr > prev {
-                    format!("↓{}", format_number(curr - prev))
+                    format!("↓{}", format_compact_number(curr - prev))
                 } else {
                     "-".to_string()
                 }
@@ -142,7 +142,7 @@ pub async fn handle_history(args: HistoryArgs) -> Result<()> {
         .current
         .last()
         .and_then(|g| g.overall_rank)
-        .map(format_number)
+        .map(format_compact_number)
         .unwrap_or_else(|| "N/A".to_string());
     let total_transfers: u64 = history.current.iter().map(|g| g.event_transfers).sum();
     let total_transfer_cost: i64 = history.current.iter().map(|g| g.event_transfers_cost).sum();
@@ -172,14 +172,4 @@ pub async fn handle_history(args: HistoryArgs) -> Result<()> {
     }
 
     Ok(())
-}
-
-fn format_number(n: u64) -> String {
-    if n >= 1_000_000 {
-        format!("{:.1}M", n as f64 / 1_000_000.0)
-    } else if n >= 1_000 {
-        format!("{:.0}K", n as f64 / 1_000.0)
-    } else {
-        n.to_string()
-    }
 }
