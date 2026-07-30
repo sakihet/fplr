@@ -1,6 +1,6 @@
 use crate::api::FplClient;
 use crate::error::{FplrError, Result};
-use crate::utils::event_helpers::get_effective_event_id;
+use crate::utils::event_helpers::{find_next_event, get_effective_event_id};
 use crate::utils::team_helpers::create_team_ref_map;
 use clap::Args;
 use owo_colors::OwoColorize;
@@ -37,10 +37,13 @@ pub async fn handle_swing(args: SwingArgs) -> Result<()> {
     let team_map = create_team_ref_map(&bootstrap_data.teams);
     let fixtures = FplClient::fetch_fixtures().await?;
 
+    // Fixtures are scheduled in advance, so before the season starts fall back to the
+    // upcoming GW1 instead of erroring out.
     let start_gw = args
         .gw
         .or_else(|| crate::utils::event_helpers::get_current_event_id(&bootstrap_data.events))
         .or_else(|| get_effective_event_id(&bootstrap_data.events, None))
+        .or_else(|| find_next_event(&bootstrap_data.events).map(|e| e.id as u32))
         .ok_or(FplrError::NoNextEvent)?;
 
     let window = args.window;
