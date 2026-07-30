@@ -1,11 +1,8 @@
-use crate::api::FplClient;
 use crate::error::Result;
 use crate::models::Position;
 use crate::models::XgiSortBy;
-use crate::utils::constants::*;
-use crate::utils::formatters::*;
-use crate::utils::team_helpers::find_team_ids_by_name;
-use std::collections::HashMap;
+use crate::utils::constants::WIDTH_STAT;
+use crate::utils::expected_stat::{ExpectedStatSpec, StatSort, print_expected_stat_table};
 
 pub async fn handle_xgi(
     sort: XgiSortBy,
@@ -13,119 +10,19 @@ pub async fn handle_xgi(
     pos_opt: Option<Position>,
     limit: usize,
 ) -> Result<()> {
-    let data = FplClient::fetch_bootstrap_static().await?;
+    let sort = match sort {
+        XgiSortBy::Actual => StatSort::Actual,
+        XgiSortBy::Xgi => StatSort::Expected,
+        XgiSortBy::Diff => StatSort::Diff,
+        XgiSortBy::Ratio => StatSort::Ratio,
+    };
+    let spec = ExpectedStatSpec {
+        actual_label: "Actual",
+        expected_label: "xGI",
+        actual_width: WIDTH_STAT,
+        actual_fn: |p| (p.goals_scored + p.assists) as f64,
+        expected_fn: |p| p.expected_goal_involvements.parse().unwrap_or(0.0),
+    };
 
-    // Map team id to names
-    let team_names: HashMap<u64, String> = data
-        .teams
-        .iter()
-        .map(|t| (t.id, t.short_name.clone()))
-        .collect();
-
-    let mut players: Vec<_> = data
-        .elements
-        .iter()
-        .filter(|p| {
-            // Team filter
-            if let Some(team_name) = &team_opt {
-                let target_team_ids = find_team_ids_by_name(&data.teams, team_name);
-                if !target_team_ids.contains(&p.team) {
-                    return false;
-                }
-            }
-
-            // Position filter
-            if let Some(pos) = &pos_opt
-                && p.element_type != pos.element_type_id() as u64
-            {
-                return false;
-            }
-
-            true
-        })
-        .map(|p| {
-            let xgi: f64 = p.expected_goal_involvements.parse().unwrap_or(0.0);
-            let actual = (p.goals_scored + p.assists) as f64;
-            let diff = actual - xgi;
-            let ratio = if xgi > 0.0 { actual / xgi } else { 0.0 };
-            let team_name = team_names
-                .get(&p.team)
-                .cloned()
-                .unwrap_or_else(|| "N/A".to_string());
-            let pos_name = Position::from_element_type_id(p.element_type)
-                .map(|pos| pos.display_name())
-                .unwrap_or("N/A");
-
-            (
-                p.id,
-                p.web_name.clone(),
-                pos_name,
-                team_name,
-                actual,
-                xgi,
-                diff,
-                ratio,
-            )
-        })
-        .collect();
-
-    // Sort by selected metric descending
-    match sort {
-        XgiSortBy::Actual => {
-            players.sort_by(|a, b| b.4.partial_cmp(&a.4).unwrap_or(std::cmp::Ordering::Equal))
-        }
-        XgiSortBy::Diff => {
-            players.sort_by(|a, b| b.6.partial_cmp(&a.6).unwrap_or(std::cmp::Ordering::Equal))
-        }
-        XgiSortBy::Ratio => {
-            players.sort_by(|a, b| b.7.partial_cmp(&a.7).unwrap_or(std::cmp::Ordering::Equal))
-        }
-        XgiSortBy::Xgi => {
-            players.sort_by(|a, b| b.5.partial_cmp(&a.5).unwrap_or(std::cmp::Ordering::Equal))
-        }
-    }
-
-    println!(
-        "{:>id_w$}  {:<name_w$}  {:<pos_w$}  {:<team_w$}  {:>act_w$}  {:>xgi_w$}  {:>diff_w$}  {:>ratio_w$}",
-        "ID",
-        "Player",
-        "Pos",
-        "Team",
-        "Actual",
-        "xGI",
-        "Diff",
-        "Ratio",
-        id_w = WIDTH_ID,
-        name_w = WIDTH_NAME,
-        pos_w = WIDTH_POS,
-        team_w = WIDTH_TEAM_SHORT_NAME,
-        act_w = WIDTH_STAT,
-        xgi_w = WIDTH_STAT,
-        diff_w = WIDTH_STAT,
-        ratio_w = WIDTH_STAT,
-    );
-
-    for (id, name, pos, team, actual, xgi, diff, ratio) in players.into_iter().take(limit) {
-        println!(
-            "{:>id_w$}  {:<name_w$}  {:<pos_w$}  {:<team_w$}  {:>act_w$.0}  {:>xgi_w$.2}  {:>diff_w$.2}  {:>ratio_w$.2}",
-            id,
-            truncate(&name, WIDTH_NAME),
-            pos,
-            team,
-            actual,
-            xgi,
-            diff,
-            ratio,
-            id_w = WIDTH_ID,
-            name_w = WIDTH_NAME,
-            pos_w = WIDTH_POS,
-            team_w = WIDTH_TEAM_SHORT_NAME,
-            act_w = WIDTH_STAT,
-            xgi_w = WIDTH_STAT,
-            diff_w = WIDTH_STAT,
-            ratio_w = WIDTH_STAT,
-        );
-    }
-
-    Ok(())
+    print_expected_stat_table(sort, team_opt, pos_opt, limit, spec).await
 }
