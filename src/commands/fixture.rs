@@ -1,6 +1,6 @@
 use crate::api::FplClient;
 use crate::error::{FplrError, Result};
-use crate::utils::event_helpers::get_effective_event_id;
+use crate::utils::event_helpers::{find_next_event, get_effective_event_id};
 use crate::utils::team_helpers::create_team_map;
 use crate::utils::{constants::*, formatters::*};
 use clap::Args;
@@ -54,8 +54,12 @@ pub async fn handle_fixture(args: FixtureArgs) -> Result<()> {
     let bootstrap_data = FplClient::fetch_bootstrap_static().await?;
     let team_map = create_team_map(&bootstrap_data.teams);
 
+    // Fixtures (unlike picks/live stats) are scheduled in advance, so before the season
+    // starts (get_effective_event_id returns None) fall back to the upcoming GW1 fixtures
+    // instead of erroring out.
     let base_event_id = get_effective_event_id(&bootstrap_data.events, args.gw)
-        .ok_or(FplrError::NoNextEvent)? as u32;
+        .or_else(|| find_next_event(&bootstrap_data.events).map(|e| e.id as u32))
+        .ok_or(FplrError::NoNextEvent)?;
 
     let event_id = if args.next {
         (base_event_id + 1) as u64
