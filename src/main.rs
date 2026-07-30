@@ -181,8 +181,11 @@ enum Commands {
         #[arg(long)]
         fpl: bool,
     },
-    /// Show regions
-    Region {},
+    /// Show regions, or players from a specific region if a name is given
+    Region {
+        /// Region name (shows players from this region instead of the region list)
+        name: Option<String>,
+    },
     /// Show season results matrix
     Results {},
     /// Show set piece takers (penalties, free kicks, corners)
@@ -423,7 +426,17 @@ async fn run() -> Result<()> {
             ict,
             fpl,
         } => commands::handle_player_summary(player_id, graph, xg, ict, fpl).await?,
-        Commands::Region {} => commands::handle_region().await?,
+        Commands::Region { name } => match name {
+            Some(name) => {
+                commands::handle_player(commands::PlayerFilterArgs {
+                    region: Some(name),
+                    limit: 20,
+                    ..Default::default()
+                })
+                .await?
+            }
+            None => commands::handle_region().await?,
+        },
         Commands::Results {} => commands::handle_results().await?,
         Commands::SetPiece { team } => commands::handle_set_piece(team).await?,
         Commands::Status {} => commands::handle_status().await?,
