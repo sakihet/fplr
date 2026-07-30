@@ -3,6 +3,7 @@ use crate::config::Config;
 use crate::error::Result;
 use crate::models::EntryLeagueItem;
 use crate::utils::constants::*;
+use crate::utils::formatters::format_compact_number;
 use clap::Args;
 use owo_colors::OwoColorize;
 
@@ -64,7 +65,7 @@ fn print_league_section(title: &str, leagues: &[EntryLeagueItem]) {
         } else {
             format!(
                 "{:>width$}",
-                format_number(league.entry_rank),
+                format_compact_number(league.entry_rank),
                 width = WIDTH_RANK_WIDE
             )
         };
@@ -73,19 +74,19 @@ fn print_league_section(title: &str, leagues: &[EntryLeagueItem]) {
             format!("{:<6}", "-")
         } else if league.entry_rank < league.entry_last_rank {
             let d = league.entry_last_rank - league.entry_rank;
-            format!("{:<6}", format!("↑{}", format_number(d)))
+            format!("{:<6}", format!("↑{}", format_compact_number(d)))
                 .green()
                 .to_string()
         } else if league.entry_rank > league.entry_last_rank {
             let d = league.entry_rank - league.entry_last_rank;
-            format!("{:<6}", format!("↓{}", format_number(d)))
+            format!("{:<6}", format!("↓{}", format_compact_number(d)))
                 .red()
                 .to_string()
         } else {
             format!("{:<6}", "→").dimmed().to_string()
         };
 
-        let members_str = format_number(league.rank_count);
+        let members_str = format_compact_number(league.rank_count);
 
         println!(
             "{:>8}  {:<name_w$}  {:<7}  {}  {}  {:>rank_w$}",
@@ -98,15 +99,5 @@ fn print_league_section(title: &str, leagues: &[EntryLeagueItem]) {
             name_w = WIDTH_NAME,
             rank_w = WIDTH_RANK_WIDE,
         );
-    }
-}
-
-fn format_number(n: u64) -> String {
-    if n >= 1_000_000 {
-        format!("{:.1}M", n as f64 / 1_000_000.0)
-    } else if n >= 1_000 {
-        format!("{:.0}K", n as f64 / 1_000.0)
-    } else {
-        n.to_string()
     }
 }

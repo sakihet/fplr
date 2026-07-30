@@ -114,6 +114,17 @@ pub fn format_signed_number(n: i64) -> String {
     }
 }
 
+/// Format a number with K/M suffixes for compact display (e.g. 12_345 -> "12K")
+pub fn format_compact_number(n: u64) -> String {
+    if n >= 1_000_000 {
+        format!("{:.1}M", n as f64 / 1_000_000.0)
+    } else if n >= 1_000 {
+        format!("{:.0}K", n as f64 / 1_000.0)
+    } else {
+        n.to_string()
+    }
+}
+
 /// Truncate a string to a maximum length and add an ellipsis if it exceeds it.
 pub fn truncate(s: &str, max_len: usize) -> String {
     if s.chars().count() > max_len {
