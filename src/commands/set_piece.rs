@@ -1,12 +1,13 @@
 use crate::api::FplClient;
 use crate::error::Result;
+use crate::utils::constants::WIDTH_FULL_NAME;
 
 pub async fn handle_set_piece(team_name: Option<String>) -> Result<()> {
     // Fetch bootstrap-static to resolve team names
     let bootstrap = FplClient::fetch_bootstrap_static().await?;
     let data = FplClient::fetch_set_piece_notes().await?;
 
-    println!("{:<20} Set Piece Info", "Team");
+    println!("{:<width$} Set Piece Info", "Team", width = WIDTH_FULL_NAME);
 
     for team_notes in data.teams {
         // Get team name from team_id
@@ -28,9 +29,19 @@ pub async fn handle_set_piece(team_name: Option<String>) -> Result<()> {
         // Print each note for this team
         for (i, note) in team_notes.notes.iter().enumerate() {
             if i == 0 {
-                println!("{:<20} {}", team_full_name, note.info_message);
+                println!(
+                    "{:<width$} {}",
+                    team_full_name,
+                    note.info_message,
+                    width = WIDTH_FULL_NAME
+                );
             } else {
-                println!("{:<20} {}", "", note.info_message);
+                println!(
+                    "{:<width$} {}",
+                    "",
+                    note.info_message,
+                    width = WIDTH_FULL_NAME
+                );
             }
         }
         println!();

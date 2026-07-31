@@ -3,6 +3,9 @@ use std::collections::HashMap;
 use crate::api::FplClient;
 use crate::error::{FplrError, Result};
 use crate::models::{Fixture, Team};
+use crate::utils::constants::{
+    WIDTH_AVG, WIDTH_DATE, WIDTH_DIFFICULTY, WIDTH_FULL_NAME, WIDTH_HA, WIDTH_ID,
+};
 use crate::utils::formatters::{
     colorize_text_by_difficulty, difficulty_to_stars, format_datetime_local,
 };
@@ -50,8 +53,17 @@ fn display_team_fdr(
 
     println!("Team: {} ({})", team.name, team.short_name);
     println!(
-        "{:<4} {:<24} {:<20} {:<5} {:<15}",
-        "GW", "Date", "Opponent", "H/A", "Difficulty"
+        "{:<id_w$} {:<date_w$} {:<opp_w$} {:<ha_w$} {:<diff_w$}",
+        "GW",
+        "Date",
+        "Opponent",
+        "H/A",
+        "Difficulty",
+        id_w = WIDTH_ID,
+        date_w = WIDTH_DATE,
+        opp_w = WIDTH_FULL_NAME,
+        ha_w = WIDTH_HA,
+        diff_w = WIDTH_DIFFICULTY,
     );
 
     let mut team_fixtures: Vec<_> = fixtures
@@ -94,8 +106,17 @@ fn display_team_fdr(
         let difficulty_display = difficulty_to_stars(difficulty);
 
         println!(
-            "{:<4} {:<24} {:<20} {:<5} {:<15}",
-            event, kickoff, opponent, location, difficulty_display
+            "{:<id_w$} {:<date_w$} {:<opp_w$} {:<ha_w$} {:<diff_w$}",
+            event,
+            kickoff,
+            opponent,
+            location,
+            difficulty_display,
+            id_w = WIDTH_ID,
+            date_w = WIDTH_DATE,
+            opp_w = WIDTH_FULL_NAME,
+            ha_w = WIDTH_HA,
+            diff_w = WIDTH_DIFFICULTY,
         );
     }
 
@@ -190,16 +211,16 @@ fn display_all_teams_fdr(
     }
 
     // Print header with dynamic widths
-    print!("{:<20}", "Team");
+    print!("{:<width$}", "Team", width = WIDTH_FULL_NAME);
     for (idx, event) in events_to_show.iter().enumerate() {
         let width = column_widths[idx];
         print!("  {:<width$}", format!("GW{}", event));
     }
-    println!("  {:<5}", "Avg");
+    println!("  {:<width$}", "Avg", width = WIDTH_AVG);
 
     // Print each team's FDR
     for (_, team, fdr_values) in team_fdr_data {
-        print!("{:<20}", team.name);
+        print!("{:<width$}", team.name, width = WIDTH_FULL_NAME);
 
         let mut total = 0.0;
         let mut count = 0;
@@ -232,6 +253,6 @@ fn display_all_teams_fdr(
         } else {
             "-".to_string()
         };
-        println!("  {:<5}", avg);
+        println!("  {:<width$}", avg, width = WIDTH_AVG);
     }
 }

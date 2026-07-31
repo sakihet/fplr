@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use crate::api::FplClient;
 use crate::error::Result;
+use crate::utils::constants::{WIDTH_FULL_NAME, WIDTH_ID, WIDTH_STAT_SMALL};
 use crate::utils::player_helpers::create_player_map;
 
 pub async fn handle_pick(manager_id: u64, event_id: u32) -> Result<()> {
@@ -18,8 +19,16 @@ pub async fn handle_pick(manager_id: u64, event_id: u32) -> Result<()> {
     let picks = FplClient::fetch_manager_picks(manager_id, event_id).await?;
 
     println!(
-        "{:<4} {:<20} {:<4} {:<4} {:<4} {:<4}",
-        "ID", "Name", "Pos", "C", "VC", "Pts"
+        "{:<id_w$} {:<name_w$} {:<stat_w$} {:<stat_w$} {:<stat_w$} {:<stat_w$}",
+        "ID",
+        "Name",
+        "Pos",
+        "C",
+        "VC",
+        "Pts",
+        id_w = WIDTH_ID,
+        name_w = WIDTH_FULL_NAME,
+        stat_w = WIDTH_STAT_SMALL,
     );
     for pick in picks.picks.iter() {
         let name = player_map
@@ -30,13 +39,16 @@ pub async fn handle_pick(manager_id: u64, event_id: u32) -> Result<()> {
         let points = points_map.get(&pick.element).copied().unwrap_or(0);
 
         println!(
-            "{:<4} {:<20} {:<4} {:<4} {:<4} {:<4}",
+            "{:<id_w$} {:<name_w$} {:<stat_w$} {:<stat_w$} {:<stat_w$} {:<stat_w$}",
             pick.element,
             name,
             pick.position,
             if pick.is_captain { "Y" } else { "N" },
             if pick.is_vice_captain { "Y" } else { "N" },
             points,
+            id_w = WIDTH_ID,
+            name_w = WIDTH_FULL_NAME,
+            stat_w = WIDTH_STAT_SMALL,
         );
     }
 

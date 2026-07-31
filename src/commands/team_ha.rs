@@ -3,6 +3,9 @@ use std::collections::HashMap;
 use crate::api::FplClient;
 use crate::error::Result;
 use crate::models::TeamHaSortBy;
+use crate::utils::constants::{
+    WIDTH_GW, WIDTH_RANK, WIDTH_STAT_SMALL, WIDTH_STR, WIDTH_TEAM_SHORT_NAME,
+};
 
 #[derive(Default)]
 struct TeamHaStats {
@@ -106,7 +109,7 @@ pub async fn handle_team_ha(sort_by: &TeamHaSortBy) -> Result<()> {
     });
 
     println!(
-        "{:<4}  {:<4} | {:>2} {:>3} {:>3} {:>3} {:>3} {:>3} {:>4} | {:>2} {:>3} {:>3} {:>3} {:>3} {:>3} {:>4} | {:>4} {:>4}",
+        "{:<rank_w$}  {:<team_w$} | {:>gw_w$} {:>str_w$} {:>str_w$} {:>str_w$} {:>str_w$} {:>str_w$} {:>stat_w$} | {:>gw_w$} {:>str_w$} {:>str_w$} {:>str_w$} {:>str_w$} {:>str_w$} {:>stat_w$} | {:>stat_w$} {:>stat_w$}",
         "Rank",
         "Team",
         "HP",
@@ -124,12 +127,17 @@ pub async fn handle_team_ha(sort_by: &TeamHaSortBy) -> Result<()> {
         "AGC",
         "APts",
         "TPts",
-        "Diff"
+        "Diff",
+        rank_w = WIDTH_RANK,
+        team_w = WIDTH_TEAM_SHORT_NAME,
+        gw_w = WIDTH_GW,
+        str_w = WIDTH_STR,
+        stat_w = WIDTH_STAT_SMALL,
     );
     for (i, row) in stats_vec.iter().enumerate() {
         let diff = row.hpts - row.apts;
         println!(
-            "{:>4}  {:<4} | {:>2} {:>3} {:>3} {:>3} {:>3} {:>3} {:>4} | {:>2} {:>3} {:>3} {:>3} {:>3} {:>3} {:>4} | {:>4} {:>4}",
+            "{:>rank_w$}  {:<team_w$} | {:>gw_w$} {:>str_w$} {:>str_w$} {:>str_w$} {:>str_w$} {:>str_w$} {:>stat_w$} | {:>gw_w$} {:>str_w$} {:>str_w$} {:>str_w$} {:>str_w$} {:>str_w$} {:>stat_w$} | {:>stat_w$} {:>stat_w$}",
             i + 1,
             row.name,
             row.hp,
@@ -151,7 +159,12 @@ pub async fn handle_team_ha(sort_by: &TeamHaSortBy) -> Result<()> {
                 format!("+{}", diff)
             } else {
                 format!("{}", diff)
-            }
+            },
+            rank_w = WIDTH_RANK,
+            team_w = WIDTH_TEAM_SHORT_NAME,
+            gw_w = WIDTH_GW,
+            str_w = WIDTH_STR,
+            stat_w = WIDTH_STAT_SMALL,
         );
     }
     Ok(())

@@ -1,6 +1,10 @@
 use crate::api::FplClient;
 use crate::error::{FplrError, Result};
 use crate::models::{BootstrapStatic, Fixture, Team};
+use crate::utils::constants::{
+    WIDTH_AVG, WIDTH_DATE, WIDTH_FDR_CELL, WIDTH_FDR_STAT, WIDTH_FORM_DIFF, WIDTH_FULL_NAME,
+    WIDTH_HA, WIDTH_ID, WIDTH_STAT_WIDE,
+};
 use crate::utils::formatters::{colorize_text_by_difficulty, format_datetime_local};
 use crate::utils::team_helpers::{create_team_ref_map, find_team_ids_by_name};
 use owo_colors::OwoColorize;
@@ -184,8 +188,21 @@ fn display_team_fdr_form(
         colorize_form_string(&team_form_entry.results)
     );
     println!(
-        "{:<4} {:<24} {:<20} {:<5} {:<10} {:<10} {:<12} {:<10}",
-        "GW", "Date", "Opponent", "H/A", "Static", "Opp Form", "Form Diff", "Adj FDR"
+        "{:<id_w$} {:<date_w$} {:<opp_w$} {:<ha_w$} {:<stat_w$} {:<stat_w$} {:<diff_w$} {:<stat_w$}",
+        "GW",
+        "Date",
+        "Opponent",
+        "H/A",
+        "Static",
+        "Opp Form",
+        "Form Diff",
+        "Adj FDR",
+        id_w = WIDTH_ID,
+        date_w = WIDTH_DATE,
+        opp_w = WIDTH_FULL_NAME,
+        ha_w = WIDTH_HA,
+        stat_w = WIDTH_FDR_STAT,
+        diff_w = WIDTH_FORM_DIFF,
     );
 
     let mut team_fixtures: Vec<_> = fixtures
@@ -244,19 +261,24 @@ fn display_team_fdr_form(
         visible_diff_len += format!("{:.1}", diff.abs()).len();
 
         print!(
-            "{:<4} {:<24} {:<20} {:<5} {:<10} {:<10.1} ",
+            "{:<id_w$} {:<date_w$} {:<opp_w$} {:<ha_w$} {:<stat_w$} {:<stat_w$.1} ",
             event,
             kickoff,
             opponent.name,
             if is_home { "H" } else { "A" },
             static_difficulty,
             opp_form_entry.total_form,
+            id_w = WIDTH_ID,
+            date_w = WIDTH_DATE,
+            opp_w = WIDTH_FULL_NAME,
+            ha_w = WIDTH_HA,
+            stat_w = WIDTH_FDR_STAT,
         );
         print!("{}", colored_diff);
-        if 12 > visible_diff_len {
-            print!("{}", " ".repeat(12 - visible_diff_len));
+        if WIDTH_FORM_DIFF > visible_diff_len {
+            print!("{}", " ".repeat(WIDTH_FORM_DIFF - visible_diff_len));
         }
-        println!("{:<10.1}", adjusted_fdr);
+        println!("{:<stat_w$.1}", adjusted_fdr, stat_w = WIDTH_FDR_STAT);
     }
 
     Ok(())
@@ -361,23 +383,39 @@ fn display_all_teams_fdr_form(
 
     // Print Table
     println!("\nForm-Adjusted FDR Matrix (Next {} GWs)", limit);
-    print!("{:<20} {:<8} {:<8} {:<10}", "Team", "Form", "75%", "Last 5");
+    print!(
+        "{:<name_w$} {:<form_w$} {:<form_w$} {:<stat_w$}",
+        "Team",
+        "Form",
+        "75%",
+        "Last 5",
+        name_w = WIDTH_FULL_NAME,
+        form_w = WIDTH_STAT_WIDE,
+        stat_w = WIDTH_FDR_STAT,
+    );
     for event in &events_to_show {
-        print!("  {:<16}", format!("GW{}", event));
+        print!(
+            "  {:<width$}",
+            format!("GW{}", event),
+            width = WIDTH_FDR_CELL
+        );
     }
-    println!("  {:<5}", "Avg");
+    println!("  {:<width$}", "Avg", width = WIDTH_AVG);
 
     for (name, own_form, form_75, results, row_data, avg_opp_f) in team_fdr_data {
         print!(
-            "{:<20} {:<8.1} {:<8.1} {:<10}",
+            "{:<name_w$} {:<form_w$.1} {:<form_w$.1} {:<stat_w$}",
             name,
             own_form,
             form_75,
-            colorize_form_string(&results)
+            colorize_form_string(&results),
+            name_w = WIDTH_FULL_NAME,
+            form_w = WIDTH_STAT_WIDE,
+            stat_w = WIDTH_FDR_STAT,
         );
         for gw_entries in row_data {
             if gw_entries.is_empty() {
-                print!("  {:<16}", "-");
+                print!("  {:<width$}", "-", width = WIDTH_FDR_CELL);
             } else {
                 let mut cell_text = String::new();
                 let mut visible_len = 0;
@@ -401,11 +439,11 @@ fn display_all_teams_fdr_form(
                 }
 
                 print!("  {}", cell_text);
-                if 16 > visible_len {
-                    print!("{}", " ".repeat(16 - visible_len));
+                if WIDTH_FDR_CELL > visible_len {
+                    print!("{}", " ".repeat(WIDTH_FDR_CELL - visible_len));
                 }
             }
         }
-        println!("  {:<5.1}", avg_opp_f);
+        println!("  {:<width$.1}", avg_opp_f, width = WIDTH_AVG);
     }
 }
