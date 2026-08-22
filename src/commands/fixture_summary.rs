@@ -1,5 +1,6 @@
 use crate::api::FplClient;
 use crate::error::{FplrError, Result};
+use crate::utils::constants::{WIDTH_FULL_NAME, WIDTH_STAT_SMALL};
 use crate::utils::team_helpers::create_team_map;
 use owo_colors::OwoColorize;
 use std::collections::HashMap;
@@ -119,8 +120,8 @@ pub async fn handle_fixture_summary(fixture_id: u64) -> Result<()> {
     );
     println!();
 
-    let name_w = 20;
-    let pts_w = 4;
+    let name_w = WIDTH_FULL_NAME;
+    let pts_w = WIDTH_STAT_SMALL;
 
     println!("=== {} (Home) Players ===", home_team_name);
     println!(

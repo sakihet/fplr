@@ -42,3 +42,4 @@ pub const WIDTH_FDR_CELL: usize = 16;
 pub const WIDTH_LONG_NAME: usize = 25;
 pub const WIDTH_ENTRY_ID: usize = 12;
 pub const WIDTH_ABBR: usize = 6;
+pub const WIDTH_ISO: usize = 4;

@@ -4,7 +4,7 @@ use owo_colors::OwoColorize;
 
 use crate::api::FplClient;
 use crate::error::Result;
-use crate::utils::constants::WIDTH_TEAM_SHORT_NAME;
+use crate::utils::constants::{WIDTH_STR, WIDTH_TEAM_SHORT_NAME};
 
 fn color_score(score: &str, result: char, cell_w: usize) -> String {
     let s = format!("{:>cell_w$}", score, cell_w = cell_w);
@@ -77,7 +77,7 @@ pub async fn handle_results() -> Result<()> {
     }
 
     let label_w = WIDTH_TEAM_SHORT_NAME;
-    let cell_w: usize = 3;
+    let cell_w: usize = WIDTH_STR;
 
     // Header row: GW number for first slot, "+" for extra DGW slots
     print!("{:<label_w$}  ", "");

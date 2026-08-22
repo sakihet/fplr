@@ -1,6 +1,7 @@
 use crate::api::FplClient;
 use crate::error::{FplrError, Result};
 use crate::models::Position;
+use crate::utils::constants::{WIDTH_FULL_NAME, WIDTH_LONG_NAME};
 use crate::utils::team_helpers::create_team_map;
 use owo_colors::OwoColorize;
 
@@ -19,8 +20,8 @@ pub async fn handle_compare(id1: u64, id2: u64) -> Result<()> {
         .find(|e| e.id == id2)
         .ok_or(FplrError::PlayerNotFound(id2))?;
 
-    let name_w = 20;
-    let label_w = 25;
+    let name_w = WIDTH_FULL_NAME;
+    let label_w = WIDTH_LONG_NAME;
 
     println!(
         "\n{:<label_w$} {:>name_w$} {:>name_w$}",
