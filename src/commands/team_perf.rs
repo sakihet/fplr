@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use crate::api::FplClient;
 use crate::error::Result;
 use crate::models::Fixture;
+use crate::utils::constants::{WIDTH_AVAIL, WIDTH_FULL_NAME, WIDTH_STAT_WIDE};
 use crate::utils::event_helpers::get_current_event_id;
 use crate::utils::formatters::color_trend;
 
@@ -182,14 +183,30 @@ pub async fn handle_team_perf(gw: Option<u32>, last: usize) -> Result<()> {
     team_stats.sort_by(|a, b| b.3.partial_cmp(&a.3).unwrap());
 
     // Print header
-    let mut header = format!("{:<5} {:<20}", "Rank", "Team");
+    let mut header = format!(
+        "{:<rank_w$} {:<name_w$}",
+        "Rank",
+        "Team",
+        rank_w = WIDTH_AVAIL,
+        name_w = WIDTH_FULL_NAME
+    );
     for gw in &gw_list {
-        header.push_str(&format!(" {:>5}", format!("GW{}", gw)));
+        header.push_str(&format!(
+            " {:>width$}",
+            format!("GW{}", gw),
+            width = WIDTH_AVAIL
+        ));
     }
     let avg_label = format!("Avg({})", gw_list.len());
     header.push_str(&format!(
-        " {:>5} {:>5} {:>8} {:>8} {:>5}",
-        "Min", "Max", avg_label, "Avg(all)", "Trend"
+        " {:>s_w$} {:>s_w$} {:>w_w$} {:>w_w$} {:>s_w$}",
+        "Min",
+        "Max",
+        avg_label,
+        "Avg(all)",
+        "Trend",
+        s_w = WIDTH_AVAIL,
+        w_w = WIDTH_STAT_WIDE,
     ));
     println!("{}", header);
 
@@ -197,19 +214,30 @@ pub async fn handle_team_perf(gw: Option<u32>, last: usize) -> Result<()> {
     for (rank, (_team_id, name, points, avg, min, max, season_avg, trend)) in
         team_stats.iter().enumerate()
     {
-        let mut row = format!("{:<5} {:<20}", rank + 1, name);
+        let mut row = format!(
+            "{:<rank_w$} {:<name_w$}",
+            rank + 1,
+            name,
+            rank_w = WIDTH_AVAIL,
+            name_w = WIDTH_FULL_NAME
+        );
         for p in points {
             match p {
-                Some(val) => row.push_str(&format!(" {:>5}", val)),
-                None => row.push_str("     -"),
+                Some(val) => row.push_str(&format!(" {:>width$}", val, width = WIDTH_AVAIL)),
+                None => row.push_str(&format!(" {:>width$}", "-", width = WIDTH_AVAIL)),
             }
         }
         row.push_str(&format!(
-            " {:>5} {:>5} {:>8.1} {:>8.1} ",
-            min, max, avg, season_avg
+            " {:>s_w$} {:>s_w$} {:>w_w$.1} {:>w_w$.1} ",
+            min,
+            max,
+            avg,
+            season_avg,
+            s_w = WIDTH_AVAIL,
+            w_w = WIDTH_STAT_WIDE,
         ));
 
-        let trend_colored = color_trend(&format!("{:>5}", trend));
+        let trend_colored = color_trend(&format!("{:>width$}", trend, width = WIDTH_AVAIL));
         println!("{}{}", row, trend_colored);
     }
 

@@ -1,5 +1,6 @@
 use crate::api::FplClient;
 use crate::error::{FplrError, Result};
+use crate::utils::constants::{WIDTH_NAME, WIDTH_STAT};
 use crate::utils::event_helpers::{find_next_event, get_effective_event_id};
 use crate::utils::team_helpers::create_team_ref_map;
 use clap::Args;
@@ -149,8 +150,13 @@ pub async fn handle_swing(args: SwingArgs) -> Result<()> {
 
 fn print_swing_table(results: &[SwingResult]) {
     println!(
-        "{:<6}  {:<16}  {:<16}  {:<6}",
-        "Team", "Before", "After", "Diff"
+        "{:<team_w$}  {:<name_w$}  {:<name_w$}  {:<team_w$}",
+        "Team",
+        "Before",
+        "After",
+        "Diff",
+        team_w = WIDTH_STAT,
+        name_w = WIDTH_NAME,
     );
     println!("{}", "-".repeat(48));
     for r in results {
@@ -170,8 +176,13 @@ fn print_swing_table(results: &[SwingResult]) {
         };
 
         println!(
-            "{:<6}  {:<16}  {:<16}  {}",
-            r.team_name, before_str, after_str, diff_str
+            "{:<team_w$}  {:<name_w$}  {:<name_w$}  {}",
+            r.team_name,
+            before_str,
+            after_str,
+            diff_str,
+            team_w = WIDTH_STAT,
+            name_w = WIDTH_NAME,
         );
     }
 }

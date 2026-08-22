@@ -1,6 +1,7 @@
 use crate::api::FplClient;
 use crate::error::Result;
 use crate::models::TeamTrendSortBy;
+use crate::utils::constants::{WIDTH_AVAIL, WIDTH_RANK, WIDTH_TEAM_SHORT_NAME};
 use crate::utils::event_helpers::get_current_event_id;
 use crate::utils::formatters::to_sparkline;
 use futures::future::join_all;
@@ -216,7 +217,7 @@ pub async fn handle_team_trend(sort: TeamTrendSortBy, weeks: usize) -> Result<()
 
     // Print table
     println!(
-        "{:>4}  {:<4}  {:>5}  {:>5}  {:>5}  {:>5}  {:>5}  {:>5}  {:<p_w$}  {:<xg_w$}  {:<xgc_w$}  {:<bps_w$}  {:<ict_w$}  {:<sav_w$}",
+        "{:>rank_w$}  {:<team_w$}  {:>s_w$}  {:>s_w$}  {:>s_w$}  {:>s_w$}  {:>s_w$}  {:>s_w$}  {:<p_w$}  {:<xg_w$}  {:<xgc_w$}  {:<bps_w$}  {:<ict_w$}  {:<sav_w$}",
         "Rank",
         "Team",
         "Pts",
@@ -231,6 +232,9 @@ pub async fn handle_team_trend(sort: TeamTrendSortBy, weeks: usize) -> Result<()
         "BPS-Tr",
         "ICT-Tr",
         "Sav-Tr",
+        rank_w = WIDTH_RANK,
+        team_w = WIDTH_TEAM_SHORT_NAME,
+        s_w = WIDTH_AVAIL,
         p_w = spark_w,
         xg_w = spark_w,
         xgc_w = spark_w,
@@ -255,7 +259,7 @@ pub async fn handle_team_trend(sort: TeamTrendSortBy, weeks: usize) -> Result<()
         let ict_spark = to_sparkline(&ict_ints, max_ict_int);
 
         println!(
-            "{:>4}  {:<4}  {:>5.1}  {:>5.2}  {:>5.2}  {:>5.1}  {:>5.1}  {:>5.1}  {:<p_w$}  {:<xg_w$}  {:<xgc_w$}  {:<bps_w$}  {:<ict_w$}  {:<sav_w$}",
+            "{:>rank_w$}  {:<team_w$}  {:>s_w$.1}  {:>s_w$.2}  {:>s_w$.2}  {:>s_w$.1}  {:>s_w$.1}  {:>s_w$.1}  {:<p_w$}  {:<xg_w$}  {:<xgc_w$}  {:<bps_w$}  {:<ict_w$}  {:<sav_w$}",
             i + 1,
             row.name,
             row.avg_pts,
@@ -270,6 +274,9 @@ pub async fn handle_team_trend(sort: TeamTrendSortBy, weeks: usize) -> Result<()
             bps_spark,
             ict_spark,
             sav_spark,
+            rank_w = WIDTH_RANK,
+            team_w = WIDTH_TEAM_SHORT_NAME,
+            s_w = WIDTH_AVAIL,
             p_w = spark_w,
             xg_w = spark_w,
             xgc_w = spark_w,

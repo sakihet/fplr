@@ -281,8 +281,8 @@ pub async fn handle_region() -> Result<()> {
         "ISO3".bold(),
         id_w = WIDTH_ID,
         name_w = name_width,
-        iso2_w = 4,
-        iso3_w = 4,
+        iso2_w = WIDTH_ISO,
+        iso3_w = WIDTH_ISO,
     );
 
     for (id, name, iso2, iso3) in REGIONS {
@@ -294,8 +294,8 @@ pub async fn handle_region() -> Result<()> {
             iso3,
             id_w = WIDTH_ID,
             name_w = name_width,
-            iso2_w = 4,
-            iso3_w = 4,
+            iso2_w = WIDTH_ISO,
+            iso3_w = WIDTH_ISO,
         );
     }
 

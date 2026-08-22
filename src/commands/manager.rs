@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use crate::api::FplClient;
 use crate::error::{FplrError, Result};
 use crate::models::Position;
+use crate::utils::constants::{WIDTH_ABBR, WIDTH_ID, WIDTH_LONG_NAME, WIDTH_STAT_SMALL};
 use crate::utils::event_helpers::get_effective_event_id;
 use crate::utils::player_helpers::create_player_map;
 use crate::utils::team_helpers::create_team_short_name_map;
@@ -38,16 +39,36 @@ pub async fn handle_manager(manager_id: u64, gw: Option<u32>) -> Result<()> {
     println!("Manager ID: {} (GW {})", manager_id, event_id);
     println!("\n--- Starting XI ---");
     println!(
-        "{:<4} {:<25} {:<6} {:<6} {:<4} {:<4} {:<4}",
-        "ID", "Name", "Team", "Pos", "C", "VC", "Pts"
+        "{:<id_w$} {:<name_w$} {:<abbr_w$} {:<abbr_w$} {:<stat_w$} {:<stat_w$} {:<stat_w$}",
+        "ID",
+        "Name",
+        "Team",
+        "Pos",
+        "C",
+        "VC",
+        "Pts",
+        id_w = WIDTH_ID,
+        name_w = WIDTH_LONG_NAME,
+        abbr_w = WIDTH_ABBR,
+        stat_w = WIDTH_STAT_SMALL,
     );
 
     for (i, pick) in picks.picks.iter().enumerate() {
         if i == 11 {
             println!("\n--- Bench ---");
             println!(
-                "{:<4} {:<25} {:<6} {:<6} {:<4} {:<4} {:<4}",
-                "ID", "Name", "Team", "Pos", "C", "VC", "Pts"
+                "{:<id_w$} {:<name_w$} {:<abbr_w$} {:<abbr_w$} {:<stat_w$} {:<stat_w$} {:<stat_w$}",
+                "ID",
+                "Name",
+                "Team",
+                "Pos",
+                "C",
+                "VC",
+                "Pts",
+                id_w = WIDTH_ID,
+                name_w = WIDTH_LONG_NAME,
+                abbr_w = WIDTH_ABBR,
+                stat_w = WIDTH_STAT_SMALL,
             );
         }
 
@@ -71,7 +92,7 @@ pub async fn handle_manager(manager_id: u64, gw: Option<u32>) -> Result<()> {
         let points = points_map.get(&pick.element).copied().unwrap_or(0);
 
         println!(
-            "{:<4} {:<25} {:<6} {:<6} {:<4} {:<4} {:<4}",
+            "{:<id_w$} {:<name_w$} {:<abbr_w$} {:<abbr_w$} {:<stat_w$} {:<stat_w$} {:<stat_w$}",
             pick.element,
             name,
             team_short,
@@ -79,6 +100,10 @@ pub async fn handle_manager(manager_id: u64, gw: Option<u32>) -> Result<()> {
             if pick.is_captain { "Y" } else { "" },
             if pick.is_vice_captain { "Y" } else { "" },
             points,
+            id_w = WIDTH_ID,
+            name_w = WIDTH_LONG_NAME,
+            abbr_w = WIDTH_ABBR,
+            stat_w = WIDTH_STAT_SMALL,
         );
     }
 

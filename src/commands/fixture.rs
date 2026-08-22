@@ -123,9 +123,6 @@ pub async fn handle_fixture(args: FixtureArgs) -> Result<()> {
 
     println!("Fixtures for Gameweek {}:", event_id);
 
-    // Width for extra columns
-    const EXTRA_COL: usize = 6;
-
     // Build and print header
     let mut header = format!(
         "{:>id_w$}  {:<time_w$}  {:<status_w$}  {:<home_w$}  {:<away_w$}  {:<score_w$}",
@@ -147,7 +144,7 @@ pub async fn handle_fixture(args: FixtureArgs) -> Result<()> {
             "  {:>f_w$}  {:>f_w$}",
             "H.Form",
             "A.Form",
-            f_w = EXTRA_COL
+            f_w = WIDTH_STAT
         ));
     }
     if args.xg {
@@ -155,7 +152,7 @@ pub async fn handle_fixture(args: FixtureArgs) -> Result<()> {
             "  {:>f_w$}  {:>f_w$}",
             "H.xG",
             "A.xG",
-            f_w = EXTRA_COL
+            f_w = WIDTH_STAT
         ));
     }
     println!("{}", header);
@@ -226,8 +223,8 @@ pub async fn handle_fixture(args: FixtureArgs) -> Result<()> {
             let a_total = fm.get(&fixture.team_a).cloned().unwrap_or(0.0);
 
             // Format plain values for width, then color the higher one green
-            let h_plain = format!("{:>f_w$.1}", h_total, f_w = EXTRA_COL);
-            let a_plain = format!("{:>f_w$.1}", a_total, f_w = EXTRA_COL);
+            let h_plain = format!("{:>f_w$.1}", h_total, f_w = WIDTH_STAT);
+            let a_plain = format!("{:>f_w$.1}", a_total, f_w = WIDTH_STAT);
             let (h_cell, a_cell) = if h_total > a_total {
                 (h_plain.green().to_string(), a_plain)
             } else if a_total > h_total {
@@ -267,8 +264,8 @@ pub async fn handle_fixture(args: FixtureArgs) -> Result<()> {
                 let h_val = format!("{:.2}{}", h_xg, h_marker);
                 let a_val = format!("{:.2}{}", a_xg, a_marker);
 
-                let h_plain = format!("{:>f_w$}", h_val, f_w = EXTRA_COL);
-                let a_plain = format!("{:>f_w$}", a_val, f_w = EXTRA_COL);
+                let h_plain = format!("{:>f_w$}", h_val, f_w = WIDTH_STAT);
+                let a_plain = format!("{:>f_w$}", a_val, f_w = WIDTH_STAT);
                 let (h_cell, a_cell) = if h_xg > a_xg {
                     (h_plain.green().to_string(), a_plain)
                 } else if a_xg > h_xg {
@@ -278,7 +275,7 @@ pub async fn handle_fixture(args: FixtureArgs) -> Result<()> {
                 };
                 row.push_str(&format!("  {}  {}", h_cell, a_cell));
             } else {
-                row.push_str(&format!("  {:>f_w$}  {:>f_w$}", "-", "-", f_w = EXTRA_COL));
+                row.push_str(&format!("  {:>f_w$}  {:>f_w$}", "-", "-", f_w = WIDTH_STAT));
             }
         }
         println!("{}", row);
