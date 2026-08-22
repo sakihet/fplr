@@ -4,6 +4,15 @@ Browse FPL data comfortably from your terminal.
 
 ## Installation
 
+### Homebrew
+
+```sh
+brew tap sakihet/tap
+brew install fplr
+```
+
+### From source
+
 ```sh
 git clone https://github.com/sakihet/fplr.git
 cd fplr
