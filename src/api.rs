@@ -1,5 +1,9 @@
+use std::sync::OnceLock;
+use std::time::Duration;
+
 use serde::de::DeserializeOwned;
 
+use crate::cache;
 use crate::error::Result;
 use crate::models::{
     BootstrapStatic, DreamTeam, EntryDetail, Fixture, LeagueStandingsResponse, LiveData,
@@ -7,13 +11,32 @@ use crate::models::{
 };
 
 const BASE_URL: &str = "https://fantasy.premierleague.com/api";
+const REQUEST_TIMEOUT: Duration = Duration::from_secs(10);
+
+static HTTP_CLIENT: OnceLock<reqwest::Client> = OnceLock::new();
+
+fn http_client() -> &'static reqwest::Client {
+    HTTP_CLIENT.get_or_init(|| {
+        reqwest::Client::builder()
+            .timeout(REQUEST_TIMEOUT)
+            .build()
+            .expect("failed to build HTTP client")
+    })
+}
 
 pub struct FplClient;
 
 impl FplClient {
     async fn fetch<T: DeserializeOwned>(endpoint: &str) -> Result<T> {
+        // A cached body that no longer deserializes is treated as a miss
+        if let Some(cached) = cache::read(endpoint)
+            && let Ok(json) = serde_json::from_str(&cached)
+        {
+            return Ok(json);
+        }
+
         let url = format!("{}{}", BASE_URL, endpoint);
-        let response = reqwest::get(&url).await?;
+        let response = http_client().get(&url).send().await?;
 
         if !response.status().is_success() {
             let status = response.status();
@@ -21,7 +44,16 @@ impl FplClient {
             return Err(crate::error::FplrError::ApiStatus(status, body));
         }
 
-        let json: T = response.json().await?;
+        let cache_control = response
+            .headers()
+            .get(reqwest::header::CACHE_CONTROL)
+            .and_then(|v| v.to_str().ok())
+            .map(str::to_string);
+
+        let body = response.text().await?;
+        cache::write(endpoint, cache_control.as_deref(), &body);
+
+        let json: T = serde_json::from_str(&body)?;
         Ok(json)
     }
 

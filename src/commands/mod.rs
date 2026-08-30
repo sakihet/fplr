@@ -1,4 +1,5 @@
 pub mod availability;
+pub mod cache;
 pub mod compare;
 pub mod config;
 pub mod differential;
@@ -43,6 +44,7 @@ pub mod xgc;
 pub mod xgi;
 
 pub use availability::handle_availability;
+pub use cache::{CacheArgs, handle_cache};
 pub use compare::handle_compare;
 pub use config::{ConfigArgs, handle_config};
 pub use differential::handle_differential;

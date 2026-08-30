@@ -50,6 +50,31 @@ fn compute_team_form(elements: &[crate::models::Element]) -> HashMap<u64, f64> {
     team_total
 }
 
+/// Split teams into blank (no fixture) and double (more than one) for a gameweek
+fn blank_and_double<'a>(
+    teams: &[(u64, &'a str)],
+    pairs: &[(u64, u64)],
+) -> (Vec<&'a str>, Vec<&'a str>) {
+    let mut counts: HashMap<u64, usize> = HashMap::new();
+    for (home, away) in pairs {
+        *counts.entry(*home).or_insert(0) += 1;
+        *counts.entry(*away).or_insert(0) += 1;
+    }
+
+    let mut blank = Vec::new();
+    let mut double = Vec::new();
+    for (id, short_name) in teams {
+        match counts.get(id).copied().unwrap_or(0) {
+            0 => blank.push(*short_name),
+            n if n > 1 => double.push(*short_name),
+            _ => {}
+        }
+    }
+    blank.sort_unstable();
+    double.sort_unstable();
+    (blank, double)
+}
+
 pub async fn handle_fixture(args: FixtureArgs) -> Result<()> {
     let bootstrap_data = FplClient::fetch_bootstrap_static().await?;
     let team_map = create_team_map(&bootstrap_data.teams);
@@ -86,6 +111,18 @@ pub async fn handle_fixture(args: FixtureArgs) -> Result<()> {
     }
 
     target_fixtures.sort_by(|a, b| a.kickoff_time.cmp(&b.kickoff_time));
+
+    // Blanks and doubles only appear once fixtures are rescheduled mid-season
+    let teams: Vec<(u64, &str)> = bootstrap_data
+        .teams
+        .iter()
+        .map(|t| (t.id, t.short_name.as_str()))
+        .collect();
+    let pairs: Vec<(u64, u64)> = target_fixtures
+        .iter()
+        .map(|f| (f.team_h, f.team_a))
+        .collect();
+    let (blank, double) = blank_and_double(&teams, &pairs);
 
     // Count how many matches each team has played/started in this gameweek to average DGW xG
     let mut team_played_counts: HashMap<u64, usize> = HashMap::new();
@@ -285,5 +322,57 @@ pub async fn handle_fixture(args: FixtureArgs) -> Result<()> {
         println!("\n* xG is an average per match due to Double Gameweek (DGW)");
     }
 
+    if !blank.is_empty() || !double.is_empty() {
+        println!();
+        if !blank.is_empty() {
+            let label = format!("Blank ({}):", blank.len());
+            println!("{} {}", label.red(), blank.join("  "));
+        }
+        if !double.is_empty() {
+            let label = format!("Double ({}):", double.len());
+            println!("{} {}", label.green(), double.join("  "));
+        }
+    }
+
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const TEAMS: [(u64, &str); 4] = [(1, "ARS"), (2, "BOU"), (3, "CHE"), (4, "LIV")];
+
+    #[test]
+    fn test_blank_and_double_full_gameweek() {
+        let pairs = [(1, 2), (3, 4)];
+        let (blank, double) = blank_and_double(&TEAMS, &pairs);
+        assert!(blank.is_empty());
+        assert!(double.is_empty());
+    }
+
+    #[test]
+    fn test_blank_and_double_blank_gameweek() {
+        let pairs = [(1, 2)];
+        let (blank, double) = blank_and_double(&TEAMS, &pairs);
+        assert_eq!(blank, vec!["CHE", "LIV"]);
+        assert!(double.is_empty());
+    }
+
+    #[test]
+    fn test_blank_and_double_double_gameweek() {
+        let pairs = [(1, 2), (3, 4), (1, 3)];
+        let (blank, double) = blank_and_double(&TEAMS, &pairs);
+        assert!(blank.is_empty());
+        assert_eq!(double, vec!["ARS", "CHE"]);
+    }
+
+    #[test]
+    fn test_blank_and_double_mixed_and_sorted() {
+        // LIV plays twice, BOU not at all
+        let pairs = [(4, 1), (4, 3)];
+        let (blank, double) = blank_and_double(&TEAMS, &pairs);
+        assert_eq!(blank, vec!["BOU"]);
+        assert_eq!(double, vec!["LIV"]);
+    }
 }

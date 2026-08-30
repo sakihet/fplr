@@ -78,6 +78,11 @@ pub fn color_form_result(result: char) -> String {
     }
 }
 
+/// Color an in-play match result: same colors as `color_form_result`, dimmed
+pub fn color_form_result_in_play(result: char) -> String {
+    color_form_result(result).dimmed().to_string()
+}
+
 /// Color a value based on comparison with baseline: above=green, below=red, equal=default
 pub fn color_by_comparison(value: i64, baseline: i64) -> String {
     let value_str = format!("{:>5}", value);

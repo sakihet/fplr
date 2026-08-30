@@ -2,6 +2,7 @@ use crate::api::FplClient;
 use crate::config::Config;
 use crate::error::Result;
 use crate::utils::event_helpers::{find_current_event, find_next_event};
+use crate::utils::fixture_helpers::gameweek_progress;
 use crate::utils::formatters::format_datetime_local;
 
 use crate::utils::constants::*;
@@ -35,12 +36,11 @@ pub async fn handle_status() -> Result<()> {
         Vec::new()
     };
 
-    let total_fixtures = fixtures.len();
-    let finished_fixtures = fixtures.iter().filter(|f| f.finished).count();
-    let started_fixtures = fixtures
-        .iter()
-        .filter(|f| f.started == Some(true) && !f.finished)
-        .count();
+    let progress = gameweek_progress(&fixtures);
+    let total_fixtures = progress.total;
+    let finished_fixtures = progress.settled;
+    let started_fixtures = progress.in_play;
+    let awaiting_bonus_fixtures = progress.awaiting_bonus;
 
     if let (Some(current), Some(next)) = (current_event, next_event) {
         println!(
@@ -77,14 +77,21 @@ pub async fn handle_status() -> Result<()> {
         );
 
         if total_fixtures > 0 {
-            let in_progress_text = if started_fixtures > 0 {
-                format!(" ({} In Progress)", started_fixtures)
-            } else {
+            let mut notes: Vec<String> = Vec::new();
+            if started_fixtures > 0 {
+                notes.push(format!("{} In Progress", started_fixtures));
+            }
+            if awaiting_bonus_fixtures > 0 {
+                notes.push(format!("{} Awaiting Bonus", awaiting_bonus_fixtures));
+            }
+            let notes_text = if notes.is_empty() {
                 "".to_string()
+            } else {
+                format!(" ({})", notes.join(", "))
             };
             println!(
                 "\nFixtures: {} / {} Finished{}",
-                finished_fixtures, total_fixtures, in_progress_text
+                finished_fixtures, total_fixtures, notes_text
             );
         }
     } else {

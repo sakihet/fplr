@@ -1,4 +1,5 @@
 mod api;
+mod cache;
 mod commands;
 mod config;
 mod error;
@@ -15,6 +16,9 @@ use clap_complete::{Shell, generate};
 struct Args {
     #[command(subcommand)]
     commands: Commands,
+    /// Bypass the HTTP response cache
+    #[arg(long, global = true)]
+    no_cache: bool,
 }
 
 #[derive(Subcommand, Debug)]
@@ -40,6 +44,8 @@ enum Commands {
         #[arg(short, long, default_value = "20")]
         limit: usize,
     },
+    /// Manage the HTTP response cache
+    Cache(commands::CacheArgs),
     /// Compare two players side-by-side
     Compare {
         /// First player ID
@@ -79,6 +85,9 @@ enum Commands {
         team: Option<String>,
         #[arg(short, long, default_value = "5")]
         limit: usize,
+        /// Start from this gameweek
+        #[arg(short, long)]
+        from: Option<u64>,
         #[arg(short, long)]
         all: bool,
     },
@@ -91,6 +100,9 @@ enum Commands {
         team: Option<String>,
         #[arg(short, long, default_value = "5")]
         limit: usize,
+        /// Start from this gameweek
+        #[arg(short, long)]
+        from: Option<u64>,
         /// Sort teams by average difficulty (ascending)
         #[arg(long)]
         sort_by_avg: bool,
@@ -200,7 +212,11 @@ enum Commands {
     /// Show mathematically calculated Fixture Swings
     Swing(commands::SwingArgs),
     /// Show league table
-    Table {},
+    Table {
+        /// Include matches currently in play
+        #[arg(short, long)]
+        live: bool,
+    },
     /// Show talisman players
     Talisman {
         /// Filter by team name
@@ -350,6 +366,7 @@ async fn main() {
 
 async fn run() -> Result<()> {
     let args = Args::parse();
+    cache::set_no_cache(args.no_cache);
 
     match args.commands {
         Commands::Availability {
@@ -360,6 +377,7 @@ async fn run() -> Result<()> {
             all,
             limit,
         } => commands::handle_availability(team, name, news, position, all, limit).await?,
+        Commands::Cache(args) => commands::handle_cache(args)?,
         Commands::Compare { id1, id2 } => commands::handle_compare(id1, id2).await?,
         Commands::Completions { shell } => {
             generate(shell, &mut Args::command(), "fplr", &mut std::io::stdout());
@@ -372,15 +390,19 @@ async fn run() -> Result<()> {
             limit,
         } => commands::handle_differential(max_sel, sort, position, limit).await?,
         Commands::DreamTeam { gw } => commands::handle_dream_team(gw).await?,
-        Commands::FdrForm { team, limit, all } => {
-            commands::handle_fdr_form(team, limit, all).await?
-        }
+        Commands::FdrForm {
+            team,
+            limit,
+            from,
+            all,
+        } => commands::handle_fdr_form(team, limit, from, all).await?,
         Commands::Fixture(args) => commands::handle_fixture(args).await?,
         Commands::FixtureDifficultyRating {
             team,
             limit,
+            from,
             sort_by_avg,
-        } => commands::handle_fixture_difficulty_rating(team, limit, sort_by_avg).await?,
+        } => commands::handle_fixture_difficulty_rating(team, limit, from, sort_by_avg).await?,
         Commands::FixtureSummary { id } => commands::handle_fixture_summary(id).await?,
         Commands::Gameweek {} => commands::handle_gameweek().await?,
         Commands::History(args) => commands::handle_history(args).await?,
@@ -441,7 +463,7 @@ async fn run() -> Result<()> {
         Commands::SetPiece { team } => commands::handle_set_piece(team).await?,
         Commands::Status {} => commands::handle_status().await?,
         Commands::Swing(args) => commands::handle_swing(args).await?,
-        Commands::Table {} => commands::handle_table().await?,
+        Commands::Table { live } => commands::handle_table(live).await?,
         Commands::Talisman { team } => commands::handle_talisman(team).await?,
         Commands::Team { sort } => commands::handle_team(&sort).await?,
         Commands::TeamAvailability => commands::handle_team_availability().await?,
