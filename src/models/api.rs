@@ -118,6 +118,8 @@ pub struct Fixture {
     pub code: u64,
     pub event: Option<u64>,
     pub finished: bool,
+    pub finished_provisional: bool,
+    pub minutes: u64,
     pub started: Option<bool>,
     pub kickoff_time: Option<String>,
     pub team_a: u64,
