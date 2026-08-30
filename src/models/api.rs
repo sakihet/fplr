@@ -355,7 +355,6 @@ pub struct SetPieceNotes {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct StandingResult {
-    pub id: u64,
     pub event_total: i64,
     pub player_name: String,
     pub rank: u64,
