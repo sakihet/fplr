@@ -2,6 +2,7 @@ use crate::api::FplClient;
 use crate::config::Config;
 use crate::error::Result;
 use crate::utils::event_helpers::{find_current_event, find_next_event};
+use crate::utils::fixture_helpers::gameweek_progress;
 use crate::utils::formatters::format_datetime_local;
 
 use crate::utils::constants::*;
@@ -35,21 +36,11 @@ pub async fn handle_status() -> Result<()> {
         Vec::new()
     };
 
-    let total_fixtures = fixtures.len();
-    // `finished` only flips after FPL confirms bonus, so a played match is
-    // already settled once `finished_provisional` is set
-    let finished_fixtures = fixtures
-        .iter()
-        .filter(|f| f.finished || f.finished_provisional)
-        .count();
-    let started_fixtures = fixtures
-        .iter()
-        .filter(|f| f.started == Some(true) && !f.finished && !f.finished_provisional)
-        .count();
-    let awaiting_bonus_fixtures = fixtures
-        .iter()
-        .filter(|f| f.finished_provisional && !f.finished)
-        .count();
+    let progress = gameweek_progress(&fixtures);
+    let total_fixtures = progress.total;
+    let finished_fixtures = progress.settled;
+    let started_fixtures = progress.in_play;
+    let awaiting_bonus_fixtures = progress.awaiting_bonus;
 
     if let (Some(current), Some(next)) = (current_event, next_event) {
         println!(

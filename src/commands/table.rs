@@ -4,9 +4,9 @@ use owo_colors::OwoColorize;
 
 use crate::api::FplClient;
 use crate::error::Result;
-use crate::models::Fixture;
 use crate::utils::constants::*;
 use crate::utils::event_helpers::find_current_event;
+use crate::utils::fixture_helpers::{gameweek_progress, is_in_play, is_settled};
 use crate::utils::formatters::{
     color_form_result, color_form_result_in_play, color_league_position, format_signed_number,
 };
@@ -37,18 +37,6 @@ impl TeamStats {
     fn goal_difference(&self) -> i64 {
         self.goals_for as i64 - self.goals_against as i64
     }
-}
-
-/// A fixture's score is final for league table purposes once it is settled.
-/// `finished` only flips after FPL confirms bonus points, so `finished_provisional`
-/// already marks a settled match.
-fn is_settled(fixture: &Fixture) -> bool {
-    fixture.finished || fixture.finished_provisional
-}
-
-/// A fixture is in play once it has kicked off but its score is not settled yet.
-fn is_in_play(fixture: &Fixture) -> bool {
-    fixture.started == Some(true) && !is_settled(fixture)
 }
 
 pub async fn handle_table(live: bool) -> Result<()> {
@@ -184,14 +172,8 @@ pub async fn handle_table(live: bool) -> Result<()> {
 
     // Signal that the current gameweek is not settled yet
     if let Some(current) = find_current_event(&bootstrap_data.events) {
-        let total = fixtures
-            .iter()
-            .filter(|f| f.event == Some(current.id))
-            .count();
-        let played = fixtures
-            .iter()
-            .filter(|f| f.event == Some(current.id) && is_settled(f))
-            .count();
+        let progress = gameweek_progress(fixtures.iter().filter(|f| f.event == Some(current.id)));
+        let (played, total) = (progress.settled, progress.total);
 
         if played < total {
             println!(
