@@ -16,16 +16,26 @@ type TeamFdrData<'a> = (u64, &'a Team, Vec<Vec<(String, u8)>>);
 pub async fn handle_fixture_difficulty_rating(
     team: Option<String>,
     limit: usize,
+    from: Option<u64>,
     sort_by_avg: bool,
 ) -> Result<()> {
     let bootstrap_data = FplClient::fetch_bootstrap_static().await?;
     let team_map = create_team_ref_map(&bootstrap_data.teams);
 
     let fixtures = FplClient::fetch_fixtures().await?;
+    // No lower bound unless --from is given
+    let start_event = from.unwrap_or(0);
     let unfinished_fixtures: Vec<&Fixture> = fixtures
         .iter()
-        .filter(|f| !f.finished && f.event.is_some())
+        .filter(|f| !f.finished && f.event.is_some_and(|e| e >= start_event))
         .collect();
+
+    if let Some(start) = from
+        && unfinished_fixtures.is_empty()
+    {
+        println!("No fixtures found from Gameweek {}.", start);
+        return Ok(());
+    }
 
     if let Some(team_name) = team {
         let team_ids = find_team_ids_by_name(&bootstrap_data.teams, &team_name);

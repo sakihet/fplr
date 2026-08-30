@@ -91,6 +91,9 @@ enum Commands {
         team: Option<String>,
         #[arg(short, long, default_value = "5")]
         limit: usize,
+        /// Start from this gameweek
+        #[arg(short, long)]
+        from: Option<u64>,
         /// Sort teams by average difficulty (ascending)
         #[arg(long)]
         sort_by_avg: bool,
@@ -383,8 +386,9 @@ async fn run() -> Result<()> {
         Commands::FixtureDifficultyRating {
             team,
             limit,
+            from,
             sort_by_avg,
-        } => commands::handle_fixture_difficulty_rating(team, limit, sort_by_avg).await?,
+        } => commands::handle_fixture_difficulty_rating(team, limit, from, sort_by_avg).await?,
         Commands::FixtureSummary { id } => commands::handle_fixture_summary(id).await?,
         Commands::Gameweek {} => commands::handle_gameweek().await?,
         Commands::History(args) => commands::handle_history(args).await?,
