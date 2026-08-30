@@ -8,6 +8,9 @@ pub enum FplrError {
     #[error("API request failed with status {0}: {1}")]
     ApiStatus(reqwest::StatusCode, String),
 
+    #[error("Failed to parse API response: {0}")]
+    Json(#[from] serde_json::Error),
+
     #[error("Failed to read config file: {0}")]
     ConfigRead(#[from] std::io::Error),
 

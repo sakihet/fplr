@@ -1,4 +1,5 @@
 mod api;
+mod cache;
 mod commands;
 mod config;
 mod error;
@@ -15,6 +16,9 @@ use clap_complete::{Shell, generate};
 struct Args {
     #[command(subcommand)]
     commands: Commands,
+    /// Bypass the HTTP response cache
+    #[arg(long, global = true)]
+    no_cache: bool,
 }
 
 #[derive(Subcommand, Debug)]
@@ -40,6 +44,8 @@ enum Commands {
         #[arg(short, long, default_value = "20")]
         limit: usize,
     },
+    /// Manage the HTTP response cache
+    Cache(commands::CacheArgs),
     /// Compare two players side-by-side
     Compare {
         /// First player ID
@@ -360,6 +366,7 @@ async fn main() {
 
 async fn run() -> Result<()> {
     let args = Args::parse();
+    cache::set_no_cache(args.no_cache);
 
     match args.commands {
         Commands::Availability {
@@ -370,6 +377,7 @@ async fn run() -> Result<()> {
             all,
             limit,
         } => commands::handle_availability(team, name, news, position, all, limit).await?,
+        Commands::Cache(args) => commands::handle_cache(args)?,
         Commands::Compare { id1, id2 } => commands::handle_compare(id1, id2).await?,
         Commands::Completions { shell } => {
             generate(shell, &mut Args::command(), "fplr", &mut std::io::stdout());
