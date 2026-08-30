@@ -36,10 +36,19 @@ pub async fn handle_status() -> Result<()> {
     };
 
     let total_fixtures = fixtures.len();
-    let finished_fixtures = fixtures.iter().filter(|f| f.finished).count();
+    // `finished` only flips after FPL confirms bonus, so a played match is
+    // already settled once `finished_provisional` is set
+    let finished_fixtures = fixtures
+        .iter()
+        .filter(|f| f.finished || f.finished_provisional)
+        .count();
     let started_fixtures = fixtures
         .iter()
-        .filter(|f| f.started == Some(true) && !f.finished)
+        .filter(|f| f.started == Some(true) && !f.finished && !f.finished_provisional)
+        .count();
+    let awaiting_bonus_fixtures = fixtures
+        .iter()
+        .filter(|f| f.finished_provisional && !f.finished)
         .count();
 
     if let (Some(current), Some(next)) = (current_event, next_event) {
@@ -77,14 +86,21 @@ pub async fn handle_status() -> Result<()> {
         );
 
         if total_fixtures > 0 {
-            let in_progress_text = if started_fixtures > 0 {
-                format!(" ({} In Progress)", started_fixtures)
-            } else {
+            let mut notes: Vec<String> = Vec::new();
+            if started_fixtures > 0 {
+                notes.push(format!("{} In Progress", started_fixtures));
+            }
+            if awaiting_bonus_fixtures > 0 {
+                notes.push(format!("{} Awaiting Bonus", awaiting_bonus_fixtures));
+            }
+            let notes_text = if notes.is_empty() {
                 "".to_string()
+            } else {
+                format!(" ({})", notes.join(", "))
             };
             println!(
                 "\nFixtures: {} / {} Finished{}",
-                finished_fixtures, total_fixtures, in_progress_text
+                finished_fixtures, total_fixtures, notes_text
             );
         }
     } else {
