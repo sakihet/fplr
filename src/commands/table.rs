@@ -168,6 +168,8 @@ pub async fn handle_table(live: bool) -> Result<()> {
             .cmp(&a.points)
             .then_with(|| b.goal_difference().cmp(&a.goal_difference()))
             .then_with(|| b.goals_for.cmp(&a.goals_for))
+            // Break remaining ties by name so the order is stable across runs
+            .then_with(|| a.name.cmp(&b.name))
     });
 
     // Signal that the current gameweek is not settled yet
