@@ -6,6 +6,7 @@ use crate::api::FplClient;
 use crate::error::Result;
 use crate::models::Fixture;
 use crate::utils::constants::*;
+use crate::utils::event_helpers::find_current_event;
 use crate::utils::formatters::{
     color_form_result, color_form_result_in_play, color_league_position, format_signed_number,
 };
@@ -38,11 +39,16 @@ impl TeamStats {
     }
 }
 
-/// A fixture is in play once it has kicked off but its score is not settled yet.
+/// A fixture's score is final for league table purposes once it is settled.
 /// `finished` only flips after FPL confirms bonus points, so `finished_provisional`
-/// already marks a match whose score is final for league table purposes.
+/// already marks a settled match.
+fn is_settled(fixture: &Fixture) -> bool {
+    fixture.finished || fixture.finished_provisional
+}
+
+/// A fixture is in play once it has kicked off but its score is not settled yet.
 fn is_in_play(fixture: &Fixture) -> bool {
-    fixture.started == Some(true) && !fixture.finished && !fixture.finished_provisional
+    fixture.started == Some(true) && !is_settled(fixture)
 }
 
 pub async fn handle_table(live: bool) -> Result<()> {
@@ -74,7 +80,7 @@ pub async fn handle_table(live: bool) -> Result<()> {
             if !live {
                 continue;
             }
-        } else if !fixture.finished && !fixture.finished_provisional {
+        } else if !is_settled(fixture) {
             continue;
         }
 
@@ -175,6 +181,29 @@ pub async fn handle_table(live: bool) -> Result<()> {
             .then_with(|| b.goal_difference().cmp(&a.goal_difference()))
             .then_with(|| b.goals_for.cmp(&a.goals_for))
     });
+
+    // Signal that the current gameweek is not settled yet
+    if let Some(current) = find_current_event(&bootstrap_data.events) {
+        let total = fixtures
+            .iter()
+            .filter(|f| f.event == Some(current.id))
+            .count();
+        let played = fixtures
+            .iter()
+            .filter(|f| f.event == Some(current.id) && is_settled(f))
+            .count();
+
+        if played < total {
+            println!(
+                "{}",
+                format!(
+                    "GW{} in progress \u{2014} {played}/{total} matches played",
+                    current.id
+                )
+                .dimmed()
+            );
+        }
+    }
 
     // Display table
     println!(
