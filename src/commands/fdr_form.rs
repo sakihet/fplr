@@ -403,7 +403,17 @@ fn display_all_teams_fdr_form(
     team_fdr_data.sort_by(|a, b| a.0.cmp(&b.0));
 
     // Print Table
-    println!("\nForm-Adjusted FDR Matrix (Next {} GWs)", limit);
+    // --from pins the window to actual gameweeks, so show that range instead
+    let range = match (
+        start_event > 0,
+        events_to_show.first(),
+        events_to_show.last(),
+    ) {
+        (true, Some(first), Some(last)) if first == last => format!("GW{}", first),
+        (true, Some(first), Some(last)) => format!("GW{}-GW{}", first, last),
+        _ => format!("Next {} GWs", limit),
+    };
+    println!("\nForm-Adjusted FDR Matrix ({})", range);
     print!(
         "{:<name_w$} {:<form_w$} {:<form_w$} {:<stat_w$}",
         "Team",
