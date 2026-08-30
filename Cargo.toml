@@ -6,7 +6,8 @@ authors = ["saki"]
 description = "CLI for Fantasy Premier League"
 license = "MIT"
 repository = "https://github.com/sakihet/fplr"
-keywords = ["fpl"]
+keywords = ["fantasy-football", "football", "fpl", "premier-league", "soccer"]
+categories = ["command-line-utilities"]
 
 [dependencies]
 chrono = "0.4.42"
