@@ -10,10 +10,27 @@ use crate::utils::team_helpers::{create_team_ref_map, find_team_ids_by_name};
 use owo_colors::OwoColorize;
 use std::collections::HashMap;
 
-pub async fn handle_fdr_form(team: Option<String>, limit: usize, _all: bool) -> Result<()> {
+pub async fn handle_fdr_form(
+    team: Option<String>,
+    limit: usize,
+    from: Option<u64>,
+    _all: bool,
+) -> Result<()> {
     let bootstrap_data = FplClient::fetch_bootstrap_static().await?;
     let team_map = create_team_ref_map(&bootstrap_data.teams);
     let fixtures = FplClient::fetch_fixtures().await?;
+
+    // No lower bound unless --from is given
+    let start_event = from.unwrap_or(0);
+
+    if let Some(start) = from
+        && !fixtures
+            .iter()
+            .any(|f| !f.finished && f.event.is_some_and(|e| e >= start_event))
+    {
+        println!("No fixtures found from Gameweek {}.", start);
+        return Ok(());
+    }
 
     let team_forms = calculate_team_forms(&fixtures, &bootstrap_data);
 
@@ -23,9 +40,9 @@ pub async fn handle_fdr_form(team: Option<String>, limit: usize, _all: bool) -> 
             return Err(FplrError::TeamNotFoundByName(team_name));
         }
         let tid = team_ids[0];
-        display_team_fdr_form(&fixtures, tid, limit, &team_map, &team_forms)?;
+        display_team_fdr_form(&fixtures, tid, limit, start_event, &team_map, &team_forms)?;
     } else {
-        display_all_teams_fdr_form(&fixtures, limit, &team_map, &team_forms);
+        display_all_teams_fdr_form(&fixtures, limit, start_event, &team_map, &team_forms);
     }
 
     Ok(())
@@ -164,6 +181,7 @@ fn display_team_fdr_form(
     fixtures: &[Fixture],
     team_id: u64,
     limit: usize,
+    start_event: u64,
     team_map: &HashMap<u64, &Team>,
     team_forms: &HashMap<u64, TeamFormEntry>,
 ) -> Result<()> {
@@ -208,7 +226,9 @@ fn display_team_fdr_form(
     let mut team_fixtures: Vec<_> = fixtures
         .iter()
         .filter(|f| {
-            !f.finished && f.event.is_some() && (f.team_h == team_id || f.team_a == team_id)
+            !f.finished
+                && f.event.is_some_and(|e| e >= start_event)
+                && (f.team_h == team_id || f.team_a == team_id)
         })
         .collect();
 
@@ -287,12 +307,13 @@ fn display_team_fdr_form(
 fn display_all_teams_fdr_form(
     fixtures: &[Fixture],
     limit: usize,
+    start_event: u64,
     team_map: &HashMap<u64, &Team>,
     team_forms: &HashMap<u64, TeamFormEntry>,
 ) {
     let mut events: Vec<u64> = fixtures
         .iter()
-        .filter(|f| !f.finished && f.event.is_some())
+        .filter(|f| !f.finished && f.event.is_some_and(|e| e >= start_event))
         .filter_map(|f| f.event)
         .collect::<std::collections::HashSet<_>>()
         .into_iter()

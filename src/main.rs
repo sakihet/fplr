@@ -79,6 +79,9 @@ enum Commands {
         team: Option<String>,
         #[arg(short, long, default_value = "5")]
         limit: usize,
+        /// Start from this gameweek
+        #[arg(short, long)]
+        from: Option<u64>,
         #[arg(short, long)]
         all: bool,
     },
@@ -379,9 +382,12 @@ async fn run() -> Result<()> {
             limit,
         } => commands::handle_differential(max_sel, sort, position, limit).await?,
         Commands::DreamTeam { gw } => commands::handle_dream_team(gw).await?,
-        Commands::FdrForm { team, limit, all } => {
-            commands::handle_fdr_form(team, limit, all).await?
-        }
+        Commands::FdrForm {
+            team,
+            limit,
+            from,
+            all,
+        } => commands::handle_fdr_form(team, limit, from, all).await?,
         Commands::Fixture(args) => commands::handle_fixture(args).await?,
         Commands::FixtureDifficultyRating {
             team,
