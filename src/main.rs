@@ -7,7 +7,9 @@ mod models;
 mod utils;
 
 use crate::error::{FplrError, Result};
-use crate::models::{Position, SortBy, TeamFormSortBy, TeamHaSortBy, TeamSortBy, TeamTrendSortBy};
+use crate::models::{
+    Position, SortBy, TeamFormSortBy, TeamHaSortBy, TeamSortBy, TeamStatsSortBy, TeamTrendSortBy,
+};
 use clap::{CommandFactory, Parser, Subcommand};
 use clap_complete::{Shell, generate};
 
@@ -256,6 +258,16 @@ enum Commands {
         #[arg(short, long, default_value = "5")]
         last: usize,
     },
+    /// Show team attack/defence stats per match (CS%, xG/match)
+    #[command(name = "team-stats")]
+    TeamStats {
+        /// Sort by metric
+        #[arg(short, long, default_value = "xg")]
+        sort: TeamStatsSortBy,
+        /// Limit to the most recent N completed gameweeks
+        #[arg(short, long)]
+        last: Option<usize>,
+    },
     /// Show team performance trends with sparklines
     #[command(name = "team-trend")]
     TeamTrend {
@@ -471,6 +483,7 @@ async fn run() -> Result<()> {
         Commands::TeamForm { sort } => commands::handle_team_form(&sort).await?,
         Commands::TeamHa { sort } => commands::handle_team_ha(&sort).await?,
         Commands::TeamPerf { gw, last } => commands::handle_team_perf(gw, last).await?,
+        Commands::TeamStats { sort, last } => commands::handle_team_stats(&sort, last).await?,
         Commands::TeamTrend { sort, weeks } => commands::handle_team_trend(sort, weeks).await?,
         Commands::Template {} => commands::handle_template().await?,
         Commands::Top {} => commands::handle_top().await?,

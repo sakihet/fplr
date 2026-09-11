@@ -311,6 +311,21 @@ pub enum TeamHaSortBy {
     Diff,
 }
 
+#[derive(Clone, Debug, Default, ValueEnum)]
+pub enum TeamStatsSortBy {
+    #[value(alias = "cs")]
+    Cs,
+    #[value(alias = "ga")]
+    Ga,
+    #[value(alias = "gf")]
+    Gf,
+    #[default]
+    #[value(alias = "xg")]
+    Xg,
+    #[value(alias = "xga")]
+    Xga,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

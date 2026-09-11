@@ -71,6 +71,7 @@ Commands:
   team-form                  Show team form based on total player form
   team-ha                    Show team home/away performance stats
   team-perf                  Show team performance based on player points per GW
+  team-stats                 Show team attack/defence stats per match (CS%, xG/match)
   team-trend                 Show team performance trends with sparklines
   template                   Show template squad (top players by ownership per position)
   top                        Show top teams in the overall league
