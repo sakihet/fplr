@@ -97,15 +97,20 @@ pub async fn handle_team_ha(sort_by: &TeamHaSortBy) -> Result<()> {
 
     let mut stats_vec: Vec<TeamHaStats> = stats_map.into_values().collect();
 
-    stats_vec.sort_by(|a, b| match sort_by {
-        TeamHaSortBy::AwayPts => b.apts.cmp(&a.apts).then_with(|| b.tpts.cmp(&a.tpts)),
-        TeamHaSortBy::Diff => {
-            let diff_a = a.hpts - a.apts;
-            let diff_b = b.hpts - b.apts;
-            diff_b.cmp(&diff_a).then_with(|| b.tpts.cmp(&a.tpts))
-        }
-        TeamHaSortBy::HomePts => b.hpts.cmp(&a.hpts).then_with(|| b.tpts.cmp(&a.tpts)),
-        TeamHaSortBy::Pts => b.tpts.cmp(&a.tpts).then_with(|| b.hpts.cmp(&a.hpts)),
+    stats_vec.sort_by(|a, b| {
+        let ordering = match sort_by {
+            TeamHaSortBy::AwayPts => b.apts.cmp(&a.apts).then_with(|| b.tpts.cmp(&a.tpts)),
+            TeamHaSortBy::Diff => {
+                let diff_a = a.hpts - a.apts;
+                let diff_b = b.hpts - b.apts;
+                diff_b.cmp(&diff_a).then_with(|| b.tpts.cmp(&a.tpts))
+            }
+            TeamHaSortBy::HomePts => b.hpts.cmp(&a.hpts).then_with(|| b.tpts.cmp(&a.tpts)),
+            TeamHaSortBy::Pts => b.tpts.cmp(&a.tpts).then_with(|| b.hpts.cmp(&a.hpts)),
+        };
+        // Tie-break by name: the source is a HashMap, so ties would otherwise
+        // come out in a different order on every run
+        ordering.then_with(|| a.name.cmp(&b.name))
     });
 
     println!(

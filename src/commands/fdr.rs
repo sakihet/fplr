@@ -199,7 +199,12 @@ fn display_all_teams_fdr(
                     f32::MAX
                 }
             };
-            avg(a).partial_cmp(&avg(b)).unwrap()
+            // Tie-break by name: `team_map` is a HashMap, so ties would
+            // otherwise come out in a different order on every run
+            avg(a)
+                .partial_cmp(&avg(b))
+                .unwrap()
+                .then_with(|| a.1.name.cmp(&b.1.name))
         });
     } else {
         team_fdr_data.sort_by(|a, b| a.1.name.cmp(&b.1.name));
