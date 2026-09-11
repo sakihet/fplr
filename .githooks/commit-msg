@@ -1,0 +1,13 @@
+#!/bin/sh
+# Keep commit messages to a single subject line.
+# Merges, reverts and cherry-picks keep the body git generated for them.
+git_dir=$(git rev-parse --git-dir)
+for f in MERGE_HEAD REVERT_HEAD CHERRY_PICK_HEAD; do
+	[ -f "$git_dir/$f" ] && exit 0
+done
+
+# First non-blank, non-comment line is the subject; everything after it goes.
+subject=$(grep -v '^#' "$1" | sed -n '/./{p;q;}')
+[ -z "$subject" ] && exit 0
+
+printf '%s\n' "$subject" > "$1"

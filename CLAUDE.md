@@ -12,6 +12,7 @@ make fmt         # cargo fmt
 make lint        # cargo clippy -- -D warnings
 make lint-fix    # cargo clippy --fix --allow-dirty --allow-staged -- -D warnings
 make install     # cargo install --path .
+make setup       # enable the repo git hooks (run once per clone)
 ```
 
 After generating or modifying code: run `make fmt` then `make lint-fix`.
@@ -47,5 +48,5 @@ Follow Conventional Commits: `type: short summary` (or `type(scope): summary`).
 
 - Types used in this repo: `feat`, `fix`, `refactor`, `style`, `docs`, `chore`, `ci`
 - Summary: lowercase, imperative mood ("add", not "added"/"adds"), no trailing period
-- Keep the subject line concise; add a body only when the "why" isn't obvious from the diff
-- Default to a single-line commit message (subject only, no body) unless the user asks for more detail
+- Subject line only — never write a body. `.githooks/commit-msg` strips anything after it
+- Merge, revert and cherry-pick commits keep the body git generates for them
