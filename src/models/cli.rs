@@ -311,6 +311,31 @@ pub enum TeamHaSortBy {
     Diff,
 }
 
+#[derive(Clone, Debug, PartialEq, ValueEnum)]
+pub enum SetPieceType {
+    #[value(alias = "corners")]
+    Corner,
+    #[value(alias = "freekick", alias = "free-kick", alias = "direct-freekick")]
+    Fk,
+    #[value(alias = "penalty", alias = "penalties")]
+    Pen,
+}
+
+#[derive(Clone, Debug, Default, ValueEnum)]
+pub enum TeamStatsSortBy {
+    #[value(alias = "cs")]
+    Cs,
+    #[value(alias = "ga")]
+    Ga,
+    #[value(alias = "gf")]
+    Gf,
+    #[default]
+    #[value(alias = "xg")]
+    Xg,
+    #[value(alias = "xga")]
+    Xga,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -1,9 +1,9 @@
 use crate::api::FplClient;
 use crate::error::{FplrError, Result};
+use crate::utils::color::Colorize;
 use crate::utils::constants::{WIDTH_FULL_NAME, WIDTH_STAT_SMALL};
 use crate::utils::fixture_helpers::{is_in_play, is_settled};
 use crate::utils::team_helpers::create_team_map;
-use owo_colors::OwoColorize;
 use std::collections::HashMap;
 
 struct MatchPlayerStat {

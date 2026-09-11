@@ -7,7 +7,10 @@ mod models;
 mod utils;
 
 use crate::error::{FplrError, Result};
-use crate::models::{Position, SortBy, TeamFormSortBy, TeamHaSortBy, TeamSortBy, TeamTrendSortBy};
+use crate::models::{
+    Position, SetPieceType, SortBy, TeamFormSortBy, TeamHaSortBy, TeamSortBy, TeamStatsSortBy,
+    TeamTrendSortBy,
+};
 use clap::{CommandFactory, Parser, Subcommand};
 use clap_complete::{Shell, generate};
 
@@ -19,6 +22,9 @@ struct Args {
     /// Bypass the HTTP response cache
     #[arg(long, global = true)]
     no_cache: bool,
+    /// Disable colored output
+    #[arg(long, global = true)]
+    no_color: bool,
 }
 
 #[derive(Subcommand, Debug)]
@@ -78,6 +84,20 @@ enum Commands {
         #[arg(short, long)]
         gw: Option<u32>,
     },
+    /// Show fixture difficulty rating
+    #[command(name = "fdr", visible_alias = "fixture-difficulty-rating")]
+    Fdr {
+        #[arg(short, long)]
+        team: Option<String>,
+        #[arg(short, long, default_value = "5")]
+        limit: usize,
+        /// Start from this gameweek
+        #[arg(short, long)]
+        from: Option<u64>,
+        /// Sort teams by average difficulty (ascending)
+        #[arg(long)]
+        sort_by_avg: bool,
+    },
     /// Show form-adjusted fixture difficulty rating
     #[command(name = "fdr-form")]
     FdrForm {
@@ -93,20 +113,6 @@ enum Commands {
     },
     /// Show upcoming fixtures
     Fixture(commands::FixtureArgs),
-    /// Show fixture difficulty rating
-    #[command(visible_alias = "fdr")]
-    FixtureDifficultyRating {
-        #[arg(short, long)]
-        team: Option<String>,
-        #[arg(short, long, default_value = "5")]
-        limit: usize,
-        /// Start from this gameweek
-        #[arg(short, long)]
-        from: Option<u64>,
-        /// Sort teams by average difficulty (ascending)
-        #[arg(long)]
-        sort_by_avg: bool,
-    },
     /// Show detailed points summary for a specific fixture
     #[command(name = "fixture-summary")]
     FixtureSummary {
@@ -206,6 +212,9 @@ enum Commands {
         /// Filter by team name
         #[arg(short, long)]
         team: Option<String>,
+        /// Filter by set piece type
+        #[arg(long = "type", value_name = "TYPE")]
+        kind: Option<SetPieceType>,
     },
     /// Show status
     Status {},
@@ -255,6 +264,16 @@ enum Commands {
         /// Number of recent gameweeks to show
         #[arg(short, long, default_value = "5")]
         last: usize,
+    },
+    /// Show team attack/defence stats per match (CS%, xG/match)
+    #[command(name = "team-stats")]
+    TeamStats {
+        /// Sort by metric
+        #[arg(short, long, default_value = "xg")]
+        sort: TeamStatsSortBy,
+        /// Limit to the most recent N completed gameweeks
+        #[arg(short, long)]
+        last: Option<usize>,
     },
     /// Show team performance trends with sparklines
     #[command(name = "team-trend")]
@@ -367,6 +386,7 @@ async fn main() {
 async fn run() -> Result<()> {
     let args = Args::parse();
     cache::set_no_cache(args.no_cache);
+    utils::color::init(args.no_color);
 
     match args.commands {
         Commands::Availability {
@@ -390,6 +410,12 @@ async fn run() -> Result<()> {
             limit,
         } => commands::handle_differential(max_sel, sort, position, limit).await?,
         Commands::DreamTeam { gw } => commands::handle_dream_team(gw).await?,
+        Commands::Fdr {
+            team,
+            limit,
+            from,
+            sort_by_avg,
+        } => commands::handle_fdr(team, limit, from, sort_by_avg).await?,
         Commands::FdrForm {
             team,
             limit,
@@ -397,12 +423,6 @@ async fn run() -> Result<()> {
             all,
         } => commands::handle_fdr_form(team, limit, from, all).await?,
         Commands::Fixture(args) => commands::handle_fixture(args).await?,
-        Commands::FixtureDifficultyRating {
-            team,
-            limit,
-            from,
-            sort_by_avg,
-        } => commands::handle_fixture_difficulty_rating(team, limit, from, sort_by_avg).await?,
         Commands::FixtureSummary { id } => commands::handle_fixture_summary(id).await?,
         Commands::Gameweek {} => commands::handle_gameweek().await?,
         Commands::History(args) => commands::handle_history(args).await?,
@@ -460,7 +480,7 @@ async fn run() -> Result<()> {
             None => commands::handle_region().await?,
         },
         Commands::Results {} => commands::handle_results().await?,
-        Commands::SetPiece { team } => commands::handle_set_piece(team).await?,
+        Commands::SetPiece { team, kind } => commands::handle_set_piece(team, kind).await?,
         Commands::Status {} => commands::handle_status().await?,
         Commands::Swing(args) => commands::handle_swing(args).await?,
         Commands::Table { live } => commands::handle_table(live).await?,
@@ -471,6 +491,7 @@ async fn run() -> Result<()> {
         Commands::TeamForm { sort } => commands::handle_team_form(&sort).await?,
         Commands::TeamHa { sort } => commands::handle_team_ha(&sort).await?,
         Commands::TeamPerf { gw, last } => commands::handle_team_perf(gw, last).await?,
+        Commands::TeamStats { sort, last } => commands::handle_team_stats(&sort, last).await?,
         Commands::TeamTrend { sort, weeks } => commands::handle_team_trend(sort, weeks).await?,
         Commands::Template {} => commands::handle_template().await?,
         Commands::Top {} => commands::handle_top().await?,

@@ -1,13 +1,13 @@
 use crate::api::FplClient;
 use crate::error::{FplrError, Result};
 use crate::models::{BootstrapStatic, Fixture, Team};
+use crate::utils::color::Colorize;
 use crate::utils::constants::{
     WIDTH_AVG, WIDTH_DATE, WIDTH_FDR_CELL, WIDTH_FDR_STAT, WIDTH_FORM_DIFF, WIDTH_FULL_NAME,
     WIDTH_HA, WIDTH_ID, WIDTH_STAT_WIDE,
 };
 use crate::utils::formatters::{colorize_text_by_difficulty, format_datetime_local};
 use crate::utils::team_helpers::{create_team_ref_map, find_team_ids_by_name};
-use owo_colors::OwoColorize;
 use std::collections::HashMap;
 
 pub async fn handle_fdr_form(

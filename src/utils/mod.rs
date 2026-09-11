@@ -1,3 +1,4 @@
+pub mod color;
 pub mod constants;
 pub mod event_helpers;
 pub mod expected_stat;

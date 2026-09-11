@@ -13,7 +13,7 @@ use crate::utils::team_helpers::{create_team_ref_map, find_team_ids_by_name};
 
 type TeamFdrData<'a> = (u64, &'a Team, Vec<Vec<(String, u8)>>);
 
-pub async fn handle_fixture_difficulty_rating(
+pub async fn handle_fdr(
     team: Option<String>,
     limit: usize,
     from: Option<u64>,
@@ -199,7 +199,12 @@ fn display_all_teams_fdr(
                     f32::MAX
                 }
             };
-            avg(a).partial_cmp(&avg(b)).unwrap()
+            // Tie-break by name: `team_map` is a HashMap, so ties would
+            // otherwise come out in a different order on every run
+            avg(a)
+                .partial_cmp(&avg(b))
+                .unwrap()
+                .then_with(|| a.1.name.cmp(&b.1.name))
         });
     } else {
         team_fdr_data.sort_by(|a, b| a.1.name.cmp(&b.1.name));

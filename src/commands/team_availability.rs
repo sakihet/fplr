@@ -72,7 +72,12 @@ pub async fn handle_team_availability() -> Result<()> {
         } else {
             1.0
         };
-        b_pct.partial_cmp(&a_pct).unwrap()
+        // Tie-break by name: the source is a HashMap, so ties would otherwise
+        // come out in a different order on every run
+        b_pct
+            .partial_cmp(&a_pct)
+            .unwrap()
+            .then_with(|| a.name.cmp(&b.name))
     });
 
     let team_w = WIDTH_TEAM_NAME;

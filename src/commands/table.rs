@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use owo_colors::OwoColorize;
+use crate::utils::color::Colorize;
 
 use crate::api::FplClient;
 use crate::error::Result;

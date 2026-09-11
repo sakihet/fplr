@@ -1,10 +1,10 @@
 use crate::api::FplClient;
 use crate::error::{FplrError, Result};
+use crate::utils::color::Colorize;
 use crate::utils::event_helpers::{find_next_event, get_effective_event_id};
 use crate::utils::team_helpers::create_team_map;
 use crate::utils::{constants::*, formatters::*};
 use clap::Args;
-use owo_colors::OwoColorize;
 use std::collections::HashMap;
 
 #[derive(Debug, Args)]

@@ -82,6 +82,9 @@ pub struct Element {
     pub clearances_blocks_interceptions: u64,
     pub recoveries: u64,
     pub defensive_contribution: u64,
+    pub corners_and_indirect_freekicks_order: Option<u64>,
+    pub direct_freekicks_order: Option<u64>,
+    pub penalties_order: Option<u64>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -332,25 +335,6 @@ pub struct SeasonHistory {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct ManagerHistory {
     pub current: Vec<SeasonHistory>,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct SetPieceNoteInfo {
-    pub external_link: bool,
-    pub info_message: String,
-    pub source_link: String,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct SetPieceTeam {
-    pub notes: Vec<SetPieceNoteInfo>,
-    pub id: u64,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct SetPieceNotes {
-    pub last_updated: String,
-    pub teams: Vec<SetPieceTeam>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

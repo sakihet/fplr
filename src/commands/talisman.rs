@@ -8,8 +8,8 @@ use std::collections::HashMap;
 pub async fn handle_talisman(team_opt: Option<String>) -> Result<()> {
     let data = FplClient::fetch_bootstrap_static().await?;
 
-    let mut team_total_points: HashMap<u64, u64> = HashMap::new();
-    let mut team_players: HashMap<u64, Vec<(u64, String, String, u64)>> = HashMap::new();
+    let mut team_total_points: HashMap<u64, i64> = HashMap::new();
+    let mut team_players: HashMap<u64, Vec<(u64, String, String, i64)>> = HashMap::new();
 
     // Map team id to team names
     let mut team_names: HashMap<u64, String> = HashMap::new();
@@ -21,7 +21,8 @@ pub async fn handle_talisman(team_opt: Option<String>) -> Result<()> {
 
     // Calculate total points per team and collect players
     for player in &data.elements {
-        let pts = player.total_points as u64;
+        // total_points can be negative, so it must stay signed
+        let pts = player.total_points;
         *team_total_points.entry(player.team).or_insert(0) += pts;
 
         let pos_name = crate::models::Position::from_element_type_id(player.element_type)

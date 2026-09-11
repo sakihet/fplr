@@ -2,10 +2,10 @@ use crate::api::FplClient;
 use crate::config::Config;
 use crate::error::Result;
 use crate::models::EntryLeagueItem;
+use crate::utils::color::Colorize;
 use crate::utils::constants::*;
 use crate::utils::formatters::format_compact_number;
 use clap::Args;
-use owo_colors::OwoColorize;
 
 #[derive(Debug, Args)]
 pub struct MyLeaguesArgs {
