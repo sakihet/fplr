@@ -84,6 +84,20 @@ enum Commands {
         #[arg(short, long)]
         gw: Option<u32>,
     },
+    /// Show fixture difficulty rating
+    #[command(name = "fdr", visible_alias = "fixture-difficulty-rating")]
+    Fdr {
+        #[arg(short, long)]
+        team: Option<String>,
+        #[arg(short, long, default_value = "5")]
+        limit: usize,
+        /// Start from this gameweek
+        #[arg(short, long)]
+        from: Option<u64>,
+        /// Sort teams by average difficulty (ascending)
+        #[arg(long)]
+        sort_by_avg: bool,
+    },
     /// Show form-adjusted fixture difficulty rating
     #[command(name = "fdr-form")]
     FdrForm {
@@ -99,20 +113,6 @@ enum Commands {
     },
     /// Show upcoming fixtures
     Fixture(commands::FixtureArgs),
-    /// Show fixture difficulty rating
-    #[command(visible_alias = "fdr")]
-    FixtureDifficultyRating {
-        #[arg(short, long)]
-        team: Option<String>,
-        #[arg(short, long, default_value = "5")]
-        limit: usize,
-        /// Start from this gameweek
-        #[arg(short, long)]
-        from: Option<u64>,
-        /// Sort teams by average difficulty (ascending)
-        #[arg(long)]
-        sort_by_avg: bool,
-    },
     /// Show detailed points summary for a specific fixture
     #[command(name = "fixture-summary")]
     FixtureSummary {
@@ -410,6 +410,12 @@ async fn run() -> Result<()> {
             limit,
         } => commands::handle_differential(max_sel, sort, position, limit).await?,
         Commands::DreamTeam { gw } => commands::handle_dream_team(gw).await?,
+        Commands::Fdr {
+            team,
+            limit,
+            from,
+            sort_by_avg,
+        } => commands::handle_fdr(team, limit, from, sort_by_avg).await?,
         Commands::FdrForm {
             team,
             limit,
@@ -417,12 +423,6 @@ async fn run() -> Result<()> {
             all,
         } => commands::handle_fdr_form(team, limit, from, all).await?,
         Commands::Fixture(args) => commands::handle_fixture(args).await?,
-        Commands::FixtureDifficultyRating {
-            team,
-            limit,
-            from,
-            sort_by_avg,
-        } => commands::handle_fixture_difficulty_rating(team, limit, from, sort_by_avg).await?,
         Commands::FixtureSummary { id } => commands::handle_fixture_summary(id).await?,
         Commands::Gameweek {} => commands::handle_gameweek().await?,
         Commands::History(args) => commands::handle_history(args).await?,

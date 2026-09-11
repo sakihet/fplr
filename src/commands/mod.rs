@@ -50,7 +50,7 @@ pub use compare::handle_compare;
 pub use config::{ConfigArgs, handle_config};
 pub use differential::handle_differential;
 pub use dream_team::handle_dream_team;
-pub use fdr::handle_fixture_difficulty_rating;
+pub use fdr::handle_fdr;
 pub use fdr_form::handle_fdr_form;
 pub use fixture::{FixtureArgs, handle_fixture};
 pub use fixture_summary::handle_fixture_summary;

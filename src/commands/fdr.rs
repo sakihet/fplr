@@ -13,7 +13,7 @@ use crate::utils::team_helpers::{create_team_ref_map, find_team_ids_by_name};
 
 type TeamFdrData<'a> = (u64, &'a Team, Vec<Vec<(String, u8)>>);
 
-pub async fn handle_fixture_difficulty_rating(
+pub async fn handle_fdr(
     team: Option<String>,
     limit: usize,
     from: Option<u64>,
