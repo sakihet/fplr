@@ -1,4 +1,4 @@
-use owo_colors::OwoColorize;
+use crate::utils::color::Colorize;
 use textplots::{Chart, Plot, Shape};
 
 use crate::api::FplClient;

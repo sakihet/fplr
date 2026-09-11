@@ -33,6 +33,25 @@ fplr config set manager-id YOUR_MANAGER_ID
 2. Click the "Points" link
 3. Check the URL: `https://fantasy.premierleague.com/entry/{manager_id}/event/{event_id}`
 
+### Color output
+
+Output is colored only when it goes to a terminal, so piping into `grep`, `awk`
+or a file gives plain text:
+
+```sh
+fplr table | grep Arsenal
+```
+
+Color is turned off when any of these apply:
+
+| | |
+| --- | --- |
+| `--no-color` | passed on the command line |
+| `NO_COLOR` | set to a non-empty value ([no-color.org](https://no-color.org/)) |
+| `FPLR_NO_COLOR` | set to a non-empty value |
+| `TERM=dumb` | |
+| stdout is not a terminal | e.g. a pipe or a redirect |
+
 ## Commands
 
 ```

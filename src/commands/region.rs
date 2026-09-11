@@ -1,6 +1,6 @@
 use crate::error::Result;
+use crate::utils::color::Colorize;
 use crate::utils::constants::*;
-use owo_colors::OwoColorize;
 
 pub const REGIONS: &[(u16, &str, &str, &str)] = &[
     (1, "Afghanistan", "AF", "AFG"),

@@ -1,9 +1,9 @@
 use crate::api::FplClient;
 use crate::error::Result;
+use crate::utils::color::Colorize;
 use crate::utils::constants::*;
 use crate::utils::formatters::truncate;
 use clap::Args;
-use owo_colors::OwoColorize;
 
 #[derive(Debug, Args)]
 pub struct MiniLeagueArgs {

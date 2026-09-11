@@ -22,6 +22,9 @@ struct Args {
     /// Bypass the HTTP response cache
     #[arg(long, global = true)]
     no_cache: bool,
+    /// Disable colored output
+    #[arg(long, global = true)]
+    no_color: bool,
 }
 
 #[derive(Subcommand, Debug)]
@@ -383,6 +386,7 @@ async fn main() {
 async fn run() -> Result<()> {
     let args = Args::parse();
     cache::set_no_cache(args.no_cache);
+    utils::color::init(args.no_color);
 
     match args.commands {
         Commands::Availability {

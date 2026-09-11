@@ -1,12 +1,12 @@
 use crate::api::FplClient;
 use crate::error::Result;
 use crate::models::Position;
+use crate::utils::color::Colorize;
 use crate::utils::constants::*;
 use crate::utils::event_helpers::get_current_event_id;
 use crate::utils::formatters::format_compact_number;
 use crate::utils::team_helpers::create_team_short_name_map;
 use clap::Args;
-use owo_colors::OwoColorize;
 
 #[derive(Debug, Args)]
 pub struct TransferArgs {
