@@ -8,7 +8,8 @@ mod utils;
 
 use crate::error::{FplrError, Result};
 use crate::models::{
-    Position, SortBy, TeamFormSortBy, TeamHaSortBy, TeamSortBy, TeamStatsSortBy, TeamTrendSortBy,
+    Position, SetPieceType, SortBy, TeamFormSortBy, TeamHaSortBy, TeamSortBy, TeamStatsSortBy,
+    TeamTrendSortBy,
 };
 use clap::{CommandFactory, Parser, Subcommand};
 use clap_complete::{Shell, generate};
@@ -208,6 +209,9 @@ enum Commands {
         /// Filter by team name
         #[arg(short, long)]
         team: Option<String>,
+        /// Filter by set piece type
+        #[arg(long = "type", value_name = "TYPE")]
+        kind: Option<SetPieceType>,
     },
     /// Show status
     Status {},
@@ -472,7 +476,7 @@ async fn run() -> Result<()> {
             None => commands::handle_region().await?,
         },
         Commands::Results {} => commands::handle_results().await?,
-        Commands::SetPiece { team } => commands::handle_set_piece(team).await?,
+        Commands::SetPiece { team, kind } => commands::handle_set_piece(team, kind).await?,
         Commands::Status {} => commands::handle_status().await?,
         Commands::Swing(args) => commands::handle_swing(args).await?,
         Commands::Table { live } => commands::handle_table(live).await?,

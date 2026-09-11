@@ -1,50 +1,89 @@
 use crate::api::FplClient;
 use crate::error::Result;
-use crate::utils::constants::WIDTH_FULL_NAME;
+use crate::models::{Element, SetPieceType};
+use crate::utils::constants::{
+    WIDTH_NAME, WIDTH_ORDER, WIDTH_SET_PIECE_TYPE, WIDTH_TEAM_NAME, WIDTH_TEAM_SHORT_NAME,
+};
+use crate::utils::formatters::truncate;
+use crate::utils::team_helpers::find_team_ids_by_name;
 
-pub async fn handle_set_piece(team_name: Option<String>) -> Result<()> {
-    // Fetch bootstrap-static to resolve team names
-    let bootstrap = FplClient::fetch_bootstrap_static().await?;
-    let data = FplClient::fetch_set_piece_notes().await?;
+/// A set piece type, its column label, and the element field holding its taker order.
+type SetPieceColumn = (SetPieceType, &'static str, fn(&Element) -> Option<u64>);
 
-    println!("{:<width$} Set Piece Info", "Team", width = WIDTH_FULL_NAME);
+/// Set piece types, in the order they are listed for each team.
+const SET_PIECE_TYPES: [SetPieceColumn; 3] = [
+    (SetPieceType::Pen, "PEN", |e| e.penalties_order),
+    (SetPieceType::Fk, "FK", |e| e.direct_freekicks_order),
+    (SetPieceType::Corner, "CORNER", |e| {
+        e.corners_and_indirect_freekicks_order
+    }),
+];
 
-    for team_notes in data.teams {
-        // Get team name from team_id
-        let team = bootstrap.teams.iter().find(|t| t.id == team_notes.id);
+pub async fn handle_set_piece(team_name: Option<String>, kind: Option<SetPieceType>) -> Result<()> {
+    let data = FplClient::fetch_bootstrap_static().await?;
 
-        let team_full_name = team.map(|t| t.name.as_str()).unwrap_or("Unknown");
-        let team_short_name = team.map(|t| t.short_name.as_str()).unwrap_or("");
+    let mut teams: Vec<_> = data.teams.iter().collect();
 
-        // Apply filter if provided
-        if let Some(ref filter) = team_name {
-            let filter_lower = filter.to_lowercase();
-            if !team_short_name.to_lowercase().contains(&filter_lower)
-                && !team_full_name.to_lowercase().contains(&filter_lower)
-            {
+    if let Some(ref name) = team_name {
+        let ids = find_team_ids_by_name(&data.teams, name);
+        if ids.is_empty() {
+            println!("No team found matching '{}'", name);
+            return Ok(());
+        }
+        teams.retain(|t| ids.contains(&t.id));
+    }
+
+    teams.sort_by(|a, b| a.name.cmp(&b.name));
+
+    println!(
+        "{:<team_w$}  {:<name_w$}  {:<type_w$}  {:>order_w$}  Player",
+        "Team",
+        "Name",
+        "Type",
+        "Order",
+        team_w = WIDTH_TEAM_SHORT_NAME,
+        name_w = WIDTH_TEAM_NAME,
+        type_w = WIDTH_SET_PIECE_TYPE,
+        order_w = WIDTH_ORDER,
+    );
+
+    let mut found = false;
+
+    for team in teams {
+        for (set_piece_type, label, order_of) in SET_PIECE_TYPES {
+            if kind.as_ref().is_some_and(|k| *k != set_piece_type) {
                 continue;
             }
-        }
 
-        // Print each note for this team
-        for (i, note) in team_notes.notes.iter().enumerate() {
-            if i == 0 {
+            // Collect the takers of this set piece type, best-ranked first
+            let mut takers: Vec<(u64, &Element)> = data
+                .elements
+                .iter()
+                .filter(|e| e.team == team.id)
+                .filter_map(|e| order_of(e).map(|order| (order, e)))
+                .collect();
+            takers.sort_by_key(|(order, _)| *order);
+
+            for (order, element) in takers {
+                found = true;
                 println!(
-                    "{:<width$} {}",
-                    team_full_name,
-                    note.info_message,
-                    width = WIDTH_FULL_NAME
-                );
-            } else {
-                println!(
-                    "{:<width$} {}",
-                    "",
-                    note.info_message,
-                    width = WIDTH_FULL_NAME
+                    "{:<team_w$}  {:<name_w$}  {:<type_w$}  {:>order_w$}  {}",
+                    team.short_name,
+                    truncate(&team.name, WIDTH_TEAM_NAME),
+                    label,
+                    order,
+                    truncate(&element.web_name, WIDTH_NAME),
+                    team_w = WIDTH_TEAM_SHORT_NAME,
+                    name_w = WIDTH_TEAM_NAME,
+                    type_w = WIDTH_SET_PIECE_TYPE,
+                    order_w = WIDTH_ORDER,
                 );
             }
         }
-        println!();
+    }
+
+    if !found {
+        println!("No set piece takers match the given filters.");
     }
 
     Ok(())
