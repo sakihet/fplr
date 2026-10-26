@@ -78,6 +78,7 @@ Commands:
   pick               Show a manager's team picks for a specific event
   player             Show players
   player-summary     Show player summary
+  price-change       Show official price change progress and projections
   region             Show regions, or players from a specific region if a name is given
   results            Show season results matrix
   set-piece          Show set piece takers (penalties, free kicks, corners)

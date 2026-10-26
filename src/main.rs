@@ -199,6 +199,9 @@ enum Commands {
         #[arg(long)]
         fpl: bool,
     },
+    /// Show official price change progress and projections
+    #[command(name = "price-change")]
+    PriceChange(commands::PriceChangeArgs),
     /// Show regions, or players from a specific region if a name is given
     Region {
         /// Region name (shows players from this region instead of the region list)
@@ -468,6 +471,7 @@ async fn run() -> Result<()> {
             ict,
             fpl,
         } => commands::handle_player_summary(player_id, graph, xg, ict, fpl).await?,
+        Commands::PriceChange(args) => commands::handle_price_change(args).await?,
         Commands::Region { name } => match name {
             Some(name) => {
                 commands::handle_player(commands::PlayerFilterArgs {
