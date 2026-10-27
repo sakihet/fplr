@@ -63,7 +63,7 @@ Commands:
   config             Manage configuration
   differential       Show low-ownership players with high potential
   dream-team         Show dream team
-  fdr                Show fixture difficulty rating [aliases: fixture-difficulty-rating]
+  fdr                Show fixture difficulty rating [alias: fixture-difficulty-rating]
   fdr-form           Show form-adjusted fixture difficulty rating
   fixture            Show upcoming fixtures
   fixture-summary    Show detailed points summary for a specific fixture
@@ -79,7 +79,7 @@ Commands:
   pick               Show a manager's team picks for a specific event
   player             Show players
   player-summary     Show player summary
-  price-change       Show official price change progress and projections
+  price-change       Show official price change progress
   region             Show regions, or players from a specific region if a name is given
   results            Show season results matrix
   set-piece          Show set piece takers (penalties, free kicks, corners)
@@ -88,7 +88,7 @@ Commands:
   table              Show league table
   talisman           Show talisman players
   team               Show teams
-  team-availability  Show team availability statistics [aliases: ta]
+  team-availability  Show team availability statistics [alias: ta]
   team-fpl-rank      Show team FPL points rank vs Premier League position
   team-form          Show team form based on total player form
   team-ha            Show team home/away performance stats

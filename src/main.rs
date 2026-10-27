@@ -202,7 +202,7 @@ enum Commands {
         #[arg(long)]
         fpl: bool,
     },
-    /// Show official price change progress and projections
+    /// Show official price change progress
     #[command(name = "price-change")]
     PriceChange(commands::PriceChangeArgs),
     /// Show regions, or players from a specific region if a name is given
