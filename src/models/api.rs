@@ -85,6 +85,23 @@ pub struct Element {
     pub corners_and_indirect_freekicks_order: Option<u64>,
     pub direct_freekicks_order: Option<u64>,
     pub penalties_order: Option<u64>,
+    #[serde(default)]
+    pub price_change_percent: Option<String>,
+    #[serde(default)]
+    pub price_change_hourly_rate: i64,
+    #[serde(default)]
+    pub price_change_locked_until: Option<String>,
+}
+
+#[derive(Debug, Default, Deserialize, Serialize)]
+pub struct GameConfig {
+    #[serde(default)]
+    pub status: GameConfigStatus,
+}
+
+#[derive(Debug, Default, Deserialize, Serialize)]
+pub struct GameConfigStatus {
+    pub price_change_last_updated: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -113,6 +130,8 @@ pub struct BootstrapStatic {
     pub events: Vec<Event>,
     pub elements: Vec<Element>,
     pub teams: Vec<Team>,
+    #[serde(default)]
+    pub game_config: GameConfig,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -360,6 +379,15 @@ pub struct Standings {
 pub struct League {
     pub id: u64,
     pub name: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct MostValuableTeam {
+    pub entry: u64,
+    pub name: String,
+    pub player_name: String,
+    pub value_with_bank: u64,
+    pub total_transfers: u64,
 }
 
 #[derive(Debug, Deserialize, Serialize)]

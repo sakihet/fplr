@@ -148,6 +148,9 @@ enum Commands {
     /// Show mini-league standings
     #[command(name = "mini-league")]
     MiniLeague(commands::MiniLeagueArgs),
+    /// Show the most valuable teams (squad value including bank)
+    #[command(name = "most-valuable")]
+    MostValuable {},
     /// Show my leagues
     #[command(name = "my-leagues")]
     MyLeagues(commands::MyLeaguesArgs),
@@ -199,6 +202,9 @@ enum Commands {
         #[arg(long)]
         fpl: bool,
     },
+    /// Show official price change progress
+    #[command(name = "price-change")]
+    PriceChange(commands::PriceChangeArgs),
     /// Show regions, or players from a specific region if a name is given
     Region {
         /// Region name (shows players from this region instead of the region list)
@@ -430,6 +436,7 @@ async fn run() -> Result<()> {
         Commands::Live { gw, limit } => commands::handle_live(gw, limit).await?,
         Commands::Manager { manager_id, gw } => commands::handle_manager(manager_id, gw).await?,
         Commands::MiniLeague(args) => commands::handle_mini_league(args).await?,
+        Commands::MostValuable {} => commands::handle_most_valuable().await?,
         Commands::MyLeagues(args) => commands::handle_my_leagues(args).await?,
         Commands::MyTeam(args) => commands::handle_my_team(args).await?,
         Commands::Pick {
@@ -468,6 +475,7 @@ async fn run() -> Result<()> {
             ict,
             fpl,
         } => commands::handle_player_summary(player_id, graph, xg, ict, fpl).await?,
+        Commands::PriceChange(args) => commands::handle_price_change(args).await?,
         Commands::Region { name } => match name {
             Some(name) => {
                 commands::handle_player(commands::PlayerFilterArgs {
