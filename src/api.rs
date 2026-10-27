@@ -7,7 +7,7 @@ use crate::cache;
 use crate::error::Result;
 use crate::models::{
     BootstrapStatic, DreamTeam, EntryDetail, Fixture, LeagueStandingsResponse, LiveData,
-    ManagerHistory, ManagerPicks, PlayerSummary, Transfer,
+    ManagerHistory, ManagerPicks, MostValuableTeam, PlayerSummary, Transfer,
 };
 
 const BASE_URL: &str = "https://fantasy.premierleague.com/api";
@@ -95,6 +95,10 @@ impl FplClient {
 
     pub async fn fetch_manager_transfers(manager_id: u64) -> Result<Vec<Transfer>> {
         Self::fetch(&format!("/entry/{}/transfers/", manager_id)).await
+    }
+
+    pub async fn fetch_most_valuable_teams() -> Result<Vec<MostValuableTeam>> {
+        Self::fetch("/stats/most-valuable-teams/").await
     }
 
     pub async fn fetch_entry_details(manager_id: u64) -> Result<EntryDetail> {

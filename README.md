@@ -73,6 +73,7 @@ Commands:
   live               Show live player stats for a specific event
   manager            Show a specific manager's team
   mini-league        Show mini-league standings
+  most-valuable      Show the most valuable teams (squad value including bank)
   my-leagues         Show my leagues
   my-team            Show my team
   pick               Show a manager's team picks for a specific event

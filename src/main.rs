@@ -148,6 +148,9 @@ enum Commands {
     /// Show mini-league standings
     #[command(name = "mini-league")]
     MiniLeague(commands::MiniLeagueArgs),
+    /// Show the most valuable teams (squad value including bank)
+    #[command(name = "most-valuable")]
+    MostValuable {},
     /// Show my leagues
     #[command(name = "my-leagues")]
     MyLeagues(commands::MyLeaguesArgs),
@@ -433,6 +436,7 @@ async fn run() -> Result<()> {
         Commands::Live { gw, limit } => commands::handle_live(gw, limit).await?,
         Commands::Manager { manager_id, gw } => commands::handle_manager(manager_id, gw).await?,
         Commands::MiniLeague(args) => commands::handle_mini_league(args).await?,
+        Commands::MostValuable {} => commands::handle_most_valuable().await?,
         Commands::MyLeagues(args) => commands::handle_my_leagues(args).await?,
         Commands::MyTeam(args) => commands::handle_my_team(args).await?,
         Commands::Pick {

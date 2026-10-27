@@ -382,6 +382,15 @@ pub struct League {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
+pub struct MostValuableTeam {
+    pub entry: u64,
+    pub name: String,
+    pub player_name: String,
+    pub value_with_bank: u64,
+    pub total_transfers: u64,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
 pub struct LeagueStandingsResponse {
     pub league: League,
     pub standings: Standings,
