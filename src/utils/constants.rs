@@ -48,3 +48,5 @@ pub const WIDTH_ORDER: usize = 5;
 pub const WIDTH_PCT: usize = 6;
 pub const WIDTH_RATE: usize = 6;
 pub const WIDTH_TRANSFERS: usize = 9;
+pub const WIDTH_MINUTES_RATIO: usize = 7;
+pub const WIDTH_FLAGS: usize = 15;

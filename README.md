@@ -82,6 +82,7 @@ Commands:
   price-change       Show official price change progress
   region             Show regions, or players from a specific region if a name is given
   results            Show season results matrix
+  sell               Show sell candidates from my team (availability, fixtures, minutes)
   set-piece          Show set piece takers (penalties, free kicks, corners)
   status             Show status
   swing              Show mathematically calculated Fixture Swings
