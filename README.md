@@ -57,6 +57,7 @@ Color is turned off when any of these apply:
 ```
 Commands:
   availability       Show player availability (injuries, suspensions, etc.)
+  buy                Show replacement candidates for my team (position, budget, club limit)
   cache              Manage the HTTP response cache
   compare            Compare two players side-by-side
   completions        Generate shell completion scripts

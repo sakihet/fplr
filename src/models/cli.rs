@@ -43,6 +43,17 @@ pub enum TeamTrendSortBy {
 }
 
 #[derive(Clone, Debug, Default, ValueEnum)]
+pub enum BuySortBy {
+    #[default]
+    Form,
+    #[value(alias = "xgi90")]
+    Xgi,
+    Fdr,
+    #[value(alias = "points")]
+    Pts,
+}
+
+#[derive(Clone, Debug, Default, ValueEnum)]
 pub enum SortBy {
     Cost,
     SelectedBy,

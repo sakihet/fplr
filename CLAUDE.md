@@ -31,6 +31,8 @@ After generating or modifying code: run `make fmt` then `make lint-fix`.
   - `constants.rs` — `WIDTH_*` constants used for all table column widths
   - `formatters.rs` — datetime formatting, difficulty colorization, color helpers
   - `player_helpers.rs`, `team_helpers.rs`, `region_helpers.rs`, `event_helpers.rs` — lookup utilities
+  - `fixture_helpers.rs` — fixture state and upcoming-fixture helpers
+  - `manager_helpers.rs` — manager squad fetching
 - `src/config.rs` — TOML config at `~/.config/fplr/config.toml` storing `manager_id`.
 - `src/error.rs` — `FplrError` enum (using `thiserror`) and `Result<T>` alias.
 

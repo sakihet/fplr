@@ -1,11 +1,15 @@
 use crate::api::FplClient;
 use crate::config::Config;
-use crate::error::{FplrError, Result};
-use crate::models::{Element, Fixture, LiveData, PlayerStatus, Position};
+use crate::error::Result;
+use crate::models::{Element, LiveData, PlayerStatus, Position};
 use crate::utils::color::Colorize;
 use crate::utils::constants::*;
-use crate::utils::event_helpers::{find_next_event, get_current_event_id};
-use crate::utils::formatters::{colorize_text_by_difficulty, format_chance_of_playing};
+use crate::utils::event_helpers::get_current_event_id;
+use crate::utils::fixture_helpers::{
+    average_difficulty, format_upcoming_fixtures, upcoming_fixtures, upcoming_window, window_label,
+};
+use crate::utils::formatters::format_chance_of_playing;
+use crate::utils::manager_helpers::fetch_picks_with_fallback;
 use crate::utils::team_helpers::create_team_short_name_map;
 use clap::Args;
 use futures::future::join_all;
@@ -79,24 +83,12 @@ pub async fn handle_sell(args: SellArgs) -> Result<()> {
         return Ok(());
     };
 
-    let picks_data = match FplClient::fetch_manager_picks(manager_id, event_id).await {
-        Ok(data) => data,
-        Err(FplrError::ApiStatus(status, _)) if status.as_u16() == 404 && event_id > 1 => {
-            FplClient::fetch_manager_picks(manager_id, event_id - 1).await?
-        }
-        Err(e) => return Err(e),
-    };
+    let picks_data = fetch_picks_with_fallback(manager_id, event_id).await?;
     let squad_event = picks_data.entry_history.event;
 
     let fixtures = FplClient::fetch_fixtures().await?;
 
-    // Upcoming window starts at the next gameweek
-    let start_gw = find_next_event(&bootstrap.events)
-        .map(|e| e.id)
-        .unwrap_or(event_id as u64 + 1);
-    let window: Vec<u64> = (start_gw..start_gw + args.weeks)
-        .filter(|gw| bootstrap.events.iter().any(|e| e.id == *gw))
-        .collect();
+    let window = upcoming_window(&bootstrap.events, args.weeks);
 
     // Minutes are taken from the most recent finished gameweeks only
     let mut recent_gws: Vec<u64> = bootstrap
@@ -150,10 +142,7 @@ pub async fn handle_sell(args: SellArgs) -> Result<()> {
             });
 
             let upcoming = upcoming_fixtures(&fixtures, player.team, &window, &team_map);
-            let difficulties: Vec<u8> = upcoming.iter().flatten().map(|(_, d)| *d).collect();
-            let avg_fdr = (!difficulties.is_empty()).then(|| {
-                difficulties.iter().map(|d| *d as f64).sum::<f64>() / difficulties.len() as f64
-            });
+            let avg_fdr = average_difficulty(&upcoming);
 
             let mut flags = Vec::new();
             if let Some(flag) =
@@ -192,16 +181,11 @@ pub async fn handle_sell(args: SellArgs) -> Result<()> {
         })
     });
 
-    let window_label = match (window.first(), window.last()) {
-        (Some(first), Some(last)) if first == last => format!("GW{}", first),
-        (Some(first), Some(last)) => format!("GW{}-GW{}", first, last),
-        _ => "none".to_string(),
-    };
     println!("\n=== Sell Candidates ===\n");
     println!(
         "Squad: GW{} | Fixtures: {} | Minutes: last {} finished GWs",
         squad_event,
-        window_label,
+        window_label(&window),
         recent_gws.len()
     );
     println!(
@@ -267,22 +251,6 @@ pub async fn handle_sell(args: SellArgs) -> Result<()> {
             _ => flags_padded.red().bold().to_string(),
         };
 
-        let fixtures_display = c
-            .fixtures
-            .iter()
-            .map(|gw| {
-                if gw.is_empty() {
-                    "-".to_string()
-                } else {
-                    gw.iter()
-                        .map(|(label, difficulty)| colorize_text_by_difficulty(label, *difficulty))
-                        .collect::<Vec<_>>()
-                        .join("+")
-                }
-            })
-            .collect::<Vec<_>>()
-            .join(" ");
-
         println!(
             "{:>id_w$}  {:<pos_w$}  {:<name_w$}  {:<team_w$}  {:>cost_w$.1}  {:>form_w$}  {}  {:>min_w$}  {:>avg_w$}  {}  {}",
             player.id,
@@ -295,7 +263,7 @@ pub async fn handle_sell(args: SellArgs) -> Result<()> {
             minutes,
             avg_fdr,
             flags_display,
-            fixtures_display,
+            format_upcoming_fixtures(&c.fixtures),
             id_w = WIDTH_ID,
             pos_w = WIDTH_POS,
             name_w = WIDTH_NAME,
@@ -314,6 +282,7 @@ pub async fn handle_sell(args: SellArgs) -> Result<()> {
         );
     }
     println!("\nNote: transfers made before the next deadline are not reflected.");
+    println!("Tip: run `fplr buy --out <ID>` to find replacements.");
 
     Ok(())
 }
@@ -335,42 +304,6 @@ fn availability_flag(status: &PlayerStatus, chance: Option<u64>) -> Option<Flag>
 
 fn is_low_minutes(played: u64, matches: u64) -> bool {
     matches > 0 && (played as f64 / matches as f64) < LOW_MINUTES_THRESHOLD
-}
-
-/// Opponents per gameweek in the window; an empty entry means a blank gameweek
-fn upcoming_fixtures(
-    fixtures: &[Fixture],
-    team_id: u64,
-    window: &[u64],
-    team_map: &HashMap<u64, String>,
-) -> Vec<Vec<(String, u8)>> {
-    window
-        .iter()
-        .map(|gw| {
-            let mut gw_fixtures: Vec<&Fixture> = fixtures
-                .iter()
-                .filter(|f| f.event == Some(*gw) && (f.team_h == team_id || f.team_a == team_id))
-                .collect();
-            gw_fixtures.sort_by(|a, b| a.kickoff_time.cmp(&b.kickoff_time));
-            gw_fixtures
-                .into_iter()
-                .map(|f| {
-                    let is_home = f.team_h == team_id;
-                    let (opponent_id, difficulty) = if is_home {
-                        (f.team_a, f.team_h_difficulty)
-                    } else {
-                        (f.team_h, f.team_a_difficulty)
-                    };
-                    let opponent = team_map
-                        .get(&opponent_id)
-                        .map(|s| s.as_str())
-                        .unwrap_or("???");
-                    let label = format!("{}({})", opponent, if is_home { "H" } else { "A" });
-                    (label, difficulty)
-                })
-                .collect()
-        })
-        .collect()
 }
 
 #[cfg(test)]

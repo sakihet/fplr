@@ -1,4 +1,5 @@
 pub mod availability;
+pub mod buy;
 pub mod cache;
 pub mod compare;
 pub mod config;
@@ -48,6 +49,7 @@ pub mod xgc;
 pub mod xgi;
 
 pub use availability::handle_availability;
+pub use buy::{BuyArgs, handle_buy};
 pub use cache::{CacheArgs, handle_cache};
 pub use compare::handle_compare;
 pub use config::{ConfigArgs, handle_config};
