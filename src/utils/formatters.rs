@@ -1,5 +1,5 @@
 use crate::utils::color::Colorize;
-use chrono::{DateTime, Local, Utc};
+use chrono::{DateTime, Duration, Local, Utc};
 use chrono_tz::Tz;
 
 pub fn format_datetime_local(datetime_str: &str) -> String {
@@ -14,6 +14,24 @@ pub fn format_datetime_local(datetime_str: &str) -> String {
     // Fallback to offset format
     let local_dt = dt.with_timezone(&Local);
     local_dt.format("%Y-%m-%d %H:%M %:z").to_string()
+}
+
+/// Format the time remaining until `target` relative to `now` (e.g. "2d 5h", "3h 20m", "15m")
+pub fn format_time_until(target: DateTime<Utc>, now: DateTime<Utc>) -> String {
+    let diff = target - now;
+    if diff <= Duration::zero() {
+        return "Passed".to_string();
+    }
+    let days = diff.num_days();
+    let hours = diff.num_hours() % 24;
+    let minutes = diff.num_minutes() % 60;
+    if days > 0 {
+        format!("{}d {}h", days, hours)
+    } else if hours > 0 {
+        format!("{}h {}m", hours, minutes)
+    } else {
+        format!("{}m", minutes.max(1))
+    }
 }
 
 fn get_system_timezone() -> Option<Tz> {
@@ -257,6 +275,39 @@ mod tests {
         let chars: Vec<char> = result.chars().collect();
         assert_eq!(chars[0], ' '); // 0
         assert_eq!(chars[2], '█'); // 100
+    }
+
+    fn base_time() -> DateTime<Utc> {
+        "2026-10-30T12:00:00Z".parse().unwrap()
+    }
+
+    #[test]
+    fn test_format_time_until_days() {
+        let now = base_time();
+        let target = now + Duration::days(2) + Duration::hours(5) + Duration::minutes(30);
+        assert_eq!(format_time_until(target, now), "2d 5h");
+    }
+
+    #[test]
+    fn test_format_time_until_hours() {
+        let now = base_time();
+        let target = now + Duration::hours(3) + Duration::minutes(20);
+        assert_eq!(format_time_until(target, now), "3h 20m");
+    }
+
+    #[test]
+    fn test_format_time_until_minutes() {
+        let now = base_time();
+        assert_eq!(format_time_until(now + Duration::minutes(15), now), "15m");
+        // Less than a minute left is shown as 1m rather than 0m
+        assert_eq!(format_time_until(now + Duration::seconds(30), now), "1m");
+    }
+
+    #[test]
+    fn test_format_time_until_passed() {
+        let now = base_time();
+        assert_eq!(format_time_until(now, now), "Passed");
+        assert_eq!(format_time_until(now - Duration::hours(1), now), "Passed");
     }
 
     #[test]
