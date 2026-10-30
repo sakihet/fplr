@@ -1,9 +1,11 @@
 use crate::api::FplClient;
 use crate::config::Config;
 use crate::error::Result;
+use crate::utils::color::Colorize;
 use crate::utils::event_helpers::{find_current_event, find_next_event};
 use crate::utils::fixture_helpers::gameweek_progress;
-use crate::utils::formatters::format_datetime_local;
+use crate::utils::formatters::{format_datetime_local, format_time_until};
+use chrono::{DateTime, Duration, Utc};
 
 use crate::utils::constants::*;
 
@@ -43,21 +45,25 @@ pub async fn handle_status() -> Result<()> {
     let awaiting_bonus_fixtures = progress.awaiting_bonus;
 
     if let (Some(current), Some(next)) = (current_event, next_event) {
+        let time_left = time_left_cell(&next.deadline_time, Utc::now());
+
         println!(
-            "{:<gw_w$}  {:<avg_w$}  {:<pts_w$}  {:<max_w$}  {:<time_w$}",
+            "{:<gw_w$}  {:<avg_w$}  {:<pts_w$}  {:<max_w$}  {:<time_w$}  {:<left_w$}",
             "GW",
             "Average",
             "Points",
             "Highest",
             "Next Deadline",
+            "Time Left",
             gw_w = WIDTH_GW,
             avg_w = WIDTH_AVERAGE,
             pts_w = WIDTH_POINTS,
             max_w = WIDTH_HIGHEST,
             time_w = WIDTH_TIME,
+            left_w = WIDTH_TIME_LEFT,
         );
         println!(
-            "{:<gw_w$}  {:<avg_w$}  {:<pts_w$}  {:<max_w$}  {:<time_w$}",
+            "{:<gw_w$}  {:<avg_w$}  {:<pts_w$}  {:<max_w$}  {:<time_w$}  {}",
             current.id,
             current
                 .average_entry_score
@@ -69,6 +75,7 @@ pub async fn handle_status() -> Result<()> {
                 .map(|s| s.to_string())
                 .unwrap_or("-".to_string()),
             format_datetime_local(&next.deadline_time),
+            time_left,
             gw_w = WIDTH_GW,
             avg_w = WIDTH_AVERAGE,
             pts_w = WIDTH_POINTS,
@@ -99,4 +106,26 @@ pub async fn handle_status() -> Result<()> {
     }
 
     Ok(())
+}
+
+/// Build the padded "Time Left" cell, colored yellow under 24h and red under 1h
+fn time_left_cell(deadline_time: &str, now: DateTime<Utc>) -> String {
+    let Ok(deadline) = deadline_time.parse::<DateTime<Utc>>() else {
+        return format!("{:<width$}", "-", width = WIDTH_TIME_LEFT);
+    };
+
+    // Apply padding first, then color
+    let padded = format!(
+        "{:<width$}",
+        format_time_until(deadline, now),
+        width = WIDTH_TIME_LEFT
+    );
+    let remaining = deadline - now;
+    if remaining < Duration::hours(1) {
+        padded.red().to_string()
+    } else if remaining < Duration::hours(24) {
+        padded.yellow().to_string()
+    } else {
+        padded
+    }
 }

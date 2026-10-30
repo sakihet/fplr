@@ -4,6 +4,7 @@ pub mod event_helpers;
 pub mod expected_stat;
 pub mod fixture_helpers;
 pub mod formatters;
+pub mod manager_helpers;
 pub mod player_helpers;
 pub mod region_helpers;
 pub mod team_helpers;

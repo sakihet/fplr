@@ -50,6 +50,8 @@ enum Commands {
         #[arg(short, long, default_value = "20")]
         limit: usize,
     },
+    /// Show replacement candidates for my team (position, budget, club limit)
+    Buy(commands::BuyArgs),
     /// Manage the HTTP response cache
     Cache(commands::CacheArgs),
     /// Compare two players side-by-side
@@ -212,6 +214,8 @@ enum Commands {
     },
     /// Show season results matrix
     Results {},
+    /// Show sell candidates from my team (availability, fixtures, minutes)
+    Sell(commands::SellArgs),
     /// Show set piece takers (penalties, free kicks, corners)
     #[command(name = "set-piece")]
     SetPiece {
@@ -403,6 +407,7 @@ async fn run() -> Result<()> {
             all,
             limit,
         } => commands::handle_availability(team, name, news, position, all, limit).await?,
+        Commands::Buy(args) => commands::handle_buy(args).await?,
         Commands::Cache(args) => commands::handle_cache(args)?,
         Commands::Compare { id1, id2 } => commands::handle_compare(id1, id2).await?,
         Commands::Completions { shell } => {
@@ -488,6 +493,7 @@ async fn run() -> Result<()> {
             None => commands::handle_region().await?,
         },
         Commands::Results {} => commands::handle_results().await?,
+        Commands::Sell(args) => commands::handle_sell(args).await?,
         Commands::SetPiece { team, kind } => commands::handle_set_piece(team, kind).await?,
         Commands::Status {} => commands::handle_status().await?,
         Commands::Swing(args) => commands::handle_swing(args).await?,
