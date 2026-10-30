@@ -1,6 +1,10 @@
 # fplr - a CLI for [Fantasy Premier League](https://fantasy.premierleague.com/) in Rust
 
+[![crates.io](https://img.shields.io/crates/v/fplr.svg)](https://crates.io/crates/fplr)
+
 Browse FPL data comfortably from your terminal.
+
+Documentation: https://sakihet.github.io/fplr/
 
 ## Installation
 
@@ -9,6 +13,12 @@ Browse FPL data comfortably from your terminal.
 ```sh
 brew tap sakihet/tap
 brew install fplr
+```
+
+### Cargo
+
+```sh
+cargo install fplr
 ```
 
 ### From source

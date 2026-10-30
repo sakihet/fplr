@@ -5,6 +5,7 @@ edition = "2024"
 authors = ["saki"]
 description = "CLI for Fantasy Premier League"
 license = "MIT"
+homepage = "https://sakihet.github.io/fplr/"
 repository = "https://github.com/sakihet/fplr"
 keywords = ["fantasy-football", "football", "fpl", "premier-league", "soccer"]
 categories = ["command-line-utilities"]

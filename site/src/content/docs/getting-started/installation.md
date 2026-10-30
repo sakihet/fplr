@@ -10,6 +10,14 @@ brew tap sakihet/tap
 brew install fplr
 ```
 
+## Cargo
+
+Install from [crates.io](https://crates.io/crates/fplr). Requires a Rust toolchain.
+
+```sh
+cargo install fplr
+```
+
 ## From source
 
 Requires a Rust toolchain.
