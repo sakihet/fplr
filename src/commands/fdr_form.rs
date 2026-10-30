@@ -10,12 +10,7 @@ use crate::utils::formatters::{colorize_text_by_difficulty, format_datetime_loca
 use crate::utils::team_helpers::{create_team_ref_map, find_team_ids_by_name};
 use std::collections::HashMap;
 
-pub async fn handle_fdr_form(
-    team: Option<String>,
-    limit: usize,
-    from: Option<u64>,
-    _all: bool,
-) -> Result<()> {
+pub async fn handle_fdr_form(team: Option<String>, limit: usize, from: Option<u64>) -> Result<()> {
     let bootstrap_data = FplClient::fetch_bootstrap_static().await?;
     let team_map = create_team_ref_map(&bootstrap_data.teams);
     let fixtures = FplClient::fetch_fixtures().await?;
