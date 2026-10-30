@@ -23,7 +23,8 @@ After generating or modifying code: run `make fmt` then `make lint-fix`.
 
 ### Module layout
 
-- `src/main.rs` — `clap` CLI definition (`Args`/`Commands` enums) and top-level dispatch via `match`. All subcommands are defined here and routed to handlers.
+- `src/main.rs` — `clap` CLI definition (`Args`/`Commands` enums) and top-level dispatch via `match`. Flat subcommands are defined here and routed to handlers.
+- `src/cli/` — nested command groups (`player`, `team`, `fixture`). Each file defines a `*Args` struct, a `*Commands` enum and a `run` function that dispatches to handlers.
 - `src/api.rs` — `FplClient` struct with async methods that fetch JSON from `https://fantasy.premierleague.com/api`. Each endpoint maps to one method (e.g. `fetch_bootstrap_static`, `fetch_live`).
 - `src/models/` — serde structs for API responses (`api.rs`) and CLI types like `Position`, `SortBy` enums (`cli.rs`).
 - `src/commands/` — one file per subcommand, each exporting a `handle_*` async function. Commands fetch data via `FplClient`, compute derived stats, and print formatted tables.
@@ -40,7 +41,7 @@ After generating or modifying code: run `make fmt` then `make lint-fix`.
 
 - Use `WIDTH_*` constants from `src/utils/constants.rs` for all table column widths — never hardcode column widths.
 - Use `owo_colors` for terminal color output — no raw ANSI escape codes.
-- Keep CLI subcommands sorted alphabetically in `src/main.rs` (both the `Commands` enum variants and the `match` arms).
+- Keep CLI subcommands sorted alphabetically in `src/main.rs` and `src/cli/*.rs` (both the enum variants and the `match` arms).
 - Sort `match` arms alphabetically whenever possible.
 - Code comments in English only.
 
