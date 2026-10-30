@@ -1,0 +1,38 @@
+---
+title: fplr
+description: A CLI for Fantasy Premier League in Rust.
+template: splash
+hero:
+  tagline: Browse FPL data comfortably from your terminal.
+  actions:
+    - text: Get started
+      link: /fplr/getting-started/installation/
+      icon: right-arrow
+    - text: View on GitHub
+      link: https://github.com/sakihet/fplr
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+```sh
+brew tap sakihet/tap
+brew install fplr
+fplr status
+```
+
+<CardGrid>
+	<Card title="Players" icon="star">
+		Stats, trends, xG/xA analysis, availability and set piece takers.
+	</Card>
+	<Card title="Teams & fixtures" icon="list-format">
+		Fixture difficulty, swings, form, home/away splits and the league table.
+	</Card>
+	<Card title="Your squad" icon="seti:config">
+		My team, transfer history, buy and sell candidates, mini-leagues.
+	</Card>
+	<Card title="Live" icon="rocket">
+		Live gameweek stats, price changes and popular transfers.
+	</Card>
+</CardGrid>

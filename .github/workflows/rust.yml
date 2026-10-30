@@ -5,10 +5,12 @@ on:
     branches: [ "main" ]
     paths-ignore:
       - "*.md"
+      - "site/**"
   pull_request:
     branches: [ "main" ]
     paths-ignore:
       - "*.md"
+      - "site/**"
 
 env:
   CARGO_TERM_COLOR: always
