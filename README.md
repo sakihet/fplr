@@ -4,7 +4,7 @@
 
 Browse FPL data comfortably from your terminal.
 
-Documentation: https://sakihet.github.io/fplr/
+Documentation: https://fplr.sakih.net/
 
 ## Installation
 

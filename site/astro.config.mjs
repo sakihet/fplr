@@ -4,8 +4,7 @@ import starlight from '@astrojs/starlight';
 
 // https://astro.build/config
 export default defineConfig({
-	site: 'https://sakihet.github.io',
-	base: '/fplr',
+	site: 'https://fplr.sakih.net',
 	integrations: [
 		starlight({
 			title: 'fplr',
