@@ -9,6 +9,12 @@ export default defineConfig({
 		starlight({
 			title: 'fplr',
 			description: 'A CLI for Fantasy Premier League in Rust',
+			head: [
+				{
+					tag: 'meta',
+					attrs: { name: 'msvalidate.01', content: '27A88E3E926EA5F4AE9F04AD3397D0F7' },
+				},
+			],
 			social: [
 				{ icon: 'github', label: 'GitHub', href: 'https://github.com/sakihet/fplr' },
 				{ icon: 'seti:rust', label: 'crates.io', href: 'https://crates.io/crates/fplr' },
